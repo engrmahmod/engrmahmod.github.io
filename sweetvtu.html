@@ -694,7 +694,7 @@ function doSignup(){
   if(pass.length<4) return err.textContent='Password must be at least 4 characters.';
   const u = users();
   if(u[phone]) return err.textContent='This number is already registered. Sign in instead.';
-  u[phone] = {name, phone, email, pass, wallet:0};
+  u[phone] = {name, phone, email, pass, wallet:0, joined:new Date().toLocaleString('en-NG')};
   saveUsers(u); session=phone; DB.write('session', session);
   err.textContent=''; modal(true,'Welcome, '+name.split(' ')[0]+'!','Your SWEETVTU account is ready. Fund your wallet to start buying.');
   show('v-dash');
