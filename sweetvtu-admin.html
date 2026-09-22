@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SWEETVTU — Admin Panel</title>
+<style>
+  :root{
+    --bg:#0f0f1e; --bg2:#141428; --card:#1b1b30; --line:rgba(255,255,255,.09);
+    --text:#f4f4fa; --muted:#9a9ab5; --pink:#ff4d88; --pink2:#ff7ab0;
+    --gold:#ffc94d; --green:#2fd27d; --red:#ff5d5d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;min-height:100vh}
+  .shell{max-width:560px;margin:0 auto;min-height:100vh;padding:0 18px 60px}
+  .view{display:none;animation:fade .25s ease}
+  .view.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .app-head{padding:22px 0 6px;display:flex;align-items:center;justify-content:space-between}
+  .alogo{font-weight:900;font-size:1.35rem;letter-spacing:1px}
+  .alogo span{color:var(--pink)}
+  .badge{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,var(--gold),#ff9d42);color:#3a2200;padding:6px 12px;border-radius:999px;margin:14px 0}
+  h2{margin:6px 0 4px}
+  .sub{color:var(--muted);font-size:.9rem;margin-bottom:20px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:700}
+  .field input{width:100%;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:1rem}
+  .field input:focus{outline:none;border-color:var(--pink)}
+  .err{color:var(--red);font-size:.85rem;min-height:20px;margin-bottom:8px;font-weight:700}
+  .btn{width:100%;padding:16px;border:none;border-radius:14px;font-size:1.02rem;font-weight:900;cursor:pointer;
+    background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;margin-top:6px}
+  .btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--text)}
+  .btn.danger{background:rgba(255,93,93,.12);border:1px solid var(--red);color:var(--red)}
+  .btn.small{width:auto;padding:9px 14px;font-size:.82rem;border-radius:10px;margin:0}
+  .note{background:rgba(255,201,77,.08);border:1px solid rgba(255,201,77,.25);border-radius:12px;padding:14px;font-size:.85rem;color:var(--muted);margin-top:16px;line-height:1.5}
+  .note b{color:var(--gold)}
+  .tabs{display:flex;gap:8px;margin:18px 0;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5}
+  .tab{flex:1;text-align:center;padding:11px 4px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.78rem;cursor:pointer;color:var(--muted)}
+  .tab.on{background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;border:none}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 14px}
+  .stat small{color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+  .stat div{font-size:1.35rem;font-weight:900;margin-top:6px}
+  .stat div.g{color:var(--green)} .stat div.r{color:var(--red)} .stat div.y{color:var(--gold)}
+  .ucard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
+  .ucard .nm{font-weight:900;font-size:1.02rem}
+  .ucard .ph{color:var(--pink2);font-size:.85rem;font-weight:700}
+  .ucard .meta{color:var(--muted);font-size:.82rem;margin:6px 0 4px;line-height:1.6}
+  .ucard .wal{font-weight:900;color:var(--gold);margin:4px 0 12px}
+  .uacts{display:flex;gap:8px;flex-wrap:wrap}
+  .txgroup{margin-bottom:18px}
+  .txgroup h4{color:var(--muted);font-size:.8rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+  .tx{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:12px 14px;margin-bottom:8px;gap:10px}
+  .tx .t-main b{display:block;font-size:.88rem}
+  .tx .t-main small{color:var(--muted);font-size:.75rem}
+  .amt{font-weight:900;white-space:nowrap}
+  .amt.in{color:var(--green)} .amt.out{color:var(--red)}
+  .empty{text-align:center;color:var(--muted);padding:34px 10px;font-size:.9rem;line-height:1.7}
+  .sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+  .sec h3{margin-bottom:6px;font-size:1rem}
+  .sec p{color:var(--muted);font-size:.85rem;margin-bottom:12px;line-height:1.5}
+  .foot{text-align:center;color:var(--muted);font-size:.78rem;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="shell">
+
+  <!-- LOGIN -->
+  <div class="view active" id="a-login">
+    <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div></div>
+    <div class="badge">ADMIN AREA</div>
+    <h2>🔐 Admin login</h2>
+    <p class="sub">Only you should ever open this page. Do not share its link.</p>
+    <div class="field"><label>Admin password</label><input id="ap-pass" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+    <div class="err" id="ap-err"></div>
+    <button class="btn" onclick="doAdminLogin()">Log In</button>
+    <div class="note">First time? Default password is <b>admin123</b>.<br>Change it immediately in <b>Settings</b> after logging in.</div>
+  </div>
+
+  <!-- PANEL -->
+  <div class="view" id="a-panel">
+    <div class="app-head">
+      <div class="alogo">Admin <span>Panel</span></div>
+      <button class="btn small ghost" onclick="doAdminLogout()">Log out</button>
+    </div>
+    <div class="badge">DEMO MODE — THIS BROWSER'S DATA ONLY</div>
+
+    <div class="tabs">
+      <div class="tab on" id="atab-over" onclick="atab('over')">📊 Overview</div>
+      <div class="tab" id="atab-users" onclick="atab('users')">👥 Users</div>
+      <div class="tab" id="atab-tx" onclick="atab('tx')">🧾 Transactions</div>
+      <div class="tab" id="atab-set" onclick="atab('set')">⚙️ Settings</div>
+    </div>
+
+    <div id="t-over"></div>
+    <div id="t-users" style="display:none"></div>
+    <div id="t-tx" style="display:none"></div>
+
+    <div id="t-set" style="display:none">
+      <div class="sec">
+        <h3>🔑 Change admin password</h3>
+        <p>Pick something only you know.</p>
+        <div class="field"><label>Current password</label><input id="as-cur" type="password"></div>
+        <div class="field"><label>New password</label><input id="as-new" type="password" placeholder="Min. 6 characters"></div>
+        <div class="err" id="as-err"></div>
+        <button class="btn" onclick="admChangePw()">Update Password</button>
+      </div>
+      <div class="sec">
+        <h3>💾 Backup data</h3>
+        <p>Download all users and transactions as a file.</p>
+        <button class="btn ghost" onclick="admExport()">Download Backup (JSON)</button>
+      </div>
+      <div class="sec">
+        <h3 style="color:var(--red)">🗑️ Danger zone</h3>
+        <p>Delete every user and transaction stored in this browser. Cannot be undone.</p>
+        <button class="btn danger" onclick="admClear()">Clear All Demo Data</button>
+      </div>
+    </div>
+
+    <div class="foot">SWEETVTU Admin · Developed by Engr Mahmod</div>
+  </div>
+
+</div>
+
+<script>
+const DB = {
+  read(k,d){ try{ const v=JSON.parse(localStorage.getItem('sv_'+k)); return v==null?d:v }catch(e){ return d } },
+  write(k,v){ localStorage.setItem('sv_'+k, JSON.stringify(v)) }
+};
+const $ = id => document.getElementById(id);
+const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
+const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const users = () => DB.read('users',{});
+const saveUsers = u => DB.write('users',u);
+const txs = () => DB.read('txs',{});
+const saveTxs = t => DB.write('txs',t);
+const adminPw = () => DB.read('adminpw','admin123');
+
+function show(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  $(id).classList.add('active'); window.scrollTo(0,0);
+}
+function doAdminLogin(){
+  const p = $('ap-pass').value;
+  if(p === adminPw()){ $('ap-err').textContent=''; $('ap-pass').value=''; DB.write('admin','1'); show('a-panel'); renderAll(); }
+  else $('ap-err').textContent = 'Wrong password. Try again.';
+}
+function doAdminLogout(){ DB.write('admin',null); show('a-login'); }
+
+function atab(t){
+  ['over','users','tx','set'].forEach(k=>{
+    $('atab-'+k).classList.toggle('on', k===t);
+    $('t-'+k).style.display = k===t ? 'block' : 'none';
+  });
+  window.scrollTo(0,0);
+}
+function renderAll(){ renderOver(); renderUsers(); renderTx(); }
+
+function renderOver(){
+  const u = users(), t = txs(), phones = Object.keys(u);
+  let ntx=0, tin=0, tout=0, wal=0;
+  phones.forEach(ph=>{
+    wal += Number(u[ph].wallet)||0;
+    (t[ph]||[]).forEach(x=>{ ntx++; if(x.dir==='in') tin+=Number(x.amount)||0; else tout+=Number(x.amount)||0; });
+  });
+  $('t-over').innerHTML = `<div class="stats">
+    <div class="stat"><small>Total users</small><div>${phones.length}</div></div>
+    <div class="stat"><small>Transactions</small><div>${ntx}</div></div>
+    <div class="stat"><small>Money in</small><div class="g">${naira(tin)}</div></div>
+    <div class="stat"><small>Money out</small><div class="r">${naira(tout)}</div></div>
+    <div class="stat"><small>Wallets total</small><div class="y">${naira(wal)}</div></div>
+    <div class="stat"><small>Net volume</small><div>${naira(tin+tout)}</div></div>
+  </div>
+  <div class="note">Figures cover accounts created <b>in this browser</b> (demo storage). A backend will be needed to see every user on every phone.</div>`;
+}
+
+function renderUsers(){
+  const u = users(), phones = Object.keys(u);
+  if(!phones.length){ $('t-users').innerHTML = '<div class="empty">No users yet.<br>Accounts created on the website (this browser) will appear here.</div>'; return; }
+  $('t-users').innerHTML = phones.map(ph=>{
+    const m = u[ph];
+    return `<div class="ucard">
+      <div class="nm">${esc(m.name)}</div>
+      <div class="ph">${esc(ph)}</div>
+      <div class="meta">📧 ${esc(m.email||'—')}<br>📅 Joined: ${esc(m.joined||'—')}</div>
+      <div class="wal">Wallet: ${naira(m.wallet)}</div>
+      <div class="uacts">
+        <button class="btn small ghost" onclick="admResetPw('${esc(ph)}')">🔑 Reset password</button>
+        <button class="btn small ghost" onclick="admAdjust('${esc(ph)}')">💰 Adjust wallet</button>
+        <button class="btn small danger" onclick="admDelete('${esc(ph)}')">🗑️ Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function admResetPw(ph){
+  const u = users(); if(!u[ph]) return;
+  const np = prompt('New password for '+u[ph].name+' ('+ph+')\nMin. 4 characters:');
+  if(np===null) return;
+  if(np.length<4){ alert('Password must be at least 4 characters.'); return; }
+  u[ph].pass = np; saveUsers(u);
+  alert('Password updated for '+u[ph].name+'.');
+}
+function admAdjust(ph){
+  const u = users(); if(!u[ph]) return;
+  const v = prompt('Adjust wallet for '+u[ph].name+'\nCurrent: '+naira(u[ph].wallet)+'\nEnter amount (negative deducts, e.g. -500):','0');
+  if(v===null) return;
+  const amt = parseInt(v,10);
+  if(isNaN(amt)||amt===0){ alert('Enter a non-zero amount.'); return; }
+  u[ph].wallet = (Number(u[ph].wallet)||0) + amt; saveUsers(u);
+  const t = txs(); const mine = t[ph]||[];
+  mine.unshift({type:'fund', desc:'Admin wallet adjustment', amount:Math.abs(amt), dir: amt>0?'in':'out', date:new Date().toLocaleString('en-NG')});
+  t[ph]=mine; saveTxs(t);
+  renderAll(); alert('Wallet updated. New balance: '+naira(u[ph].wallet));
+}
+function admDelete(ph){
+  const u = users(); if(!u[ph]) return;
+  if(!confirm('Delete '+u[ph].name+' ('+ph+') and all their transactions?\nThis cannot be undone.')) return;
+  delete u[ph]; saveUsers(u);
+  const t = txs(); delete t[ph]; saveTxs(t);
+  renderAll();
+}
+
+function renderTx(){
+  const u = users(), t = txs(), phones = Object.keys(u);
+  let html = '';
+  phones.forEach(ph=>{
+    const list = t[ph]||[];
+    if(!list.length) return;
+    html += `<div class="txgroup"><h4>${esc(u[ph].name)} · ${esc(ph)}</h4>` +
+      list.map(x=>`<div class="tx"><div class="t-main"><b>${esc(x.desc)}</b><small>${esc(x.date)}</small></div>
+        <div class="amt ${x.dir}">${x.dir==='in'?'+':'−'}${naira(x.amount)}</div></div>`).join('') + `</div>`;
+  });
+  $('t-tx').innerHTML = html || '<div class="empty">No transactions yet.</div>';
+}
+
+function admChangePw(){
+  const cur = $('as-cur').value, nw = $('as-new').value, err = $('as-err');
+  if(cur !== adminPw()){ err.textContent='Current password is wrong.'; return; }
+  if(nw.length<6){ err.textContent='New password must be at least 6 characters.'; return; }
+  DB.write('adminpw', nw);
+  $('as-cur').value=''; $('as-new').value=''; err.textContent='';
+  alert('Admin password updated.');
+}
+function admExport(){
+  const data = {exportedAt:new Date().toISOString(), users:users(), transactions:txs()};
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'sweetvtu-backup.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+}
+function admClear(){
+  if(!confirm('Delete ALL users and transactions in this browser?')) return;
+  if(!confirm('Are you really sure? This cannot be undone.')) return;
+  DB.write('users',{}); DB.write('txs',{}); renderAll();
+  alert('All demo data cleared.');
+}
+
+if(DB.read('admin',null)==='1'){ show('a-panel'); renderAll(); }
+</script>
+</body>
+</html>
