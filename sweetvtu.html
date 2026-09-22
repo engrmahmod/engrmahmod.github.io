@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SWEETVTU — Sweet Prices. Sweet Service.</title>
+<meta name="description" content="SWEETVTU: cheap data, airtime, cable TV subscriptions and electricity bills — instantly, at unbeatable prices.">
+<style>
+  :root{
+    --bg:#0e0718; --bg2:#150b26; --card:#1b1030; --card2:#231543; --line:#35245c;
+    --pink:#ff4d88; --pink2:#ff7aae; --purple:#8b3dff; --gold:#ffc542;
+    --green:#2fd67c; --red:#ff5d6c; --text:#f8f4ff; --muted:#bda9dd; --radius:20px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+
+  /* ================= WEBSITE ================= */
+  nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(14,7,24,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:15px 22px}
+  .logo{font-weight:900;font-size:1.3rem;letter-spacing:1.5px;text-decoration:none}
+  .logo span{color:var(--pink)}
+  .navlinks{display:flex;gap:26px;font-size:.93rem;color:var(--muted)}
+  .navlinks a{text-decoration:none;transition:color .2s;cursor:pointer}
+  .navlinks a:hover{color:var(--pink2)}
+  .nav-cta{background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;font-weight:800;
+    padding:11px 26px;border-radius:999px;font-size:.9rem;box-shadow:0 8px 24px rgba(255,77,136,.35);transition:transform .15s;cursor:pointer;text-decoration:none}
+  .nav-cta:hover{transform:translateY(-2px)}
+  .burger{display:none;background:none;border:none;color:var(--text);font-size:1.5rem;cursor:pointer}
+  @media(max-width:820px){
+    .navlinks{display:none;position:absolute;top:100%;left:0;right:0;background:var(--bg2);flex-direction:column;
+      padding:18px 22px;gap:16px;border-bottom:1px solid var(--line)}
+    .navlinks.open{display:flex}
+    .burger{display:block}
+    .nav-cta{display:none}
+  }
+  .hero{position:relative;padding:150px 0 90px;overflow:hidden;
+    background:radial-gradient(900px 480px at 15% 0%,#3b1450 0%,transparent 60%),
+               radial-gradient(800px 420px at 90% 20%,#2a0f4d 0%,transparent 60%),var(--bg)}
+  .hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:50px;align-items:center}
+  @media(max-width:900px){.hero .wrap{grid-template-columns:1fr}}
+  .pill{display:inline-block;background:rgba(255,77,136,.12);border:1px solid rgba(255,77,136,.4);color:var(--pink2);
+    font-size:.78rem;font-weight:800;letter-spacing:2px;padding:8px 18px;border-radius:999px;margin-bottom:20px}
+  .hero h1{font-size:clamp(2.3rem,5vw,3.6rem);line-height:1.12;font-weight:900;margin-bottom:18px}
+  .hero h1 .grad{background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p.sub{color:var(--muted);font-size:1.08rem;max-width:480px;margin-bottom:32px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap}
+  .btn{display:inline-block;padding:15px 34px;border-radius:999px;font-weight:800;font-size:1rem;transition:transform .15s,box-shadow .15s;cursor:pointer;text-decoration:none;border:none}
+  .btn-pink{background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;box-shadow:0 12px 32px rgba(255,77,136,.4)}
+  .btn-pink:hover{transform:translateY(-3px)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(255,255,255,.03)}
+  .btn-ghost:hover{border-color:var(--pink)}
+  .hero-stats{display:flex;gap:38px;margin-top:44px}
+  .hero-stats div b{display:block;font-size:1.6rem;color:var(--gold)}
+  .hero-stats div small{color:var(--muted);font-size:.82rem}
+  .phone-wrap{display:flex;justify-content:center;position:relative}
+  .mphone{width:280px;height:580px;background:#0a0512;border-radius:44px;border:10px solid #2c1c4d;position:relative;
+    box-shadow:0 40px 100px rgba(255,77,136,.25);overflow:hidden}
+  .mphone .notch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:110px;height:24px;background:#2c1c4d;border-radius:999px;z-index:2}
+  .scr{padding:44px 16px 16px;height:100%;background:linear-gradient(180deg,#1d0f33,#120826)}
+  .scr .mini-logo{font-weight:900;letter-spacing:1px;font-size:.95rem;margin-bottom:12px}
+  .scr .mini-logo span{color:var(--pink)}
+  .mini-wallet{background:linear-gradient(135deg,#ff4d88,#8b3dff);border-radius:16px;padding:16px;margin-bottom:14px}
+  .mini-wallet small{font-size:.62rem;opacity:.85;letter-spacing:1px}
+  .mini-wallet b{font-size:1.4rem;display:block}
+  .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .mini-svc{background:#2b1b4d;border-radius:12px;padding:12px 6px;text-align:center;font-size:.68rem}
+  .mini-svc div{font-size:1.3rem;margin-bottom:4px}
+  .float-card{position:absolute;background:rgba(27,16,48,.95);border:1px solid var(--line);border-radius:14px;
+    padding:10px 16px;font-size:.78rem;font-weight:700;box-shadow:0 14px 40px rgba(0,0,0,.5);animation:float 4s ease-in-out infinite}
+  .float-card small{color:var(--muted);display:block;font-weight:400}
+  .fc1{top:70px;left:-30px}.fc2{bottom:110px;right:-24px;animation-delay:2s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+  @media(max-width:900px){.phone-wrap{margin-top:20px}.fc1{left:0}.fc2{right:0}}
+  .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg2);padding:20px 0;overflow:hidden}
+  .strip .wrap{display:flex;gap:44px;justify-content:center;flex-wrap:wrap;color:var(--muted);font-weight:800;letter-spacing:1px;font-size:.9rem}
+  .strip span b{color:var(--gold)}
+  section{padding:88px 0}
+  .kicker{color:var(--pink2);font-weight:800;font-size:.82rem;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;text-align:center}
+  h2.sec{font-size:clamp(1.7rem,3.4vw,2.5rem);text-align:center;margin-bottom:14px;font-weight:900}
+  p.lead{color:var(--muted);text-align:center;max-width:640px;margin:0 auto 46px}
+  .svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+  .svc-card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 28px;transition:transform .2s,border-color .2s,box-shadow .2s}
+  .svc-card:hover{transform:translateY(-8px);border-color:var(--pink);box-shadow:0 24px 60px rgba(255,77,136,.15)}
+  .svc-ic{width:62px;height:62px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:18px}
+  .i1{background:linear-gradient(135deg,#ff4d88,#a83a6e)} .i2{background:linear-gradient(135deg,#e8a020,#b06a00)}
+  .i3{background:linear-gradient(135deg,#5b2ee5,#2e7de5)} .i4{background:linear-gradient(135deg,#d6a400,#8a6d00)}
+  .svc-card h3{margin-bottom:10px;font-size:1.2rem}
+  .svc-card p{color:var(--muted);font-size:.93rem}
+  .svc-card ul{list-style:none;margin-top:14px}
+  .svc-card li{color:#cdbcec;font-size:.88rem;padding:5px 0}
+  .svc-card li::before{content:'✓ ';color:var(--gold);font-weight:800}
+  #pricing{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .tabs{display:flex;gap:12px;justify-content:center;margin-bottom:30px}
+  .tab{padding:12px 34px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-weight:800;cursor:pointer;color:var(--muted);transition:all .2s}
+  .tab.on{background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;border-color:transparent;box-shadow:0 8px 24px rgba(255,77,136,.35)}
+  .price-table{max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:none}
+  .price-table.on{display:block;animation:fade .3s}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .pt-head{padding:20px 26px;background:linear-gradient(135deg,rgba(255,77,136,.18),rgba(139,61,255,.18));font-weight:900;font-size:1.15rem;display:flex;justify-content:space-between;align-items:center}
+  .pt-head small{color:var(--gold);font-size:.78rem;letter-spacing:1px}
+  .pt-row{display:flex;justify-content:space-between;align-items:center;padding:15px 26px;border-top:1px solid var(--line)}
+  .pt-row b{font-size:1.05rem}
+  .pt-row .pr{color:var(--gold);font-weight:900;font-size:1.1rem}
+  .pt-foot{padding:18px 26px;text-align:center;border-top:1px solid var(--line)}
+  .pt-foot a{color:var(--pink2);font-weight:800;text-decoration:none;cursor:pointer}
+  .price-note{text-align:center;color:var(--muted);font-size:.85rem;margin-top:22px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;counter-reset:step}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px 28px;position:relative}
+  .step::before{counter-increment:step;content:counter(step);position:absolute;top:-22px;left:28px;width:44px;height:44px;border-radius:50%;
+    background:linear-gradient(135deg,var(--pink),#d63a72);display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1.2rem;box-shadow:0 8px 20px rgba(255,77,136,.4)}
+  .step h3{margin:8px 0 10px}
+  .step p{color:var(--muted);font-size:.93rem}
+  #why{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+  .why{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px}
+  .why .wi{font-size:2rem;margin-bottom:12px}
+  .why h3{margin-bottom:8px;font-size:1.08rem}
+  .why p{color:var(--muted);font-size:.9rem}
+  .faq{max-width:720px;margin:0 auto}
+  .qa{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+  .qa button{width:100%;background:none;border:none;color:var(--text);text-align:left;padding:18px 22px;font-size:1rem;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .qa button span{color:var(--pink);font-size:1.3rem;flex:none}
+  .qa .ans{max-height:0;overflow:hidden;transition:max-height .3s ease;color:var(--muted);font-size:.93rem}
+  .qa .ans p{padding:0 22px 20px}
+  .qa.open .ans{max-height:220px}
+  .cta-big{background:linear-gradient(135deg,#ff4d88,#8b3dff 70%,#5b2ee5);border-radius:28px;padding:64px 30px;text-align:center;position:relative;overflow:hidden}
+  .cta-big::before{content:'';position:absolute;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.1);top:-140px;right:-100px}
+  .cta-big h2{font-size:clamp(1.8rem,4vw,2.6rem);margin-bottom:12px;font-weight:900}
+  .cta-big p{opacity:.92;margin-bottom:30px;max-width:520px;margin-left:auto;margin-right:auto}
+  .cta-big .btn{background:#fff;color:#d63a72;box-shadow:0 14px 40px rgba(0,0,0,.3)}
+  footer{border-top:1px solid var(--line);padding:50px 0 30px;background:var(--bg2)}
+  .f-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:30px;margin-bottom:36px}
+  @media(max-width:700px){.f-grid{grid-template-columns:1fr}}
+  .f-grid h4{margin-bottom:14px;font-size:.95rem}
+  .f-grid a{display:block;color:var(--muted);text-decoration:none;font-size:.9rem;padding:4px 0;cursor:pointer}
+  .f-grid a:hover{color:var(--pink2)}
+  .f-grid p{color:var(--muted);font-size:.9rem}
+  .f-bottom{border-top:1px solid var(--line);padding-top:22px;text-align:center;color:var(--muted);font-size:.85rem}
+  .wa-float{position:fixed;right:20px;bottom:20px;width:60px;height:60px;border-radius:50%;background:#25d366;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 12px 34px rgba(37,211,102,.45);z-index:90;transition:transform .15s}
+  .wa-float:hover{transform:scale(1.1)}
+  .wa-float svg{width:30px;height:30px;fill:#fff}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+  .reveal.in{opacity:1;transform:none}
+
+  /* ================= APP (scoped) ================= */
+  #appmode{background:var(--bg)}
+  #appmode .ashell{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg)}
+  #appmode .view{display:none;padding:0 20px 110px;animation:fade .25s ease}
+  #appmode .view.active{display:block}
+  #appmode .demo-badge{position:sticky;top:0;z-index:40;text-align:center;font-size:.72rem;font-weight:800;letter-spacing:2px;
+    background:linear-gradient(90deg,var(--gold),#ff9d42);color:#3a2200;padding:6px}
+  #appmode .app-head{padding:22px 0 6px;display:flex;align-items:center;justify-content:space-between}
+  #appmode .alogo{font-weight:900;font-size:1.35rem;letter-spacing:1px}
+  #appmode .alogo span{color:var(--pink)}
+  #appmode .hello{color:var(--muted);font-size:.9rem}
+  #appmode .hello b{color:var(--text)}
+  #appmode .wallet{margin:16px 0;background:linear-gradient(135deg,#ff4d88,#b04dff 60%,#5b2ee5);border-radius:var(--radius);
+    padding:24px 22px;box-shadow:0 14px 40px rgba(255,77,136,.3);position:relative;overflow:hidden}
+  #appmode .wallet::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12)}
+  #appmode .wallet small{opacity:.85;font-size:.8rem;letter-spacing:1px}
+  #appmode .wallet .bal{font-size:2.2rem;font-weight:900;margin:4px 0 14px}
+  #appmode .wallet .row{display:flex;gap:10px}
+  #appmode .wbtn{flex:1;text-align:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;
+    padding:11px;border-radius:12px;font-weight:800;font-size:.9rem;cursor:pointer}
+  #appmode .wbtn:active{transform:scale(.97)}
+  #appmode .sec-title{font-size:1.05rem;font-weight:800;margin:22px 0 12px}
+  #appmode .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  #appmode .svc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 14px;text-align:center;cursor:pointer;transition:transform .15s}
+  #appmode .svc:active{transform:scale(.96)}
+  #appmode .svc .ic{font-size:2rem;margin-bottom:8px}
+  #appmode .svc b{font-size:.92rem;display:block}
+  #appmode .svc small{color:var(--muted);font-size:.75rem}
+  #appmode .field{margin-bottom:14px}
+  #appmode .field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:700}
+  #appmode .field input,#appmode .field select{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);
+    padding:14px;border-radius:12px;font-size:1rem;outline:none}
+  #appmode .field input:focus,#appmode .field select:focus{border-color:var(--pink)}
+  #appmode .btn{width:100%;padding:16px;border:none;border-radius:14px;font-size:1.02rem;font-weight:900;cursor:pointer;
+    background:linear-gradient(135deg,var(--pink),#c93a72);color:#fff;box-shadow:0 10px 26px rgba(255,77,136,.35);margin-top:6px}
+  #appmode .btn:active{transform:scale(.98)}
+  #appmode .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--text)}
+  #appmode .link{text-align:center;margin-top:16px;color:var(--muted);font-size:.92rem}
+  #appmode .link a{color:var(--pink2);font-weight:800;text-decoration:none;cursor:pointer}
+  #appmode .net-tabs{display:flex;gap:10px;margin-bottom:16px}
+  #appmode .net-tab{flex:1;text-align:center;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:800;cursor:pointer}
+  #appmode .net-tab.on{border-color:var(--pink);background:#3a1c4e;color:#fff}
+  #appmode .plan{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer}
+  #appmode .plan.on{border-color:var(--pink);background:#3a1c4e}
+  #appmode .plan b{font-size:1.05rem}
+  #appmode .plan span{color:var(--gold);font-weight:800}
+  #appmode .plan small{display:block;color:var(--muted);font-size:.75rem}
+  #appmode .banner{border-radius:var(--radius);padding:22px;margin:16px 0;color:#fff}
+  #appmode .banner h2{font-size:1.3rem;margin-bottom:4px}
+  #appmode .banner p{font-size:.88rem;opacity:.9}
+  #appmode .b-data{background:linear-gradient(135deg,#ff4d88,#a83a6e)}
+  #appmode .b-air{background:linear-gradient(135deg,#e8a020,#b06a00)}
+  #appmode .b-cable{background:linear-gradient(135deg,#5b2ee5,#2e7de5)}
+  #appmode .b-power{background:linear-gradient(135deg,#d6a400,#8a6d00)}
+  #appmode .back{background:none;border:none;color:var(--muted);font-size:.95rem;margin:14px 0 0;cursor:pointer;font-weight:700}
+  #appmode .back::before{content:'← '}
+  #appmode .tx{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
+    border-radius:14px;padding:14px 16px;margin-bottom:10px}
+  #appmode .tx .t-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--card2);margin-right:12px}
+  #appmode .tx .t-main{flex:1}
+  #appmode .tx b{font-size:.92rem;display:block}
+  #appmode .tx small{color:var(--muted);font-size:.75rem}
+  #appmode .tx .amt{font-weight:900}
+  #appmode .tx .amt.out{color:var(--red)} #appmode .tx .amt.in{color:var(--green)}
+  #appmode .empty{text-align:center;color:var(--muted);padding:40px 0}
+  #appmode .anav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:50;
+    background:rgba(21,10,36,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    display:flex;padding:10px 6px calc(10px + env(safe-area-inset-bottom))}
+  #appmode .anav button{flex:1;background:none;border:none;color:var(--muted);font-size:.68rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+  #appmode .anav button .ni{font-size:1.35rem}
+  #appmode .anav button.on{color:var(--pink)}
+  #appmode .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
+  #appmode .modal-bg.show{display:flex}
+  #appmode .modal{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px 24px;max-width:380px;width:100%;text-align:center;animation:fade .25s}
+  #appmode .modal .m-ic{font-size:3rem;margin-bottom:12px}
+  #appmode .modal h3{margin-bottom:8px}
+  #appmode .modal p{color:var(--muted);font-size:.92rem;margin-bottom:20px}
+  #appmode .note{background:#2b1b10;border:1px solid #6b4a1f;color:#ffcf7a;border-radius:12px;padding:12px 14px;font-size:.82rem;margin:14px 0}
+  #appmode .err{color:var(--red);font-size:.85rem;margin-top:10px;min-height:20px;text-align:center}
+</style>
+</head>
+<body>
+
+<!-- ==================== WEBSITE ==================== -->
+<div id="sitemode">
+<nav>
+  <div class="wrap">
+    <a class="logo" onclick="go('site')">SWEET<span>VTU</span></a>
+    <div class="navlinks" id="navlinks">
+      <a href="#services">Services</a><a href="#pricing">Prices</a><a href="#how">How it works</a>
+      <a href="#why">Why us</a><a href="#faq">FAQ</a>
+    </div>
+    <a class="nav-cta" onclick="go('v-signup')">Get Started</a>
+    <button class="burger" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="reveal in">
+      <span class="pill">● NIGERIA'S SWEETEST VTU</span>
+      <h1>Top up everything.<br><span class="grad">Pay sweet prices.</span></h1>
+      <p class="sub">Cheap mobile data, airtime, cable TV subscriptions and electricity bills — delivered instantly. Create your free account and get your own wallet &amp; dashboard.</p>
+      <div class="cta-row">
+        <a class="btn btn-pink" onclick="go('v-signup')">Create Free Account</a>
+        <a class="btn btn-ghost" href="#pricing">See Prices</a>
+      </div>
+      <div class="hero-stats">
+        <div><b>₦130</b><small>Data starting price</small></div>
+        <div><b>4</b><small>Services in one app</small></div>
+        <div><b>24/7</b><small>Always available</small></div>
+      </div>
+    </div>
+    <div class="phone-wrap reveal in">
+      <div class="float-card fc1">⚡ Data delivered<small>MTN 1GB · just now</small></div>
+      <div class="mphone">
+        <div class="notch"></div>
+        <div class="scr">
+          <div class="mini-logo">SWEET<span>VTU</span></div>
+          <div class="mini-wallet"><small>WALLET BALANCE</small><b>₦12,450</b></div>
+          <div class="mini-grid">
+            <div class="mini-svc"><div>📶</div>Data</div>
+            <div class="mini-svc"><div>📞</div>Airtime</div>
+            <div class="mini-svc"><div>📺</div>Cable TV</div>
+            <div class="mini-svc"><div>💡</div>Electricity</div>
+          </div>
+        </div>
+      </div>
+      <div class="float-card fc2">💰 Wallet funded<small>₦5,000 · just now</small></div>
+    </div>
+  </div>
+</header>
+
+<div class="strip">
+  <div class="wrap">
+    <span><b>MTN</b></span><span><b>Airtel</b></span><span><b>Glo</b></span><span><b>9mobile</b></span>
+    <span><b>DStv</b></span><span><b>GOtv</b></span><span><b>Startimes</b></span><span><b>KEDCO</b></span>
+  </div>
+</div>
+
+<section id="services">
+  <div class="wrap">
+    <div class="kicker reveal">Our services</div>
+    <h2 class="sec reveal">One account. Everything you recharge.</h2>
+    <p class="lead reveal">Sign up once — get your wallet and dashboard, then buy data, airtime, cable and power anytime.</p>
+    <div class="svc-grid">
+      <div class="svc-card reveal">
+        <div class="svc-ic i1">📶</div>
+        <h3>Buy Data</h3>
+        <p>Super-cheap SME &amp; Corporate data for MTN and Airtel, delivered to any number in seconds.</p>
+        <ul><li>From just ₦130</li><li>30-day validity</li><li>Send to family &amp; friends</li></ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-ic i2">📞</div>
+        <h3>Airtime Top-Up</h3>
+        <p>Instant airtime recharge across all Nigerian networks, any amount, any time.</p>
+        <ul><li>MTN · Airtel · Glo · 9mobile</li><li>From ₦50</li><li>Instant delivery</li></ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-ic i3">📺</div>
+        <h3>Cable TV</h3>
+        <p>Renew DStv, GOtv and Startimes subscriptions without leaving your couch.</p>
+        <ul><li>All bouquets</li><li>Instant activation</li><li>Never miss a match</li></ul>
+      </div>
+      <div class="svc-card reveal">
+        <div class="svc-ic i4">💡</div>
+        <h3>Electricity Bills</h3>
+        <p>Pay NEPA bills for prepaid and postpaid meters across all distribution companies.</p>
+        <ul><li>All DisCos covered</li><li>Token via SMS</li><li>No more darkness</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="kicker reveal">Pricing</div>
+    <h2 class="sec reveal">Sweet prices, no stories.</h2>
+    <p class="lead reveal">Real prices. What you see is what you pay.</p>
+    <div class="tabs reveal">
+      <div class="tab on" onclick="priceTab('mtn',this)">MTN</div>
+      <div class="tab" onclick="priceTab('airtel',this)">Airtel</div>
+    </div>
+    <div class="price-table on reveal" id="pt-mtn">
+      <div class="pt-head">📶 MTN Data <small>SME · 30 DAYS</small></div>
+      <div class="pt-row"><div><b>500MB</b></div><span class="pr">₦130</span></div>
+      <div class="pt-row"><div><b>1GB</b></div><span class="pr">₦235</span></div>
+      <div class="pt-row"><div><b>2GB</b></div><span class="pr">₦470</span></div>
+      <div class="pt-row"><div><b>3GB</b></div><span class="pr">₦705</span></div>
+      <div class="pt-row"><div><b>5GB</b></div><span class="pr">₦1,175</span></div>
+      <div class="pt-row"><div><b>10GB</b></div><span class="pr">₦2,350</span></div>
+      <div class="pt-foot"><a onclick="go('v-signup')">Create account to buy →</a></div>
+    </div>
+    <div class="price-table reveal" id="pt-airtel">
+      <div class="pt-head">📶 Airtel Data <small>CORPORATE · 30 DAYS</small></div>
+      <div class="pt-row"><div><b>500MB</b></div><span class="pr">₦140</span></div>
+      <div class="pt-row"><div><b>1GB</b></div><span class="pr">₦250</span></div>
+      <div class="pt-row"><div><b>2GB</b></div><span class="pr">₦500</span></div>
+      <div class="pt-row"><div><b>5GB</b></div><span class="pr">₦1,250</span></div>
+      <div class="pt-foot"><a onclick="go('v-signup')">Create account to buy →</a></div>
+    </div>
+    <p class="price-note reveal">Airtime, cable &amp; electricity prices live inside your dashboard.</p>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <div class="kicker reveal">How it works</div>
+    <h2 class="sec reveal">Sweetly simple.</h2>
+    <p class="lead reveal">From zero to topped-up in under two minutes.</p>
+    <div class="steps">
+      <div class="step reveal"><h3>Create your account</h3><p>Sign up free with your name, number and email. No wahala, no paperwork.</p></div>
+      <div class="step reveal"><h3>Fund your wallet</h3><p>Top up your SWEETVTU wallet in seconds and buy anytime, day or night.</p></div>
+      <div class="step reveal"><h3>Buy instantly</h3><p>Pick data, airtime, cable or power from your dashboard — delivered at once.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="wrap">
+    <div class="kicker reveal">Why SWEETVTU</div>
+    <h2 class="sec reveal">Sweet prices. Sweeter service.</h2>
+    <p class="lead reveal">Here's why customers keep coming back.</p>
+    <div class="why-grid">
+      <div class="why reveal"><div class="wi">💸</div><h3>Unbeatable prices</h3><p>Data from ₦130. We keep margins slim so your wallet stays fat.</p></div>
+      <div class="why reveal"><div class="wi">⚡</div><h3>Instant delivery</h3><p>Orders complete in seconds, not hours. Your time matters.</p></div>
+      <div class="why reveal"><div class="wi">🔒</div><h3>Safe &amp; secure</h3><p>Your wallet and details are protected, always.</p></div>
+      <div class="why reveal"><div class="wi">💬</div><h3>Human support</h3><p>Real people on WhatsApp when you need help — not robots.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="kicker reveal">FAQ</div>
+    <h2 class="sec reveal">Questions? Answered.</h2>
+    <p class="lead reveal">Everything you need to know before you start.</p>
+    <div class="faq">
+      <div class="qa reveal"><button onclick="toggleQa(this)">How fast is delivery?<span>+</span></button>
+        <div class="ans"><p>Most data and airtime orders complete within seconds. Cable and electricity payments are processed immediately and confirmed by SMS.</p></div></div>
+      <div class="qa reveal"><button onclick="toggleQa(this)">How do I fund my wallet?<span>+</span></button>
+        <div class="ans"><p>Fund your wallet with a bank transfer or card right inside your dashboard. Your balance is available to spend immediately.</p></div></div>
+      <div class="qa reveal"><button onclick="toggleQa(this)">Which networks are supported?<span>+</span></button>
+        <div class="ans"><p>MTN, Airtel, Glo and 9mobile for data and airtime — plus DStv, GOtv, Startimes and all major electricity distribution companies.</p></div></div>
+      <div class="qa reveal"><button onclick="toggleQa(this)">What if my transaction fails?<span>+</span></button>
+        <div class="ans"><p>Failed transactions are reversed to your wallet automatically. And our support team is one WhatsApp message away.</p></div></div>
+      <div class="qa reveal"><button onclick="toggleQa(this)">Is there a minimum amount?<span>+</span></button>
+        <div class="ans"><p>Data starts from just ₦130, airtime from ₦50, and electricity payments from ₦500. Sweet for every pocket.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="cta-big reveal">
+      <h2>Ready for sweet prices?</h2>
+      <p>Create your free account today — get your wallet and dashboard in under a minute.</p>
+      <a class="btn" onclick="go('v-signup')" style="padding:16px 44px">Create Free Account</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <a class="logo" onclick="go('site')" style="margin-bottom:12px;display:inline-block">SWEET<span>VTU</span></a>
+        <p>Sweet prices. Sweet service.<br>Data, airtime, cable TV &amp; electricity — instantly.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <a href="#services">Services</a><a href="#pricing">Prices</a><a href="#how">How it works</a><a href="#faq">FAQ</a>
+      </div>
+      <div>
+        <h4>Get started</h4>
+        <a onclick="go('v-signup')">Create account</a>
+        <a onclick="go('v-signin')">Sign in</a>
+        <a href="https://wa.me/2347072082636" target="_blank" rel="noopener">Chat on WhatsApp</a>
+      </div>
+    </div>
+    <div class="f-bottom">Developed by Engr Mahmod · © 2026 SWEETVTU</div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/2347072082636?text=Hello%20SWEETVTU" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+  <svg viewBox="0 0 32 32"><path d="M16 3C9.4 3 4 8.4 4 15c0 2.4.7 4.6 2 6.5L4 29l7.7-2c1.8 1 3.9 1.6 6.1 1.6h.1c6.6 0 12-5.4 12-12S22.6 3 16 3zm0 21.8c-1.9 0-3.7-.5-5.3-1.5l-.4-.2-4.6 1.2 1.2-4.4-.3-.4c-1.1-1.7-1.7-3.7-1.7-5.7 0-5.5 4.5-10 10-10s10 4.5 10 10-4.5 10.8-9.9 10.8zm5.5-7.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.8 1-1 1.2-.2.2-.4.2-.7.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2-.2-.3 0-.5.1-.6l.9-1c.1-.2.2-.4.3-.6.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.2-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.3-.7.3-1.3.2-1.4-.1-.1-.3-.2-.6-.3z"/></svg>
+</a>
+</div><!-- /sitemode -->
+
+<!-- ==================== APP ==================== -->
+<div id="appmode" style="display:none">
+<div class="ashell">
+  <div class="demo-badge">DEMO MODE — REAL PAYMENTS COMING SOON</div>
+
+  <div class="view" id="v-signup">
+    <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div><button class="back" onclick="go('site')">Home</button></div>
+    <h2 style="margin:14px 0 4px">Create account</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">Join SWEETVTU in under a minute.</p>
+    <div class="field"><label>Full name</label><input id="su-name" placeholder="e.g. Amina Yusuf"></div>
+    <div class="field"><label>Phone number</label><input id="su-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
+    <div class="field"><label>Email</label><input id="su-email" type="email" placeholder="you@email.com"></div>
+    <div class="field"><label>Password</label><input id="su-pass" type="password" placeholder="Choose a password"></div>
+    <div class="err" id="su-err"></div>
+    <button class="btn" onclick="doSignup()">Create Account</button>
+    <div class="link">Already have an account? <a onclick="show('v-signin')">Sign in</a></div>
+  </div>
+
+  <div class="view" id="v-signin">
+    <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div><button class="back" onclick="go('site')">Home</button></div>
+    <h2 style="margin:14px 0 4px">Welcome back</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">Sign in to your SWEETVTU wallet.</p>
+    <div class="field"><label>Phone number</label><input id="si-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
+    <div class="field"><label>Password</label><input id="si-pass" type="password" placeholder="Your password"></div>
+    <div class="err" id="si-err"></div>
+    <button class="btn" onclick="doSignin()">Sign In</button>
+    <div class="link">New here? <a onclick="show('v-signup')">Create account</a></div>
+  </div>
+
+  <div class="view" id="v-dash">
+    <div class="app-head">
+      <div><div class="hello">Hello,</div><div class="hello"><b id="dash-name">—</b> 👋</div></div>
+      <div class="alogo">SWEET<span>VTU</span></div>
+    </div>
+    <div class="wallet">
+      <small>WALLET BALANCE</small>
+      <div class="bal" id="dash-bal">₦0</div>
+      <div class="row">
+        <div class="wbtn" onclick="show('v-fund')">＋ Fund Wallet</div>
+        <div class="wbtn" onclick="show('v-history')">🧾 History</div>
+      </div>
+    </div>
+    <div class="sec-title">Buy &amp; Pay</div>
+    <div class="grid">
+      <div class="svc" onclick="openSvc('data')"><div class="ic">📶</div><b>Buy Data</b><small>MTN · Airtel</small></div>
+      <div class="svc" onclick="openSvc('airtime')"><div class="ic">📞</div><b>Airtime</b><small>All networks</small></div>
+      <div class="svc" onclick="openSvc('cable')"><div class="ic">📺</div><b>Cable TV</b><small>DStv · GOtv</small></div>
+      <div class="svc" onclick="openSvc('power')"><div class="ic">💡</div><b>Electricity</b><small>NEPA bills</small></div>
+    </div>
+    <div class="sec-title">Recent transactions</div>
+    <div id="dash-tx"></div>
+  </div>
+
+  <div class="view" id="v-data">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="banner b-data"><h2>📶 Buy Data</h2><p>Cheap SME data — delivered in seconds.</p></div>
+    <div class="net-tabs">
+      <div class="net-tab on" id="tab-mtn" onclick="pickNet('MTN')">MTN</div>
+      <div class="net-tab" id="tab-airtel" onclick="pickNet('Airtel')">Airtel</div>
+    </div>
+    <div id="plan-list"></div>
+    <div class="field"><label>Recipient phone number</label><input id="data-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
+    <div class="err" id="data-err"></div>
+    <button class="btn" onclick="buyData()">Buy Now</button>
+  </div>
+
+  <div class="view" id="v-airtime">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="banner b-air"><h2>📞 Airtime Top-Up</h2><p>Instant recharge for any network.</p></div>
+    <div class="field"><label>Network</label><select id="air-net">
+      <option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option>
+    </select></div>
+    <div class="field"><label>Phone number</label><input id="air-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
+    <div class="field"><label>Amount (₦)</label><input id="air-amt" inputmode="numeric" placeholder="e.g. 500"></div>
+    <div class="err" id="air-err"></div>
+    <button class="btn" onclick="buyAirtime()">Recharge Now</button>
+  </div>
+
+  <div class="view" id="v-cable">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="banner b-cable"><h2>📺 Cable TV</h2><p>DStv, GOtv &amp; Startimes subscriptions.</p></div>
+    <div class="note">Demo packages shown — real bouquets &amp; prices will appear here.</div>
+    <div class="field"><label>Provider</label><select id="cab-prov" onchange="renderCabPlans()">
+      <option>DStv</option><option>GOtv</option><option>Startimes</option>
+    </select></div>
+    <div id="cab-plans"></div>
+    <div class="field"><label>Smartcard / IUC number</label><input id="cab-iuc" inputmode="numeric" placeholder="e.g. 1023456789"></div>
+    <div class="err" id="cab-err"></div>
+    <button class="btn" onclick="buyCable()">Subscribe Now</button>
+  </div>
+
+  <div class="view" id="v-power">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="banner b-power"><h2>💡 Electricity Bills</h2><p>Pay NEPA bills — prepaid &amp; postpaid.</p></div>
+    <div class="field"><label>Distribution company (DisCo)</label><select id="pow-disco">
+      <option>KEDCO — Kano</option><option>Ikeja Electric</option><option>Eko Electric</option>
+      <option>Abuja Electric</option><option>Ibadan Electric</option><option>PH Electric</option>
+      <option>Kaduna Electric</option><option>Jos Electric</option><option>Enugu Electric</option>
+    </select></div>
+    <div class="field"><label>Meter type</label><select id="pow-type"><option>Prepaid</option><option>Postpaid</option></select></div>
+    <div class="field"><label>Meter number</label><input id="pow-meter" inputmode="numeric" placeholder="e.g. 1234567890"></div>
+    <div class="field"><label>Amount (₦)</label><input id="pow-amt" inputmode="numeric" placeholder="e.g. 2000"></div>
+    <div class="err" id="pow-err"></div>
+    <button class="btn" onclick="buyPower()">Pay Bill</button>
+  </div>
+
+  <div class="view" id="v-fund">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="app-head"><div class="alogo">Fund <span>Wallet</span></div></div>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Top up your SWEETVTU wallet.</p>
+    <div class="note">Demo mode: funds are added instantly for testing. Real bank transfer details will appear here.</div>
+    <div class="grid" style="margin-bottom:14px">
+      <div class="svc" onclick="setFund(1000)"><b>₦1,000</b></div>
+      <div class="svc" onclick="setFund(2000)"><b>₦2,000</b></div>
+      <div class="svc" onclick="setFund(5000)"><b>₦5,000</b></div>
+      <div class="svc" onclick="setFund(10000)"><b>₦10,000</b></div>
+    </div>
+    <div class="field"><label>Custom amount (₦)</label><input id="fund-amt" inputmode="numeric" placeholder="Enter amount"></div>
+    <div class="err" id="fund-err"></div>
+    <button class="btn" onclick="doFund()">Add Funds (Demo)</button>
+  </div>
+
+  <div class="view" id="v-history">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="app-head"><div class="alogo">Trans<span>actions</span></div></div>
+    <div id="hist-list" style="margin-top:10px"></div>
+  </div>
+
+  <div class="view" id="v-profile">
+    <button class="back" onclick="show('v-dash')">Dashboard</button>
+    <div class="app-head"><div class="alogo">My <span>Account</span></div></div>
+    <div class="tx" style="margin-top:10px">
+      <div class="t-ic">👤</div>
+      <div class="t-main"><b id="prof-name">—</b><small id="prof-sub">—</small></div>
+    </div>
+    <div class="tx"><div class="t-ic">📧</div><div class="t-main"><b>Email</b><small id="prof-email">—</small></div></div>
+    <div class="tx"><div class="t-ic">💰</div><div class="t-main"><b>Wallet balance</b><small id="prof-bal">—</small></div></div>
+    <button class="btn ghost" style="margin-top:20px" onclick="doLogout()">Log Out</button>
+  </div>
+
+  <div class="anav" id="bottomnav" style="display:none">
+    <button id="n-dash" onclick="show('v-dash')"><span class="ni">🏠</span>Home</button>
+    <button id="n-fund" onclick="show('v-fund')"><span class="ni">💳</span>Fund</button>
+    <button id="n-hist" onclick="show('v-history')"><span class="ni">🧾</span>History</button>
+    <button id="n-prof" onclick="show('v-profile')"><span class="ni">👤</span>Account</button>
+  </div>
+
+  <div class="modal-bg" id="modal"><div class="modal">
+    <div class="m-ic" id="m-ic">✅</div><h3 id="m-title">Success</h3><p id="m-msg"></p>
+    <button class="btn" onclick="closeModal()">Done</button>
+  </div></div>
+</div>
+</div><!-- /appmode -->
+
+<script>
+/* ---------- website ---------- */
+function priceTab(which, el){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.price-table').forEach(p=>p.classList.remove('on'));
+  document.getElementById('pt-'+which).classList.add('on');
+}
+function toggleQa(btn){
+  const qa = btn.parentElement, was = qa.classList.contains('open');
+  document.querySelectorAll('.qa').forEach(q=>{q.classList.remove('open'); q.querySelector('span').textContent='+';});
+  if(!was){ qa.classList.add('open'); btn.querySelector('span').textContent='−'; }
+}
+const io = new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* ---------- app ---------- */
+const DB = {
+  read(k,d){ try{ const v = JSON.parse(localStorage.getItem('sv_'+k)); return v==null?d:v }catch(e){ return d } },
+  write(k,v){ localStorage.setItem('sv_'+k, JSON.stringify(v)) }
+};
+let session = DB.read('session', null);
+let curNet = 'MTN', curPlan = null, curCabPlan = null, fundAmtSel = 0;
+
+const DATA_PLANS = {
+  MTN: [
+    {size:'500MB', price:130},{size:'1GB', price:235},{size:'2GB', price:470},
+    {size:'3GB', price:705},{size:'5GB', price:1175},{size:'10GB', price:2350}
+  ],
+  Airtel: [
+    {size:'500MB', price:140},{size:'1GB', price:250},
+    {size:'2GB', price:500},{size:'5GB', price:1250}
+  ]
+};
+const CAB_PLANS = {
+  DStv: [{n:'DStv Padi (demo)',p:1000},{n:'DStv Yanga (demo)',p:2000},{n:'DStv Confam (demo)',p:3500}],
+  GOtv: [{n:'GOtv Smallie (demo)',p:800},{n:'GOtv Jinja (demo)',p:1500},{n:'GOtv Jolli (demo)',p:2500}],
+  Startimes: [{n:'Nova (demo)',p:700},{n:'Basic (demo)',p:1200},{n:'Classic (demo)',p:2000}]
+};
+
+const $ = id => document.getElementById(id);
+const naira = n => '₦' + Number(n).toLocaleString('en-NG');
+const users = () => DB.read('users', {});
+const saveUsers = u => DB.write('users', u);
+const txs = () => DB.read('txs', {});
+const saveTxs = t => DB.write('txs', t);
+const me = () => users()[session];
+const validPhone = p => /^0\d{10}$/.test((p||'').trim());
+
+function go(where){
+  const site = $('sitemode'), app = $('appmode');
+  if(where === 'site'){
+    app.style.display = 'none'; site.style.display = 'block'; window.scrollTo(0,0);
+    $('navlinks').classList.remove('open');
+  } else {
+    site.style.display = 'none'; app.style.display = 'block';
+    show(where);
+  }
+}
+function show(id){
+  document.querySelectorAll('#appmode .view').forEach(v => v.classList.remove('active'));
+  $(id).classList.add('active');
+  window.scrollTo(0,0);
+  const logged = !!session;
+  $('bottomnav').style.display = (logged && !['v-signup','v-signin'].includes(id)) ? 'flex' : 'none';
+  ['dash','fund','hist','prof'].forEach(k => { const b=$('n-'+k); if(b) b.classList.remove('on'); });
+  const map = {'v-dash':'n-dash','v-fund':'n-fund','v-history':'n-hist','v-profile':'n-prof'};
+  if(map[id]){ const b=$(map[id]); if(b) b.classList.add('on'); }
+  if(id==='v-dash') renderDash();
+  if(id==='v-history') renderHistory();
+  if(id==='v-profile') renderProfile();
+  if(id==='v-data') renderPlans();
+  if(id==='v-cable') renderCabPlans();
+}
+function modal(ok, title, msg){
+  $('m-ic').textContent = ok ? '✅' : '❌';
+  $('m-title').textContent = title; $('m-msg').textContent = msg;
+  $('modal').classList.add('show');
+}
+function closeModal(){ $('modal').classList.remove('show'); }
+function addTx(type, desc, amount, dir){
+  const all = txs(); const mine = all[session] || [];
+  mine.unshift({type, desc, amount, dir, date: new Date().toLocaleString('en-NG')});
+  all[session] = mine; saveTxs(all);
+}
+function charge(amount, desc, type){
+  const u = users(); const m = u[session];
+  if(m.wallet < amount) return false;
+  m.wallet -= amount; u[session] = m; saveUsers(u);
+  addTx(type, desc, amount, 'out');
+  return true;
+}
+function doSignup(){
+  const name=$('su-name').value.trim(), phone=$('su-phone').value.trim(),
+        email=$('su-email').value.trim(), pass=$('su-pass').value;
+  const err=$('su-err');
+  if(name.length<3) return err.textContent='Please enter your full name.';
+  if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err.textContent='Enter a valid email address.';
+  if(pass.length<4) return err.textContent='Password must be at least 4 characters.';
+  const u = users();
+  if(u[phone]) return err.textContent='This number is already registered. Sign in instead.';
+  u[phone] = {name, phone, email, pass, wallet:0};
+  saveUsers(u); session=phone; DB.write('session', session);
+  err.textContent=''; modal(true,'Welcome, '+name.split(' ')[0]+'!','Your SWEETVTU account is ready. Fund your wallet to start buying.');
+  show('v-dash');
+}
+function doSignin(){
+  const phone=$('si-phone').value.trim(), pass=$('si-pass').value;
+  const err=$('si-err');
+  const u = users();
+  if(!u[phone] || u[phone].pass!==pass) return err.textContent='Wrong number or password. Try again.';
+  session=phone; DB.write('session', session); err.textContent='';
+  show('v-dash');
+}
+function doLogout(){ session=null; DB.write('session', null); go('site'); }
+function renderDash(){
+  const m = me(); if(!m){ go('site'); return; }
+  $('dash-name').textContent = m.name.split(' ')[0];
+  $('dash-bal').textContent = naira(m.wallet);
+  const mine = (txs()[session]||[]).slice(0,5);
+  $('dash-tx').innerHTML = mine.length ? mine.map(txHTML).join('') : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
+}
+function txHTML(t){
+  const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
+  return `<div class="tx"><div style="display:flex;align-items:center"><div class="t-ic">${icons[t.type]||'🧾'}</div>
+    <div class="t-main"><b>${t.desc}</b><small>${t.date}</small></div></div>
+    <div class="amt ${t.dir}">${t.dir==='in'?'+':'−'}${naira(t.amount)}</div></div>`;
+}
+function openSvc(which){ show('v-'+which); }
+function pickNet(n){
+  curNet=n; curPlan=null;
+  $('tab-mtn').classList.toggle('on', n==='MTN');
+  $('tab-airtel').classList.toggle('on', n==='Airtel');
+  renderPlans();
+}
+function renderPlans(){
+  $('plan-list').innerHTML = DATA_PLANS[curNet].map((p,i)=>
+    `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})">
+       <div><b>${p.size}</b><small>${curNet} · 30 days</small></div><span>${naira(p.price)}</span>
+     </div>`).join('');
+}
+function pickPlan(i){ curPlan=i; renderPlans(); }
+function buyData(){
+  const err=$('data-err'), phone=$('data-phone').value.trim();
+  if(curPlan===null) return err.textContent='Please select a data plan.';
+  if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
+  const p = DATA_PLANS[curNet][curPlan];
+  if(!charge(p.price, `${curNet} ${p.size} → ${phone}`, 'data'))
+    return err.textContent='Insufficient balance. Please fund your wallet.';
+  err.textContent='';
+  modal(true,'Data sent! 🎉', `${curNet} ${p.size} (${naira(p.price)}) sent to ${phone}.`);
+  $('data-phone').value=''; curPlan=null; renderPlans();
+}
+function buyAirtime(){
+  const err=$('air-err'), net=$('air-net').value, phone=$('air-phone').value.trim(),
+        amt=parseInt($('air-amt').value,10);
+  if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
+  if(!amt || amt<50) return err.textContent='Minimum airtime is ₦50.';
+  if(!charge(amt, `${net} airtime ${naira(amt)} → ${phone}`, 'airtime'))
+    return err.textContent='Insufficient balance. Please fund your wallet.';
+  err.textContent='';
+  modal(true,'Recharge sent! 🎉', `${naira(amt)} ${net} airtime sent to ${phone}.`);
+  $('air-phone').value=''; $('air-amt').value='';
+}
+function renderCabPlans(){
+  const prov=$('cab-prov').value; curCabPlan=null;
+  $('cab-plans').innerHTML = '<div class="field"><label>Package</label></div>' + CAB_PLANS[prov].map((p,i)=>
+    `<div class="plan${curCabPlan===i?' on':''}" onclick="pickCab(${i})">
+       <div><b>${p.n}</b></div><span>${naira(p.p)}</span>
+     </div>`).join('');
+}
+function pickCab(i){ curCabPlan=i; renderCabPlans(); }
+function buyCable(){
+  const err=$('cab-err'), prov=$('cab-prov').value, iuc=$('cab-iuc').value.trim();
+  if(curCabPlan===null) return err.textContent='Please select a package.';
+  if(iuc.length<8) return err.textContent='Enter a valid smartcard / IUC number.';
+  const p = CAB_PLANS[prov][curCabPlan];
+  if(!charge(p.p, `${prov} ${p.n} → ${iuc}`, 'cable'))
+    return err.textContent='Insufficient balance. Please fund your wallet.';
+  err.textContent='';
+  modal(true,'Subscribed! 🎉', `${prov} (${p.n}) activated on ${iuc}.`);
+  $('cab-iuc').value=''; curCabPlan=null; renderCabPlans();
+}
+function buyPower(){
+  const err=$('pow-err'), disco=$('pow-disco').value, type=$('pow-type').value,
+        meter=$('pow-meter').value.trim(), amt=parseInt($('pow-amt').value,10);
+  if(meter.length<8) return err.textContent='Enter a valid meter number.';
+  if(!amt || amt<500) return err.textContent='Minimum payment is ₦500.';
+  if(!charge(amt, `${disco} ${type} ${naira(amt)} → ${meter}`, 'power'))
+    return err.textContent='Insufficient balance. Please fund your wallet.';
+  err.textContent='';
+  modal(true,'Bill paid! 🎉', `${naira(amt)} ${type} token for meter ${meter} (${disco}). Token sent via SMS in the live version.`);
+  $('pow-meter').value=''; $('pow-amt').value='';
+}
+function setFund(a){ fundAmtSel=a; $('fund-amt').value=a; }
+function doFund(){
+  const err=$('fund-err');
+  const amt = parseInt($('fund-amt').value,10) || fundAmtSel;
+  if(!amt || amt<100) return err.textContent='Minimum funding is ₦100.';
+  const u=users(); u[session].wallet+=amt; saveUsers(u);
+  addTx('fund','Wallet funding (demo)',amt,'in');
+  err.textContent='';
+  modal(true,'Wallet funded! 💰', `${naira(amt)} added to your wallet.`);
+  $('fund-amt').value=''; fundAmtSel=0;
+}
+function renderHistory(){
+  const mine = txs()[session]||[];
+  $('hist-list').innerHTML = mine.length ? mine.map(txHTML).join('') : '<div class="empty">No transactions yet.</div>';
+}
+function renderProfile(){
+  const m=me(); if(!m) return;
+  $('prof-name').textContent=m.name; $('prof-sub').textContent=m.phone;
+  $('prof-email').textContent=m.email; $('prof-bal').textContent=naira(m.wallet);
+}
+if(session && users()[session]) go('v-dash'); else go('site');
+</script>
+</body>
+</html>
