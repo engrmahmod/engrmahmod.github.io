@@ -761,8 +761,49 @@ function openReceipt(i){
   $('rcptmodal').classList.add('show');
 }
 function closeReceipt(){ $('rcptmodal').classList.remove('show'); }
+function fmtDT(iso){
+  try{
+    const d=new Date(iso); if(isNaN(d)) return iso;
+    const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    let h=d.getHours(); const ap=h>=12?'PM':'AM'; h=h%12||12;
+    return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+', '+h+':'+String(d.getMinutes()).padStart(2,'0')+' '+ap;
+  }catch(e){ return iso; }
+}
+function wrapLines(x, text, maxW){
+  const words=String(text==null?'—':text).split(' ');
+  const lines=[]; let line='';
+  const pushWord=(w)=>{
+    while(x.measureText(w).width>maxW && w.length>1){
+      let k=1; while(k<w.length && x.measureText(w.slice(0,k+1)).width<=maxW) k++;
+      lines.push(w.slice(0,k)); w=w.slice(k);
+    }
+    return w;
+  };
+  for(let w0 of words){
+    let w=pushWord(w0);
+    const t=line?line+' '+w:w;
+    if(x.measureText(t).width>maxW && line){ lines.push(line); line=w; }
+    else line=t;
+  }
+  if(line) lines.push(line);
+  return lines.length?lines:['—'];
+}
 function receiptCanvas(){
-  const t=window.CUR_RCPT||{}; const W=600, H=860;
+  const t=window.CUR_RCPT||{}; const W=600;
+  const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
+  const rows=[
+    ['Type', names[t.type]||t.type||'—'],
+    ['Description', t.description||t.desc||'—'],
+    ['Date', fmtDT(t.created||t.date)],
+    ['Reference', t.reference||'—'],
+    ['Direction', t.direction==='in'?'Credit':'Debit']
+  ];
+  // measure pass
+  const mc=document.createElement('canvas').getContext('2d');
+  mc.font='400 24px sans-serif';
+  const maxW=W-100;
+  const wrapped=rows.map(([k,v])=>({k, lines:wrapLines(mc,v,maxW)}));
+  const H=330 + wrapped.reduce((a,r)=>a+r.lines.length*36,0) + 130;
   const c=document.createElement('canvas'); c.width=W; c.height=H;
   const x=c.getContext('2d');
   x.fillStyle='#ffffff'; x.fillRect(0,0,W,H);
@@ -770,24 +811,25 @@ function receiptCanvas(){
   x.font='800 40px sans-serif'; x.fillText('SWEETVTU', W/2, 80);
   x.fillStyle='#666'; x.font='400 22px sans-serif'; x.fillText('Transaction Receipt', W/2, 118);
   x.strokeStyle='#ccc'; x.setLineDash([8,6]); x.beginPath(); x.moveTo(40,150); x.lineTo(W-40,150); x.stroke(); x.setLineDash([]);
-  const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
-  x.fillStyle = t.direction==='in' ? '#16a34a' : '#b45309';
+  // amount: draw sign and figure separately so the ₦ never overlaps
   x.font='800 52px sans-serif';
-  x.fillText((t.direction==='in'?'+':'−')+'₦'+Number(t.amount||0).toLocaleString(), W/2, 225);
-  x.fillStyle='#16a34a'; x.font='700 24px sans-serif';
+  const signStr=t.direction==='in'?'+':'−', amtStr='₦'+Number(t.amount||0).toLocaleString();
+  const col=t.direction==='in' ? '#16a34a' : '#b45309';
+  const tw=x.measureText(signStr).width+x.measureText(amtStr).width;
+  x.textAlign='left'; x.fillStyle=col;
+  let ax=W/2-tw/2;
+  x.fillText(signStr, ax, 225); ax+=x.measureText(signStr).width;
+  x.fillText(amtStr, ax, 225);
+  x.textAlign='center'; x.fillStyle='#16a34a'; x.font='700 24px sans-serif';
   x.fillText((t.status||'successful').toUpperCase(), W/2, 265);
-  x.textAlign='left'; x.font='400 24px sans-serif';
+  x.font='400 24px sans-serif';
   let y=330;
-  const row=(k,v)=>{ x.fillStyle='#888'; x.fillText(k, 40, y);
-    x.fillStyle='#111'; x.textAlign='right';
-    const s=String(v==null?'—':v); const max=26;
-    x.fillText(s.length>max? s.slice(0,max-1)+'…' : s, W-40, y);
-    x.textAlign='left'; y+=58; };
-  row('Type', names[t.type]||t.type||'—');
-  row('Description', t.description||t.desc||'—');
-  row('Date', t.created||t.date||'—');
-  row('Reference', t.reference||'—');
-  row('Direction', t.direction==='in'?'Credit':'Debit');
+  for(const r of wrapped){
+    x.textAlign='left'; x.fillStyle='#888'; x.fillText(r.k, 40, y+8);
+    x.textAlign='right'; x.fillStyle='#111';
+    r.lines.forEach((ln,i)=>x.fillText(ln, W-40, y+8+i*36));
+    y+=r.lines.length*36+22;
+  }
   x.strokeStyle='#ccc'; x.setLineDash([8,6]); x.beginPath(); x.moveTo(40,y+6); x.lineTo(W-40,y+6); x.stroke(); x.setLineDash([]);
   x.textAlign='center'; x.fillStyle='#888'; x.font='400 20px sans-serif';
   x.fillText('Thank you for using SWEETVTU', W/2, y+52);
