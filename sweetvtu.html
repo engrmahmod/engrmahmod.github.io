@@ -643,6 +643,12 @@
     <div class="m-ic" id="m-ic">✅</div><h3 id="m-title">Success</h3><p id="m-msg"></p>
     <button class="btn" onclick="closeModal()">Done</button>
   </div></div>
+  <div class="modal-bg" id="rcptmodal"><div class="modal" style="text-align:left">
+    <div style="text-align:center"><div class="m-ic">🧾</div><h3>Transaction Receipt</h3>
+    <div style="color:var(--muted);font-size:.8rem;letter-spacing:.2em;margin-bottom:10px">SWEETVTU</div></div>
+    <div id="rcpt-body"></div>
+    <button class="btn" onclick="closeReceipt()" style="margin-top:14px">Done</button>
+  </div></div>
   <div class="modal-bg" id="pinmodal"><div class="modal">
     <div class="m-ic">🔐</div><h3>Transaction PIN</h3>
     <p style="color:var(--muted);font-size:.9rem;margin-bottom:14px">Enter your 4-digit PIN to approve this purchase.</p>
@@ -734,11 +740,27 @@ function modal(ok, title, msg){
   $('modal').classList.add('show');
 }
 function closeModal(){ $('modal').classList.remove('show'); }
-function txHTML(t){
+function openReceipt(i){
+  const t=(window.HIST_TXS||[])[i]; if(!t) return;
+  const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
+  const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
+  const stCol = t.status==='successful' ? '#4ade80' : (t.status==='pending' ? 'var(--gold)' : '#ff6b6b');
+  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.9rem"><span style="color:var(--muted)">${k}</span><b style="text-align:right;word-break:break-all">${v||'—'}</b></div>`;
+  $('rcpt-body').innerHTML =
+    `<div style="text-align:center;margin-bottom:8px"><div style="font-size:2rem">${icons[t.type]||'🧾'}</div>
+     <div style="font-size:1.5rem;font-weight:800;color:${t.direction==='in'?'#4ade80':'var(--gold)'}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div>
+     <div style="margin-top:4px"><span style="background:${stCol}22;color:${stCol};padding:3px 12px;border-radius:20px;font-size:.8rem;font-weight:700">${(t.status||'successful').toUpperCase()}</span></div></div>` +
+    row('Description', t.description||t.desc) + row('Type', names[t.type]||t.type) +
+    row('Date', t.created||t.date) + row('Reference', t.reference) +
+    row('Direction', t.direction==='in'?'Credit':'Debit');
+  $('rcptmodal').classList.add('show');
+}
+function closeReceipt(){ $('rcptmodal').classList.remove('show'); }
+function txHTML(t,i){
   const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
   const st = t.status && t.status!=='successful'
     ? ` <small style="color:${t.status==='pending'?'var(--gold)':'#ff6b6b'}">(${t.status})</small>` : '';
-  return `<div class="tx"><div style="display:flex;align-items:center"><div class="t-ic">${icons[t.type]||'🧾'}</div>
+  return `<div class="tx" onclick="openReceipt(${i})" style="cursor:pointer"><div style="display:flex;align-items:center"><div class="t-ic">${icons[t.type]||'🧾'}</div>
     <div class="t-main"><b>${t.description||t.desc||''}</b><small>${t.created||t.date||''}${st}</small></div></div>
     <div class="amt ${t.direction}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div></div>`;
 }
@@ -853,16 +875,17 @@ async function renderDash(){
   $('dash-bal').textContent = naira(ME.wallet);
   try{
     const j = await api('/api/history');
-    const mine = (j.ok?j.transactions:[]).slice(0,5);
-    $('dash-tx').innerHTML = mine.length ? mine.map(txHTML).join('')
+    window.HIST_TXS = j.ok?j.transactions:[];
+    const mine = window.HIST_TXS.slice(0,5);
+    $('dash-tx').innerHTML = mine.length ? mine.map((t,k)=>txHTML(t,k)).join('')
       : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
   }catch(e){ $('dash-tx').innerHTML='<div class="empty">Could not load transactions.</div>'; }
 }
 async function renderHistory(){
   try{
     const j = await api('/api/history');
-    const mine = j.ok?j.transactions:[];
-    $('hist-list').innerHTML = mine.length ? mine.map(txHTML).join('')
+    window.HIST_TXS = j.ok?j.transactions:[];
+    $('hist-list').innerHTML = window.HIST_TXS.length ? window.HIST_TXS.map((t,k)=>txHTML(t,k)).join('')
       : '<div class="empty">No transactions yet.</div>';
   }catch(e){ $('hist-list').innerHTML='<div class="empty">Could not load.</div>'; }
 }
