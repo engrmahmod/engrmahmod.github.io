@@ -157,7 +157,7 @@ const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'
 let ABASE = '', AKEY = '';
 try {
   const saved = JSON.parse(localStorage.getItem('sv_admin')||'null');
-  if(saved){ ABASE=saved.base||''; AKEY=saved.key||''; }
+  if(saved){ ABASE=(saved.base||'').trim(); AKEY=(saved.key||'').trim(); }
 } catch(e){}
 
 async function aapi(path, method='GET', body=null){
@@ -177,7 +177,7 @@ function show(id){
 }
 async function doAdminLogin(){
   const base = $('ap-base').value.trim().replace(/\/+$/,'') || DEFAULT_BASE;
-  const key = $('ap-pass').value;
+  const key = $('ap-pass').value.trim();
   const err = $('ap-err');
   if(base.indexOf('YOUR-BACKEND')!==-1){ err.textContent='Enter your backend URL first.'; return; }
   if(!key){ err.textContent='Enter your admin key.'; return; }
