@@ -2,151 +2,240 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SWEETVTU — Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>SWEETVTU Admin</title>
 <style>
-  :root{
-    --bg:#0f0f1e; --bg2:#141428; --card:#1b1b30; --line:rgba(255,255,255,.09);
-    --text:#f4f4fa; --muted:#9a9ab5; --pink:#ff4d88; --pink2:#ff7ab0;
-    --gold:#ffc94d; --green:#2fd27d; --red:#ff5d5d;
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',Roboto,sans-serif;min-height:100vh}
-  .shell{max-width:560px;margin:0 auto;min-height:100vh;padding:0 18px 60px}
-  .view{display:none;animation:fade .25s ease}
-  .view.active{display:block}
-  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .app-head{padding:22px 0 6px;display:flex;align-items:center;justify-content:space-between}
-  .alogo{font-weight:900;font-size:1.35rem;letter-spacing:1px}
-  .alogo span{color:var(--pink)}
-  .badge{display:inline-block;font-size:.68rem;font-weight:800;letter-spacing:2px;background:linear-gradient(90deg,var(--gold),#ff9d42);color:#3a2200;padding:6px 12px;border-radius:999px;margin:14px 0}
-  h2{margin:6px 0 4px}
-  .sub{color:var(--muted);font-size:.9rem;margin-bottom:20px}
-  .field{margin-bottom:14px}
-  .field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:700}
-  .field input{width:100%;padding:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--text);font-size:1rem}
-  .field input:focus{outline:none;border-color:var(--pink)}
-  .err{color:var(--red);font-size:.85rem;min-height:20px;margin-bottom:8px;font-weight:700}
-  .btn{width:100%;padding:16px;border:none;border-radius:14px;font-size:1.02rem;font-weight:900;cursor:pointer;
-    background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;margin-top:6px}
-  .btn.ghost{background:var(--card);border:1px solid var(--line);color:var(--text)}
-  .btn.danger{background:rgba(255,93,93,.12);border:1px solid var(--red);color:var(--red)}
-  .btn.small{width:auto;padding:9px 14px;font-size:.82rem;border-radius:10px;margin:0}
-  .note{background:rgba(255,201,77,.08);border:1px solid rgba(255,201,77,.25);border-radius:12px;padding:14px;font-size:.85rem;color:var(--muted);margin-top:16px;line-height:1.5}
-  .note b{color:var(--gold)}
-  .tabs{display:flex;gap:8px;margin:18px 0;position:sticky;top:0;background:var(--bg);padding:10px 0;z-index:5}
-  .tab{flex:1;text-align:center;padding:11px 4px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:800;font-size:.78rem;cursor:pointer;color:var(--muted)}
-  .tab.on{background:linear-gradient(135deg,var(--pink),#d63a72);color:#fff;border:none}
-  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
-  .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 14px}
-  .stat small{color:var(--muted);font-size:.72rem;font-weight:800;letter-spacing:1px;text-transform:uppercase}
-  .stat div{font-size:1.35rem;font-weight:900;margin-top:6px}
-  .stat div.g{color:var(--green)} .stat div.r{color:var(--red)} .stat div.y{color:var(--gold)}
-  .ucard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px}
-  .ucard .nm{font-weight:900;font-size:1.02rem}
-  .ucard .ph{color:var(--pink2);font-size:.85rem;font-weight:700}
-  .ucard .meta{color:var(--muted);font-size:.82rem;margin:6px 0 4px;line-height:1.6}
-  .ucard .wal{font-weight:900;color:var(--gold);margin:4px 0 12px}
-  .uacts{display:flex;gap:8px;flex-wrap:wrap}
-  .txgroup{margin-bottom:18px}
-  .txgroup h4{color:var(--muted);font-size:.8rem;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
-  .tx{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
-    border-radius:12px;padding:12px 14px;margin-bottom:8px;gap:10px}
-  .tx .t-main b{display:block;font-size:.88rem}
-  .tx .t-main small{color:var(--muted);font-size:.75rem}
-  .amt{font-weight:900;white-space:nowrap}
-  .amt.in{color:var(--green)} .amt.out{color:var(--red)}
-  .empty{text-align:center;color:var(--muted);padding:34px 10px;font-size:.9rem;line-height:1.7}
-  .sec{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
-  .sec h3{margin-bottom:6px;font-size:1rem}
-  .sec p{color:var(--muted);font-size:.85rem;margin-bottom:12px;line-height:1.5}
-  .foot{text-align:center;color:var(--muted);font-size:.78rem;margin-top:30px}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
-  .foot a{color:inherit;text-decoration:none}
-  .foot a:hover{text-decoration:underline}
+:root{
+  --bg:#0b0e1a; --bg2:#101528; --card:#141b31; --card2:#1a2340; --line:#263156;
+  --txt:#eef1ff; --muted:#8b94b8; --acc:#7c3aed; --acc2:#ec4899;
+  --gold:#f5b942; --green:#4ade80; --red:#ff6b6b;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+body{margin:0; font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--bg); color:var(--txt); min-height:100vh}
+button{font-family:inherit}
+/* ---------- login ---------- */
+#a-login{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:20px;
+  background:radial-gradient(600px 400px at 20% 10%, #2b1a5e55, transparent), radial-gradient(600px 400px at 90% 90%, #5e1a3a44, transparent), var(--bg)}
+.login-card{width:100%; max-width:380px; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:32px 26px; box-shadow:0 20px 60px #0008}
+.login-card .logo{font-size:2.2rem; text-align:center}
+.login-card h2{text-align:center; margin:8px 0 2px; letter-spacing:.15em}
+.login-card p.sub{text-align:center; color:var(--muted); font-size:.85rem; margin:0 0 20px}
+.field{margin-bottom:14px}
+.field label{display:block; font-size:.78rem; color:var(--muted); margin-bottom:6px}
+.field input{width:100%; padding:13px 14px; border-radius:12px; border:1px solid var(--line); background:var(--bg2); color:var(--txt); font-size:1rem; outline:none}
+.field input:focus{border-color:var(--acc)}
+.btn{display:block; width:100%; padding:14px; border:none; border-radius:12px; font-size:1rem; font-weight:700; cursor:pointer;
+  background:linear-gradient(135deg,var(--acc),var(--acc2)); color:#fff; transition:transform .12s, box-shadow .12s}
+.btn:active{transform:scale(.98)}
+.btn.ghost{background:var(--card2); border:1px solid var(--line)}
+.btn.sm{padding:9px 14px; font-size:.85rem; width:auto; display:inline-block}
+.btn.danger{background:linear-gradient(135deg,#dc2626,#991b1b)}
+.err{color:var(--red); font-size:.85rem; min-height:1.2em; margin:8px 0}
+/* ---------- layout ---------- */
+#a-panel{display:none}
+header.top{position:sticky; top:0; z-index:50; background:linear-gradient(135deg,#1e1245,#3b0f2e);
+  border-bottom:1px solid var(--line); padding:14px 18px; display:flex; align-items:center; gap:12px}
+header.top .t{font-weight:800; letter-spacing:.12em; font-size:1.05rem}
+header.top .live{font-size:.68rem; background:#22c55e22; color:var(--green); border:1px solid #22c55e55; padding:3px 10px; border-radius:20px; font-weight:700}
+header.top .sp{flex:1}
+.wrap{display:flex; max-width:1200px; margin:0 auto}
+nav.side{width:220px; flex-shrink:0; padding:22px 12px; position:sticky; top:65px; height:calc(100vh - 65px)}
+nav.side button{display:flex; align-items:center; gap:12px; width:100%; text-align:left; padding:13px 16px; margin-bottom:6px;
+  background:transparent; border:none; border-radius:12px; color:var(--muted); font-size:.95rem; cursor:pointer; font-weight:600}
+nav.side button .ic{font-size:1.2rem; width:28px; text-align:center}
+nav.side button.on{background:linear-gradient(135deg,#7c3aed33,#ec489933); color:#fff; box-shadow:inset 0 0 0 1px #7c3aed55}
+nav.side button:hover{color:#fff}
+main{flex:1; padding:22px 18px 60px; min-width:0}
+.tabs-mobile{display:none; gap:8px; overflow-x:auto; padding:12px 14px; background:var(--bg2); border-bottom:1px solid var(--line); position:sticky; top:64px; z-index:40}
+.tabs-mobile button{flex-shrink:0; padding:9px 16px; border-radius:20px; border:1px solid var(--line); background:var(--card); color:var(--muted); font-weight:700; font-size:.85rem; cursor:pointer}
+.tabs-mobile button.on{background:linear-gradient(135deg,var(--acc),var(--acc2)); color:#fff; border:none}
+.view{display:none}
+.view.on{display:block; animation:fade .25s}
+@keyframes fade{from{opacity:0; transform:translateY(8px)} to{opacity:1}}
+h2.vt{margin:4px 0 18px; font-size:1.3rem}
+h2.vt small{display:block; color:var(--muted); font-size:.8rem; font-weight:400; margin-top:4px}
+/* ---------- stat cards ---------- */
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:14px; margin-bottom:22px}
+.stat{background:linear-gradient(160deg,var(--card),var(--card2)); border:1px solid var(--line); border-radius:16px; padding:18px 16px; position:relative; overflow:hidden}
+.stat::after{content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.stat .ic{font-size:1.5rem; margin-bottom:8px}
+.stat .n{font-size:1.5rem; font-weight:800}
+.stat .l{color:var(--muted); font-size:.78rem; margin-top:2px}
+.card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px}
+.card h3{margin:0 0 14px; font-size:1.02rem}
+.rowline{display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px dashed var(--line); font-size:.92rem}
+.rowline:last-child{border-bottom:none}
+.rowline .k{color:var(--muted)}
+/* ---------- users ---------- */
+.search{width:100%; padding:13px 16px; border-radius:12px; border:1px solid var(--line); background:var(--bg2); color:var(--txt); font-size:1rem; margin-bottom:14px; outline:none}
+.search:focus{border-color:var(--acc)}
+.ucard{display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:border-color .15s}
+.ucard:hover{border-color:var(--acc)}
+.avatar{width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--acc),var(--acc2)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem; flex-shrink:0}
+.ucard .nm{font-weight:700}
+.ucard .ph{color:var(--muted); font-size:.82rem}
+.ucard .wl{margin-left:auto; text-align:right; font-weight:800; color:var(--gold); flex-shrink:0}
+.vbadge{font-size:.68rem; background:#22c55e22; color:var(--green); border:1px solid #22c55e44; padding:2px 8px; border-radius:12px; margin-left:8px; font-weight:700}
+.vbadge.no{background:#ff6b6b18; color:var(--red); border-color:#ff6b6b44}
+/* ---------- modal ---------- */
+.mbg{position:fixed; inset:0; background:#000a; display:none; align-items:flex-start; justify-content:center; z-index:100; padding:20px; overflow-y:auto}
+.mbg.show{display:flex}
+.modal{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:24px; width:100%; max-width:480px; margin:auto; animation:fade .2s}
+.modal h3{margin:0 0 4px}
+.kv{display:grid; grid-template-columns:110px 1fr; gap:8px 12px; font-size:.9rem; margin:14px 0}
+.kv .k{color:var(--muted)}
+.kv .v{word-break:break-all}
+.abtns{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px}
+/* ---------- api connections ---------- */
+.prov{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px}
+.prov .ph{display:flex; align-items:center; gap:12px; margin-bottom:6px}
+.prov .ph .ic{font-size:1.6rem}
+.prov .ph b{font-size:1.05rem}
+.dot{width:11px; height:11px; border-radius:50%; background:var(--muted); margin-left:auto; flex-shrink:0}
+.dot.ok{background:var(--green); box-shadow:0 0 8px var(--green)}
+.dot.bad{background:var(--red); box-shadow:0 0 8px var(--red)}
+.prov .desc{color:var(--muted); font-size:.82rem; margin:0 0 14px}
+.pfield{margin-bottom:12px}
+.pfield label{display:block; font-size:.76rem; color:var(--muted); margin-bottom:5px}
+.inwrap{position:relative}
+.inwrap input{width:100%; padding:11px 44px 11px 13px; border-radius:10px; border:1px solid var(--line); background:var(--bg2); color:var(--txt); font-size:.92rem; outline:none; font-family:ui-monospace,monospace}
+.inwrap input:focus{border-color:var(--acc)}
+.eye{position:absolute; right:6px; top:50%; transform:translateY(-50%); background:none; border:none; font-size:1.1rem; cursor:pointer; padding:6px}
+.prow{display:flex; gap:10px; margin-top:14px; flex-wrap:wrap}
+.tres{font-size:.85rem; margin-top:10px; min-height:1.3em}
+.tres.ok{color:var(--green)} .tres.bad{color:var(--red)}
+.switchrow{display:flex; align-items:center; justify-content:space-between; background:var(--bg2); border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin:12px 0}
+.switchrow .t{font-weight:700; font-size:.92rem}
+.switchrow .s{font-size:.75rem; color:var(--muted)}
+.switch{position:relative; width:56px; height:30px; flex-shrink:0; cursor:pointer}
+.switch input{opacity:0; width:0; height:0}
+.sl{position:absolute; inset:0; background:#3a4568; border-radius:30px; transition:.2s}
+.sl:before{content:''; position:absolute; width:22px; height:22px; left:4px; top:4px; background:#fff; border-radius:50%; transition:.2s}
+.switch input:checked + .sl{background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.switch input:checked + .sl:before{transform:translateX(26px)}
+.shelved{opacity:.55}
+/* ---------- tables ---------- */
+table.tbl{width:100%; border-collapse:collapse; font-size:.85rem}
+.tbl th{text-align:left; color:var(--muted); font-weight:600; padding:10px 8px; border-bottom:1px solid var(--line); font-size:.75rem; text-transform:uppercase}
+.tbl td{padding:11px 8px; border-bottom:1px solid #1c2542}
+.tbl tr:last-child td{border-bottom:none}
+.pill{font-size:.72rem; padding:3px 10px; border-radius:14px; font-weight:700}
+.pill.in{background:#22c55e1e; color:var(--green)}
+.pill.out{background:#ff6b6b1e; color:var(--red)}
+footer{text-align:center; color:var(--muted); font-size:.8rem; padding:26px 0 40px}
+footer b{color:var(--txt)}
+@media(max-width:820px){
+  nav.side{display:none}
+  .tabs-mobile{display:flex}
+  main{padding:16px 14px 60px}
+}
 </style>
 </head>
 <body>
-<div class="shell">
 
-  <!-- LOGIN -->
-  <div class="view active" id="a-login">
-    <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div></div>
-    <div class="badge">ADMIN AREA</div>
-    <h2>🔐 Admin login</h2>
-    <p class="sub">Only you should ever open this page. Do not share its link.</p>
+<!-- ============ LOGIN ============ -->
+<div id="a-login">
+  <div class="login-card">
+    <div class="logo">🛡️</div>
+    <h2>SWEETVTU</h2>
+    <p class="sub">Admin Control Panel</p>
     <div class="field"><label>Backend URL</label><input id="ap-base" placeholder="https://sweetvtu-backend.onrender.com"></div>
-    <div class="field"><label>Admin key</label><input id="ap-pass" type="password" placeholder="The ADMIN_KEY from your server" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+    <div class="field"><label>Admin Key</label><input id="ap-pass" type="password" placeholder="••••••••"></div>
     <div class="err" id="ap-err"></div>
-    <button class="btn" onclick="doAdminLogin()">Log In</button>
-    <div class="note">The admin key is the <b>ADMIN_KEY</b> you set in your Render environment variables.</div>
+    <button class="btn" onclick="doAdminLogin()">Sign In</button>
   </div>
-
-  <!-- PANEL -->
-  <div class="view" id="a-panel">
-    <div class="app-head">
-      <div class="alogo">Admin <span>Panel</span></div>
-      <button class="btn small ghost" onclick="doAdminLogout()">Log out</button>
-    </div>
-    <div class="badge">DEMO MODE — THIS BROWSER'S DATA ONLY</div>
-
-    <div class="tabs">
-      <div class="tab on" id="atab-over" onclick="atab('over')">📊 Overview</div>
-      <div class="tab" id="atab-users" onclick="atab('users')">👥 Users</div>
-      <div class="tab" id="atab-tx" onclick="atab('tx')">🧾 Transactions</div>
-      <div class="tab" id="atab-set" onclick="atab('set')">⚙️ Settings</div>
-    </div>
-
-    <div id="t-over"></div>
-    <div id="t-users" style="display:none"></div>
-    <div id="t-tx" style="display:none"></div>
-
-    <div id="t-set" style="display:none">
-      <div class="sec">
-        <h3>💰 VTpass wallet</h3>
-        <p>Your VTpass balance (this is what pays for customers' data/airtime).</p>
-        <div id="vtp-bal"><div class="empty">Loading…</div></div>
-        <button class="btn ghost" onclick="loadVtpBal()">Refresh Balance</button>
-      </div>
-      <div class="sec">
-        <h3>💲 Data prices</h3>
-        <p>Match your retail price list to VTpass plans, then review anything priced below cost.</p>
-        <button class="btn" onclick="seedPrices()">Match My Price List</button>
-        <button class="btn ghost" onclick="costCheck()">Check Below-Cost Plans</button>
-        <div id="price-msg" style="margin-top:10px"></div>
-      </div>
-      <div class="sec">
-        <h3>💾 Backup data</h3>
-        <p>Download all users and transactions as a file.</p>
-        <button class="btn ghost" onclick="admExport()">Download Backup (JSON)</button>
-      </div>
-    </div>
-
-    <div class="foot">SWEETVTU Admin · <a href="https://engrmahmod.github.io/portfolio.html" target="_blank" rel="noopener">Developed by Engr Mahmod</a></div>
-  </div>
-
 </div>
+
+<!-- ============ PANEL ============ -->
+<div id="a-panel">
+<header class="top">
+  <div style="font-size:1.5rem">🛡️</div>
+  <div class="t">SWEETVTU <span style="color:var(--gold)">ADMIN</span></div>
+  <span class="live" id="mode-badge">…</span>
+  <div class="sp"></div>
+  <button class="btn sm ghost" onclick="doAdminLogout()">Logout</button>
+</header>
+<div class="tabs-mobile" id="mtabs">
+  <button data-t="v-over" class="on" onclick="nav('v-over')">📊 Overview</button>
+  <button data-t="v-users" onclick="nav('v-users')">👥 Users</button>
+  <button data-t="v-txs" onclick="nav('v-txs')">🧾 Transactions</button>
+  <button data-t="v-conn" onclick="nav('v-conn')">🔌 API Connections</button>
+  <button data-t="v-prices" onclick="nav('v-prices')">💲 Prices</button>
+  <button data-t="v-backup" onclick="nav('v-backup')">💾 Backup</button>
+</div>
+<div class="wrap">
+<nav class="side" id="dtabs">
+  <button data-t="v-over" class="on" onclick="nav('v-over')"><span class="ic">📊</span>Overview</button>
+  <button data-t="v-users" onclick="nav('v-users')"><span class="ic">👥</span>Users</button>
+  <button data-t="v-txs" onclick="nav('v-txs')"><span class="ic">🧾</span>Transactions</button>
+  <button data-t="v-conn" onclick="nav('v-conn')"><span class="ic">🔌</span>API Connections</button>
+  <button data-t="v-prices" onclick="nav('v-prices')"><span class="ic">💲</span>Prices</button>
+  <button data-t="v-backup" onclick="nav('v-backup')"><span class="ic">💾</span>Backup</button>
+</nav>
+<main>
+  <!-- OVERVIEW -->
+  <section class="view on" id="v-over">
+    <h2 class="vt">Overview<small>Your business at a glance</small></h2>
+    <div class="stats" id="stat-grid"></div>
+    <div class="card"><h3>💰 VTpass Wallet Balance</h3><div id="vt-bal"><span style="color:var(--muted)">Loading…</span></div></div>
+    <div class="card"><h3>🔌 Provider Modes</h3><div id="mode-rows"><span style="color:var(--muted)">Loading…</span></div></div>
+  </section>
+  <!-- USERS -->
+  <section class="view" id="v-users">
+    <h2 class="vt">Users<small id="u-count"></small></h2>
+    <input class="search" id="u-search" placeholder="🔍 Search name, phone or email…" oninput="renderUserCards()">
+    <div id="u-list"></div>
+  </section>
+  <!-- TRANSACTIONS -->
+  <section class="view" id="v-txs">
+    <h2 class="vt">Transactions<small id="t-count"></small></h2>
+    <div class="card" style="padding:8px 16px; overflow-x:auto"><table class="tbl"><thead><tr><th>Date</th><th>User</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody id="tx-rows"></tbody></table></div>
+  </section>
+  <!-- API CONNECTIONS -->
+  <section class="view" id="v-conn">
+    <h2 class="vt">API Connections<small>Keys, modes and live tests — changes apply instantly</small></h2>
+    <div id="prov-list"><div class="card"><span style="color:var(--muted)">Loading…</span></div></div>
+  </section>
+  <!-- PRICES -->
+  <section class="view" id="v-prices">
+    <h2 class="vt">Prices<small>Retail price list vs provider cost</small></h2>
+    <div class="card"><h3>Price tools</h3>
+      <div class="prow" style="margin-top:0">
+        <button class="btn sm" onclick="seedPrices()">⚙️ Match My Price List</button>
+        <button class="btn sm ghost" onclick="costCheck()">🔍 Check Below-Cost Plans</button>
+      </div>
+      <div class="tres" id="price-res"></div>
+      <div id="price-list" style="margin-top:10px"></div>
+    </div>
+  </section>
+  <!-- BACKUP -->
+  <section class="view" id="v-backup">
+    <h2 class="vt">Backup<small>Download everything</small></h2>
+    <div class="card"><h3>💾 Full backup (JSON)</h3>
+      <p style="color:var(--muted); font-size:.88rem">Users, transactions and price list. Secret API values are excluded for safety — they stay in your Render settings.</p>
+      <button class="btn sm" onclick="downloadBackup()">⬇️ Download Backup</button>
+      <div class="tres" id="bak-res"></div>
+    </div>
+  </section>
+  <footer>Developed by <b>Engr Mahmod</b></footer>
+</main>
+</div>
+</div>
+
+<!-- USER MODAL -->
+<div class="mbg" id="umodal"><div class="modal">
+  <h3 id="um-name">User</h3>
+  <div style="color:var(--muted); font-size:.85rem" id="um-sub"></div>
+  <div class="kv" id="um-kv"></div>
+  <h3 style="font-size:.95rem; margin-top:6px">Recent transactions</h3>
+  <div id="um-tx" style="max-height:220px; overflow-y:auto; font-size:.85rem"></div>
+  <div class="abtns">
+    <button class="btn sm" onclick="adjustWallet()">💰 Adjust Wallet</button>
+    <button class="btn sm ghost" onclick="setTempPassword()">🔑 Set Temp Password</button>
+    <button class="btn sm danger" onclick="deleteUser()">🗑️ Delete User</button>
+    <button class="btn sm ghost" onclick="closeUser()">Close</button>
+  </div>
+</div></div>
 
 <script>
 /* SWEETVTU admin — talks to the backend. Admin key required. */
@@ -155,6 +244,8 @@ const $ = id => document.getElementById(id);
 const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let ABASE = '', AKEY = '';
+let USERS = [], TXS = [], SETCACHE = [], CONNSTAT = {};
+let CUR_USER = null;
 try {
   const saved = JSON.parse(localStorage.getItem('sv_admin')||'null');
   if(saved){ ABASE=(saved.base||'').trim(); AKEY=(saved.key||'').trim(); }
@@ -170,16 +261,17 @@ async function aapi(path, method='GET', body=null){
   if(r.status===403) throw new Error('Wrong admin key.');
   return j;
 }
-
-function show(id){
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
-  $(id).classList.add('active'); window.scrollTo(0,0);
+function nav(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
+  $(id).classList.add('on');
+  document.querySelectorAll('#dtabs button, #mtabs button').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('[data-t="'+id+'"]').forEach(b=>b.classList.add('on'));
+  window.scrollTo(0,0);
 }
 async function doAdminLogin(){
   const base = $('ap-base').value.trim().replace(/\/+$/,'') || DEFAULT_BASE;
   const key = $('ap-pass').value.trim();
   const err = $('ap-err');
-  if(base.indexOf('YOUR-BACKEND')!==-1){ err.textContent='Enter your backend URL first.'; return; }
   if(!key){ err.textContent='Enter your admin key.'; return; }
   err.textContent='Connecting…';
   try{
@@ -189,128 +281,304 @@ async function doAdminLogin(){
     ABASE=base; AKEY=key;
     localStorage.setItem('sv_admin', JSON.stringify({base, key}));
     err.textContent='';
-    show('a-panel'); renderAll();
+    $('a-login').style.display='none'; $('a-panel').style.display='block';
+    renderAll();
   }catch(e){ err.textContent=e.message; }
 }
 function doAdminLogout(){
   ABASE=''; AKEY='';
   try{ localStorage.removeItem('sv_admin'); }catch(e){}
-  show('a-login');
+  $('a-panel').style.display='none'; $('a-login').style.display='flex';
 }
-function atab(t){
-  ['over','users','tx','set'].forEach(k=>{
-    $('atab-'+k).classList.toggle('on', k===t);
-    $('t-'+k).style.display = k===t ? 'block' : 'none';
-  });
-  window.scrollTo(0,0);
-  if(t==='set') loadVtpBal();
-}
-let CACHE = {users:[], txs:[]};
 async function renderAll(){
+  await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadPrices()]);
+}
+/* ---------- overview ---------- */
+function statCard(ic, n, l){
+  return '<div class="stat"><div class="ic">'+ic+'</div><div class="n" data-count="'+n+'">0</div><div class="l">'+l+'</div></div>';
+}
+function animateCounts(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target = parseFloat(el.dataset.count); const t0 = performance.now();
+    const step = t => {
+      const p = Math.min(1, (t-t0)/900);
+      const v = target * (1-Math.pow(1-p,3));
+      el.textContent = Number.isInteger(target) ? Math.round(v).toLocaleString() : '₦'+Math.round(v).toLocaleString();
+      if(p<1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+async function loadOverview(){
   try{
-    const [u, t] = await Promise.all([aapi('/api/admin/users'), aapi('/api/admin/transactions')]);
-    if(!u.ok) throw new Error(u.error||'Failed');
-    if(!t.ok) throw new Error(t.error||'Failed');
-    CACHE.users=u.users; CACHE.txs=t.transactions;
-    renderOver(); renderUsers(); renderTx();
-  }catch(e){
-    $('t-over').innerHTML='<div class="empty">'+esc(e.message)+'</div>';
-  }
-}
-function renderOver(){
-  const users=CACHE.users, txs=CACHE.txs;
-  let ntx=txs.length, tin=0, tout=0, wal=0;
-  users.forEach(u=>{ wal+=Number(u.wallet)||0; });
-  txs.forEach(x=>{ if(x.direction==='in') tin+=Number(x.amount)||0; else tout+=Number(x.amount)||0; });
-  $('t-over').innerHTML = `<div class="stats">
-    <div class="stat"><small>Total users</small><div>${users.length}</div></div>
-    <div class="stat"><small>Transactions</small><div>${ntx}</div></div>
-    <div class="stat"><small>Money in</small><div class="g">${naira(tin)}</div></div>
-    <div class="stat"><small>Money out</small><div class="r">${naira(tout)}</div></div>
-    <div class="stat"><small>Wallets total</small><div class="y">${naira(wal)}</div></div>
-    <div class="stat"><small>Net volume</small><div>${naira(tin+tout)}</div></div>
-  </div>
-  <div class="note">Live data from your backend — every user on every phone.</div>`;
-}
-function renderUsers(){
-  const users=CACHE.users;
-  if(!users.length){ $('t-users').innerHTML='<div class="empty">No users yet.</div>'; return; }
-  $('t-users').innerHTML = users.map(m=>
-    `<div class="ucard">
-      <div class="nm">${esc(m.name)}</div>
-      <div class="ph">${esc(m.phone)}</div>
-      <div class="meta">📧 ${esc(m.email||'—')}<br>📅 Joined: ${esc(m.created||'—')}</div>
-      <div class="wal">Wallet: ${naira(m.wallet)}</div>
-      <div class="uacts">
-        <button class="btn small ghost" onclick="admAdjust('${esc(m.phone)}','${esc(m.name)}',${Number(m.wallet)||0})">💰 Adjust wallet</button>
-      </div>
-    </div>`).join('');
-}
-async function admAdjust(phone, name, bal){
-  const v = prompt('Adjust wallet for '+name+' ('+phone+')\nCurrent: '+naira(bal)+'\nEnter amount (negative deducts, e.g. -500):','0');
-  if(v===null) return;
-  const amt = parseFloat(v);
-  if(isNaN(amt)||amt===0){ alert('Enter a non-zero amount.'); return; }
+    const [u, t, s] = await Promise.all([
+      aapi('/api/admin/users'), aapi('/api/admin/transactions'), aapi('/api/admin/settings')
+    ]);
+    USERS = u.ok?u.users:[]; TXS = t.ok?t.transactions:[]; SETCACHE = s.ok?s.settings:[];
+    const wallets = USERS.reduce((a,x)=>a+Number(x.wallet||0),0);
+    const tin = TXS.filter(x=>x.direction==='in').reduce((a,x)=>a+Number(x.amount||0),0);
+    const tout = TXS.filter(x=>x.direction==='out').reduce((a,x)=>a+Number(x.amount||0),0);
+    $('stat-grid').innerHTML =
+      statCard('👥', USERS.length, 'Users') +
+      statCard('🧾', TXS.length, 'Transactions') +
+      statCard('💵', Math.round(wallets), 'Wallets total') +
+      statCard('📥', Math.round(tin), 'Money in') +
+      statCard('📤', Math.round(tout), 'Money out') +
+      statCard('⚖️', Math.round(tin-tout), 'Net volume');
+    animateCounts();
+    const vt = SETCACHE.find(x=>x.key==='VTPASS_SANDBOX');
+    const mo = SETCACHE.find(x=>x.key==='MONNIFY_SANDBOX');
+    const vtLive = vt && vt.value==='0';
+    $('mode-badge').textContent = vtLive ? 'VTPASS LIVE' : 'VTPASS TEST';
+    $('mode-rows').innerHTML =
+      '<div class="rowline"><span class="k">VTpass</span><b>'+(vtLive?'🟢 LIVE':'🟡 SANDBOX')+'</b></div>'+
+      '<div class="rowline"><span class="k">Monnify</span><b>'+(mo&&mo.value==='0'?'🟢 LIVE':'🟡 SANDBOX')+'</b></div>';
+  }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
-    const j = await aapi('/api/admin/wallet','POST',{phone, amount:Math.abs(amt), action: amt>0?'add':'deduct'});
-    if(!j.ok) throw new Error(j.error);
-    alert('Wallet updated.'); renderAll();
+    const b = await aapi('/api/admin/vtpass-balance');
+    let balTxt = '—';
+    if(b.ok){ const bal = (b.balance.content||{}).balance; balTxt = (bal==null? JSON.stringify(b.balance).slice(0,60) : naira(bal)); }
+    $('vt-bal').innerHTML = '<div class="rowline"><span class="k">Available</span><b style="font-size:1.4rem;color:var(--gold)">'+(b.ok?balTxt:esc(b.error||'unavailable'))+'</b></div>';
+  }catch(e){ $('vt-bal').innerHTML = '<span style="color:var(--muted)">Unavailable</span>'; }
+}
+/* ---------- users ---------- */
+async function loadUsers(){
+  try{
+    const j = await aapi('/api/admin/users');
+    USERS = j.ok?j.users:[];
+    renderUserCards();
+  }catch(e){ $('u-list').innerHTML = '<div class="card">Could not load users.</div>'; }
+}
+function renderUserCards(){
+  const q = ($('u-search').value||'').toLowerCase();
+  const list = USERS.filter(u => !q || (u.name+' '+u.phone+' '+u.email).toLowerCase().includes(q));
+  $('u-count').textContent = USERS.length + ' registered';
+  $('u-list').innerHTML = list.length ? list.map(u=>
+    '<div class="ucard" onclick="openUser('+u.id+')">'+
+    '<div class="avatar">'+esc((u.name||'?')[0].toUpperCase())+'</div>'+
+    '<div><div class="nm">'+esc(u.name)+'<span class="vbadge'+(u.email_verified?'':' no')+'">'+(u.email_verified?'✓ verified':'unverified')+'</span></div>'+
+    '<div class="ph">'+esc(u.phone)+' · '+esc(u.email||'')+'</div></div>'+
+    '<div class="wl">'+naira(u.wallet)+'</div></div>'
+  ).join('') : '<div class="card">No users found.</div>';
+}
+async function openUser(id){
+  try{
+    const j = await aapi('/api/admin/user?id='+id);
+    if(!j.ok) return alert(j.error||'Could not load user.');
+    const u = j.user; CUR_USER = u;
+    $('um-name').textContent = u.name;
+    $('um-sub').textContent = u.phone+' · joined '+(u.created||'').slice(0,10);
+    const kv = (k,v)=>'<div class="k">'+k+'</div><div class="v">'+v+'</div>';
+    $('um-kv').innerHTML =
+      kv('Email', esc(u.email||'—')+(u.email_verified?' <span class="vbadge">✓</span>':' <span class="vbadge no">unverified</span>'))+
+      kv('Wallet', '<b style="color:var(--gold)">'+naira(u.wallet)+'</b>')+
+      kv('Transactions', u.tx_count)+
+      kv('Bank account', u.monnify_acct ? esc(u.monnify_acct)+' · '+esc(u.monnify_bank||'')+'<br>'+esc(u.monnify_acct_name||'') : '—');
+    $('um-tx').innerHTML = (u.recent||[]).length ? u.recent.map(t=>
+      '<div class="rowline"><span class="k">'+esc((t.created||'').slice(0,16))+'</span><span>'+esc(t.description||t.type||'')+'</span><b style="color:'+(t.direction==='in'?'var(--green)':'var(--gold)')+'">'+(t.direction==='in'?'+':'−')+naira(t.amount)+'</b></div>'
+    ).join('') : '<span style="color:var(--muted)">No transactions yet.</span>';
+    $('umodal').classList.add('show');
   }catch(e){ alert(e.message); }
 }
-function renderTx(){
-  const txs=CACHE.txs;
-  if(!txs.length){ $('t-tx').innerHTML='<div class="empty">No transactions yet.</div>'; return; }
-  const byUser = {};
-  txs.forEach(x=>{ (byUser[x.phone||'—']=byUser[x.phone||'—']||[]).push(x); });
-  $('t-tx').innerHTML = Object.keys(byUser).map(ph=>
-    `<div class="txgroup"><h4>${esc(ph)}</h4>` +
-    byUser[ph].map(x=>`<div class="tx"><div class="t-main"><b>${esc(x.description)}</b>
-      <small>${esc(x.created)}${x.status&&x.status!=='successful'?' · '+esc(x.status):''}</small></div>
-      <div class="amt ${x.direction}">${x.direction==='in'?'+':'−'}${naira(x.amount)}</div></div>`).join('')
-    + `</div>`).join('');
-}
-async function loadVtpBal(){
-  $('vtp-bal').innerHTML='<div class="empty">Loading…</div>';
+function closeUser(){ $('umodal').classList.remove('show'); CUR_USER=null; }
+async function adjustWallet(){
+  if(!CUR_USER) return;
+  const amt = prompt('Amount in ₦ (positive number):', '1000');
+  if(amt===null) return;
+  const v = parseFloat(amt);
+  if(!(v>0)) return alert('Enter a valid amount.');
+  const action = confirm('OK = ADD '+naira(v)+' to wallet.\nCancel = SUBTRACT '+naira(v)+' from wallet.') ? 'add' : 'remove';
   try{
-    const j = await aapi('/api/admin/vtpass-balance');
-    const c = (j.balance&&j.balance.content&&j.balance.content.wallet)||[];
-    $('vtp-bal').innerHTML = c.length
-      ? c.map(w=>`<div class="tx"><div class="t-main"><b>VTpass wallet</b></div><div class="amt in">${naira(w.balance)}</div></div>`).join('')
-      : '<div class="empty">'+esc(JSON.stringify(j.balance).slice(0,200))+'</div>';
-  }catch(e){ $('vtp-bal').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+    const j = await aapi('/api/admin/wallet','POST',{phone: CUR_USER.phone, amount: v, action});
+    if(!j.ok) return alert(j.error||'Failed.');
+    alert('Wallet updated.');
+    closeUser(); loadUsers(); loadOverview();
+  }catch(e){ alert(e.message); }
+}
+async function setTempPassword(){
+  if(!CUR_USER) return;
+  const pw = prompt('New temporary password for '+CUR_USER.name+' (min 4 chars):', '');
+  if(pw===null) return;
+  if(pw.length<4) return alert('Password must be at least 4 characters.');
+  try{
+    const j = await aapi('/api/admin/user-password','POST',{user_id: CUR_USER.id, new_password: pw});
+    if(!j.ok) return alert(j.error||'Failed.');
+    alert('Password set. Tell the user: '+pw);
+  }catch(e){ alert(e.message); }
+}
+async function deleteUser(){
+  if(!CUR_USER) return;
+  if(!confirm('Delete '+CUR_USER.name+' and ALL their transactions? This cannot be undone.')) return;
+  if(!confirm('Really delete? Last chance.')) return;
+  try{
+    const j = await aapi('/api/admin/user','DELETE',{user_id: CUR_USER.id});
+    if(!j.ok) return alert(j.error||'Failed.');
+    alert('User deleted.');
+    closeUser(); loadUsers(); loadOverview();
+  }catch(e){ alert(e.message); }
+}
+/* ---------- transactions ---------- */
+async function loadTxs(){
+  try{
+    const j = await aapi('/api/admin/transactions');
+    TXS = j.ok?j.transactions:[];
+    const umap = {}; USERS.forEach(u=>umap[u.id]=u.name);
+    $('t-count').textContent = TXS.length + ' latest';
+    $('tx-rows').innerHTML = TXS.slice(0,120).map(t=>
+      '<tr><td style="white-space:nowrap">'+esc((t.created||'').slice(0,16).replace('T',' '))+'</td>'+
+      '<td>'+esc(umap[t.user_id]||t.phone||'')+'</td>'+
+      '<td>'+esc(t.description||t.type||'')+'</td>'+
+      '<td><span class="pill '+(t.direction==='in'?'in':'out')+'">'+(t.direction==='in'?'+':'−')+naira(t.amount)+'</span></td>'+
+      '<td>'+esc(t.status||'')+'</td></tr>'
+    ).join('');
+  }catch(e){ $('tx-rows').innerHTML = '<tr><td>Could not load.</td></tr>'; }
+}
+/* ---------- api connections ---------- */
+const PROV_META = [
+  {group:'VTpass', icon:'⚡', desc:'Data, airtime, cable TV and electricity purchases.', test:'vtpass', sandboxKey:'VTPASS_SANDBOX'},
+  {group:'Monnify', icon:'🏦', desc:'Wallet funding — permanent virtual accounts per customer.', test:'monnify', sandboxKey:'MONNIFY_SANDBOX'},
+  {group:'Email', icon:'📧', desc:'Brevo — signup codes and password resets.', test:'brevo', sandboxKey:null},
+  {group:'Paystack', icon:'💳', desc:'Shelved — Monnify handles funding now.', test:null, sandboxKey:null, shelved:true},
+];
+async function loadConns(){
+  try{
+    const j = await aapi('/api/admin/settings');
+    SETCACHE = j.ok?j.settings:[];
+    renderConns();
+  }catch(e){ $('prov-list').innerHTML = '<div class="card">Could not load settings.</div>'; }
+}
+function setting(key){ const s = SETCACHE.find(x=>x.key===key); return s||{key, value:'', secret:false, label:key}; }
+function renderConns(){
+  $('prov-list').innerHTML = PROV_META.map(p=>{
+    const fields = SETCACHE.filter(s=>s.group===p.group && s.key!==p.sandboxKey);
+    const st = CONNSTAT[p.test];
+    const dot = p.shelved ? '' : '<span class="dot'+(st===true?' ok':st===false?' bad':'')+'" id="dot-'+p.test+'"></span>';
+    let html = '<div class="prov'+(p.shelved?' shelved':'')+'"><div class="ph"><span class="ic">'+p.icon+'</span><b>'+p.group+'</b>'+dot+'</div><p class="desc">'+p.desc+'</p>';
+    if(p.sandboxKey){
+      const sb = setting(p.sandboxKey);
+      const live = sb.value==='0';
+      html += '<div class="switchrow"><div><div class="t">'+(live?'🟢 LIVE mode':'🟡 Sandbox (test) mode')+'</div>'+
+        '<div class="s">Flip to go live — applies instantly, no restart</div></div>'+
+        '<label class="switch"><input type="checkbox" '+(live?'checked':'')+' onchange="toggleSandbox(\''+p.sandboxKey+'\',this.checked)"><span class="sl"></span></label></div>';
+    }
+    fields.forEach(f=>{
+      const fid = 'f-'+f.key;
+      const isSecret = !!f.secret;
+      html += '<div class="pfield"><label>'+esc(f.label)+'</label><div class="inwrap">'+
+        '<input id="'+fid+'" type="'+(isSecret?'password':'text')+'" value="'+esc(f.value||'')+'" autocomplete="off" spellcheck="false"'+(p.shelved?' disabled':'')+'>'+
+        (isSecret?'<button class="eye" onclick="var i=document.getElementById(\''+fid+'\'); i.type=i.type===\'password\'?\'text\':\'password\'">👁️</button>':'')+
+        '</div></div>';
+    });
+    if(!p.shelved){
+      html += '<div class="prow"><button class="btn sm" onclick="saveCard(\''+p.group+'\')">💾 Save '+p.group+'</button>'+
+        (p.test?'<button class="btn sm ghost" onclick="testConn(\''+p.test+'\')">🔌 Test connection</button>':'')+'</div>'+
+        '<div class="tres" id="tres-'+p.test+'"></div>';
+    }
+    return html+'</div>';
+  }).join('');
+}
+async function saveSetting(key, value){
+  const j = await aapi('/api/admin/settings','POST',{key, value});
+  if(!j.ok) throw new Error(j.error||'Save failed.');
+  const s = SETCACHE.find(x=>x.key===key); if(s) s.value = value;
+}
+async function saveCard(group){
+  const res = $('tres-'+(PROV_META.find(p=>p.group===group)||{}).test);
+  try{
+    const fields = SETCACHE.filter(s=>s.group===group);
+    for(const f of fields){
+      const el = document.getElementById('f-'+f.key);
+      if(el && el.value !== (f.value||'')) await saveSetting(f.key, el.value);
+    }
+    if(res){ res.className='tres ok'; res.textContent='✓ Saved.'; }
+    renderConns(); loadOverview();
+  }catch(e){ if(res){ res.className='tres bad'; res.textContent='✗ '+e.message; } else alert(e.message); }
+}
+async function toggleSandbox(key, live){
+  const resId = key.startsWith('VTPASS') ? 'tres-vtpass' : 'tres-monnify';
+  const res = $(resId);
+  try{
+    await saveSetting(key, live?'0':'1');
+    if(res){ res.className='tres ok'; res.textContent = live ? '✓ Now LIVE.' : '✓ Now in sandbox.'; }
+    renderConns(); loadOverview();
+  }catch(e){ if(res){ res.className='tres bad'; res.textContent='✗ '+e.message; } }
+}
+async function testConn(service){
+  const res = $('tres-'+service), dot = $('dot-'+service);
+  res.className='tres'; res.textContent='Testing…';
+  try{
+    const j = await aapi('/api/admin/test-connection','POST',{service});
+    CONNSTAT[service] = !!j.ok;
+    if(dot) dot.className = 'dot'+(j.ok?' ok':' bad');
+    res.className = 'tres '+(j.ok?'ok':'bad');
+    res.textContent = (j.ok?'✓ ':'✗ ')+(j.detail||j.error||'');
+  }catch(e){
+    CONNSTAT[service] = false;
+    if(dot) dot.className = 'dot bad';
+    res.className='tres bad'; res.textContent='✗ '+e.message;
+  }
+}
+/* ---------- prices ---------- */
+async function loadPrices(){
+  try{
+    const j = await aapi('/api/admin/prices');
+    const rows = j.ok?j.prices:[];
+    $('price-list').innerHTML = rows.length ?
+      '<table class="tbl"><thead><tr><th>Plan</th><th>Sell</th><th>Cost</th></tr></thead><tbody>'+
+      rows.map(p=>'<tr><td>'+esc(p.label||p.variation_code)+'</td><td><b>'+naira(p.sell_price)+'</b></td><td>'+(p.cost_price!=null?naira(p.cost_price):'—')+'</td></tr>').join('')+'</tbody></table>'
+      : '<span style="color:var(--muted)">No prices set yet — tap “Match My Price List”.</span>';
+  }catch(e){}
 }
 async function seedPrices(){
-  $('price-msg').innerHTML='Matching your price list to VTpass plans…';
+  const res = $('price-res'); res.className='tres'; res.textContent='Matching…';
   try{
     const j = await aapi('/api/admin/seed-prices','POST',{});
-    if(!j.ok) throw new Error(j.error);
-    const bad = j.seeded.filter(s=>s.below_cost);
-    $('price-msg').innerHTML = `<div class="note">Matched ${j.seeded.length} plans. `+
-      (bad.length?`<b style="color:var(--red)">${bad.length} are priced BELOW VTpass cost — you lose money on each sale:</b><br>`+
-        bad.map(b=>esc(b.plan)+` (sell ${naira(b.sell)} / cost ${naira(b.cost)})`).join('<br>')
-       : 'All matched plans are above cost. ✔')+
-      (j.unmatched.length?`<br><br>Unmatched (${j.unmatched.length}) — set manually if needed.`:'')+`</div>`;
-  }catch(e){ $('price-msg').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    const bad = (j.seeded||[]).filter(s=>s.below_cost);
+    res.className = 'tres '+(bad.length?'bad':'ok');
+    res.textContent = '✓ Matched '+(j.seeded||[]).length+' plans.'+(bad.length?' ⚠️ '+bad.length+' BELOW COST — check them!':'');
+    loadPrices();
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
 }
 async function costCheck(){
-  $('price-msg').innerHTML='Checking…';
+  const res = $('price-res'); res.className='tres'; res.textContent='Checking…';
   try{
     const j = await aapi('/api/admin/cost-check');
-    if(!j.ok) throw new Error(j.error);
-    $('price-msg').innerHTML = j.losing.length
-      ? `<div class="note"><b style="color:var(--red)">${j.losing.length} plans lose money:</b><br>`+
-        j.losing.map(l=>esc(l.plan)+` — sell ${naira(l.sell)}, cost ${naira(l.cost)} (lose ${naira(l.loss)})`).join('<br')+`</div>`
-      : '<div class="note">No below-cost plans. ✔</div>';
-  }catch(e){ $('price-msg').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    const losing = j.losing||[];
+    res.className = 'tres '+(losing.length?'bad':'ok');
+    res.textContent = losing.length ? '⚠️ '+losing.length+' plans selling BELOW cost:' : '✓ No below-cost plans. All good.';
+    if(losing.length) res.textContent += ' '+losing.slice(0,8).map(l=>l.plan+' (−'+naira(l.loss)+')').join(', ');
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
 }
-function admExport(){
-  const data = {exportedAt:new Date().toISOString(), users:CACHE.users, transactions:CACHE.txs};
-  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob); a.download = 'sweetvtu-backup.json'; a.click();
-  setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
+/* ---------- backup ---------- */
+async function downloadBackup(){
+  const res = $('bak-res'); res.className='tres'; res.textContent='Preparing…';
+  try{
+    const [u, t, p] = await Promise.all([aapi('/api/admin/users'), aapi('/api/admin/transactions'), aapi('/api/admin/prices')]);
+    const data = {
+      app: 'SWEETVTU', exported: new Date().toISOString(),
+      users: u.ok?u.users:[], transactions: t.ok?t.transactions:[], prices: p.ok?p.prices:[],
+      settings_keys: SETCACHE.map(s=>({key:s.key, group:s.group, secret:s.secret}))
+    };
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'sweetvtu-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    a.click();
+    res.className='tres ok'; res.textContent='✓ Backup downloaded.';
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
 }
-if(ABASE && AKEY){ $('ap-base').value=ABASE; (async()=>{ try{ await aapi('/api/admin/users'); show('a-panel'); renderAll(); }catch(e){ show('a-login'); } })(); }
+/* ---------- boot ---------- */
+(async function(){
+  if(ABASE && AKEY){
+    try{
+      const r = await fetch(ABASE + '/api/admin/users', {headers:{'X-Admin-Key':AKEY}});
+      if(r.ok){ $('a-login').style.display='none'; $('a-panel').style.display='block'; renderAll(); return; }
+    }catch(e){}
+  }
+  $('a-login').style.display='flex';
+})();
 </script>
 </body>
 </html>
