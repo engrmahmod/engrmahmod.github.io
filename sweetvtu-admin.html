@@ -96,10 +96,11 @@
     <div class="badge">ADMIN AREA</div>
     <h2>🔐 Admin login</h2>
     <p class="sub">Only you should ever open this page. Do not share its link.</p>
-    <div class="field"><label>Admin password</label><input id="ap-pass" type="password" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
+    <div class="field"><label>Backend URL</label><input id="ap-base" placeholder="https://sweetvtu-backend.onrender.com"></div>
+    <div class="field"><label>Admin key</label><input id="ap-pass" type="password" placeholder="The ADMIN_KEY from your server" onkeydown="if(event.key==='Enter')doAdminLogin()"></div>
     <div class="err" id="ap-err"></div>
     <button class="btn" onclick="doAdminLogin()">Log In</button>
-    <div class="note">First time? Default password is <b>admin123</b>.<br>Change it immediately in <b>Settings</b> after logging in.</div>
+    <div class="note">The admin key is the <b>ADMIN_KEY</b> you set in your Render environment variables.</div>
   </div>
 
   <!-- PANEL -->
@@ -123,22 +124,22 @@
 
     <div id="t-set" style="display:none">
       <div class="sec">
-        <h3>🔑 Change admin password</h3>
-        <p>Pick something only you know.</p>
-        <div class="field"><label>Current password</label><input id="as-cur" type="password"></div>
-        <div class="field"><label>New password</label><input id="as-new" type="password" placeholder="Min. 6 characters"></div>
-        <div class="err" id="as-err"></div>
-        <button class="btn" onclick="admChangePw()">Update Password</button>
+        <h3>💰 VTpass wallet</h3>
+        <p>Your VTpass balance (this is what pays for customers' data/airtime).</p>
+        <div id="vtp-bal"><div class="empty">Loading…</div></div>
+        <button class="btn ghost" onclick="loadVtpBal()">Refresh Balance</button>
+      </div>
+      <div class="sec">
+        <h3>💲 Data prices</h3>
+        <p>Match your retail price list to VTpass plans, then review anything priced below cost.</p>
+        <button class="btn" onclick="seedPrices()">Match My Price List</button>
+        <button class="btn ghost" onclick="costCheck()">Check Below-Cost Plans</button>
+        <div id="price-msg" style="margin-top:10px"></div>
       </div>
       <div class="sec">
         <h3>💾 Backup data</h3>
         <p>Download all users and transactions as a file.</p>
         <button class="btn ghost" onclick="admExport()">Download Backup (JSON)</button>
-      </div>
-      <div class="sec">
-        <h3 style="color:var(--red)">🗑️ Danger zone</h3>
-        <p>Delete every user and transaction stored in this browser. Cannot be undone.</p>
-        <button class="btn danger" onclick="admClear()">Clear All Demo Data</button>
       </div>
     </div>
 
@@ -148,140 +149,168 @@
 </div>
 
 <script>
-const DB = {
-  read(k,d){ try{ const v=JSON.parse(localStorage.getItem('sv_'+k)); return v==null?d:v }catch(e){ return d } },
-  write(k,v){ localStorage.setItem('sv_'+k, JSON.stringify(v)) }
-};
+/* SWEETVTU admin — talks to the backend. Admin key required. */
+const DEFAULT_BASE = 'https://sweetvtu-backend.onrender.com';
 const $ = id => document.getElementById(id);
 const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const users = () => DB.read('users',{});
-const saveUsers = u => DB.write('users',u);
-const txs = () => DB.read('txs',{});
-const saveTxs = t => DB.write('txs',t);
-const adminPw = () => DB.read('adminpw','admin123');
+let ABASE = '', AKEY = '';
+try {
+  const saved = JSON.parse(localStorage.getItem('sv_admin')||'null');
+  if(saved){ ABASE=saved.base||''; AKEY=saved.key||''; }
+} catch(e){}
+
+async function aapi(path, method='GET', body=null){
+  const r = await fetch(ABASE + path, {
+    method,
+    headers: {'Content-Type':'application/json', 'X-Admin-Key': AKEY},
+    body: body ? JSON.stringify(body) : null
+  });
+  const j = await r.json().catch(()=>({ok:false, error:'Server did not respond.'}));
+  if(r.status===403) throw new Error('Wrong admin key.');
+  return j;
+}
 
 function show(id){
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
   $(id).classList.add('active'); window.scrollTo(0,0);
 }
-function doAdminLogin(){
-  const p = $('ap-pass').value;
-  if(p === adminPw()){ $('ap-err').textContent=''; $('ap-pass').value=''; DB.write('admin','1'); show('a-panel'); renderAll(); }
-  else $('ap-err').textContent = 'Wrong password. Try again.';
+async function doAdminLogin(){
+  const base = $('ap-base').value.trim().replace(/\/+$/,'') || DEFAULT_BASE;
+  const key = $('ap-pass').value;
+  const err = $('ap-err');
+  if(base.indexOf('YOUR-BACKEND')!==-1){ err.textContent='Enter your backend URL first.'; return; }
+  if(!key){ err.textContent='Enter your admin key.'; return; }
+  err.textContent='Connecting…';
+  try{
+    const r = await fetch(base + '/api/admin/users', {headers:{'X-Admin-Key':key}});
+    if(r.status===403) throw new Error('Wrong admin key.');
+    if(!r.ok) throw new Error('Server error '+r.status);
+    ABASE=base; AKEY=key;
+    localStorage.setItem('sv_admin', JSON.stringify({base, key}));
+    err.textContent='';
+    show('a-panel'); renderAll();
+  }catch(e){ err.textContent=e.message; }
 }
-function doAdminLogout(){ DB.write('admin',null); show('a-login'); }
-
+function doAdminLogout(){
+  ABASE=''; AKEY='';
+  try{ localStorage.removeItem('sv_admin'); }catch(e){}
+  show('a-login');
+}
 function atab(t){
   ['over','users','tx','set'].forEach(k=>{
     $('atab-'+k).classList.toggle('on', k===t);
     $('t-'+k).style.display = k===t ? 'block' : 'none';
   });
   window.scrollTo(0,0);
+  if(t==='set') loadVtpBal();
 }
-function renderAll(){ renderOver(); renderUsers(); renderTx(); }
-
+let CACHE = {users:[], txs:[]};
+async function renderAll(){
+  try{
+    const [u, t] = await Promise.all([aapi('/api/admin/users'), aapi('/api/admin/transactions')]);
+    if(!u.ok) throw new Error(u.error||'Failed');
+    if(!t.ok) throw new Error(t.error||'Failed');
+    CACHE.users=u.users; CACHE.txs=t.transactions;
+    renderOver(); renderUsers(); renderTx();
+  }catch(e){
+    $('t-over').innerHTML='<div class="empty">'+esc(e.message)+'</div>';
+  }
+}
 function renderOver(){
-  const u = users(), t = txs(), phones = Object.keys(u);
-  let ntx=0, tin=0, tout=0, wal=0;
-  phones.forEach(ph=>{
-    wal += Number(u[ph].wallet)||0;
-    (t[ph]||[]).forEach(x=>{ ntx++; if(x.dir==='in') tin+=Number(x.amount)||0; else tout+=Number(x.amount)||0; });
-  });
+  const users=CACHE.users, txs=CACHE.txs;
+  let ntx=txs.length, tin=0, tout=0, wal=0;
+  users.forEach(u=>{ wal+=Number(u.wallet)||0; });
+  txs.forEach(x=>{ if(x.direction==='in') tin+=Number(x.amount)||0; else tout+=Number(x.amount)||0; });
   $('t-over').innerHTML = `<div class="stats">
-    <div class="stat"><small>Total users</small><div>${phones.length}</div></div>
+    <div class="stat"><small>Total users</small><div>${users.length}</div></div>
     <div class="stat"><small>Transactions</small><div>${ntx}</div></div>
     <div class="stat"><small>Money in</small><div class="g">${naira(tin)}</div></div>
     <div class="stat"><small>Money out</small><div class="r">${naira(tout)}</div></div>
     <div class="stat"><small>Wallets total</small><div class="y">${naira(wal)}</div></div>
     <div class="stat"><small>Net volume</small><div>${naira(tin+tout)}</div></div>
   </div>
-  <div class="note">Figures cover accounts created <b>in this browser</b> (demo storage). A backend will be needed to see every user on every phone.</div>`;
+  <div class="note">Live data from your backend — every user on every phone.</div>`;
 }
-
 function renderUsers(){
-  const u = users(), phones = Object.keys(u);
-  if(!phones.length){ $('t-users').innerHTML = '<div class="empty">No users yet.<br>Accounts created on the website (this browser) will appear here.</div>'; return; }
-  $('t-users').innerHTML = phones.map(ph=>{
-    const m = u[ph];
-    return `<div class="ucard">
+  const users=CACHE.users;
+  if(!users.length){ $('t-users').innerHTML='<div class="empty">No users yet.</div>'; return; }
+  $('t-users').innerHTML = users.map(m=>
+    `<div class="ucard">
       <div class="nm">${esc(m.name)}</div>
-      <div class="ph">${esc(ph)}</div>
-      <div class="meta">📧 ${esc(m.email||'—')}<br>📅 Joined: ${esc(m.joined||'—')}</div>
+      <div class="ph">${esc(m.phone)}</div>
+      <div class="meta">📧 ${esc(m.email||'—')}<br>📅 Joined: ${esc(m.created||'—')}</div>
       <div class="wal">Wallet: ${naira(m.wallet)}</div>
       <div class="uacts">
-        <button class="btn small ghost" onclick="admResetPw('${esc(ph)}')">🔑 Reset password</button>
-        <button class="btn small ghost" onclick="admAdjust('${esc(ph)}')">💰 Adjust wallet</button>
-        <button class="btn small danger" onclick="admDelete('${esc(ph)}')">🗑️ Delete</button>
+        <button class="btn small ghost" onclick="admAdjust('${esc(m.phone)}','${esc(m.name)}',${Number(m.wallet)||0})">💰 Adjust wallet</button>
       </div>
-    </div>`;
-  }).join('');
+    </div>`).join('');
 }
-
-function admResetPw(ph){
-  const u = users(); if(!u[ph]) return;
-  const np = prompt('New password for '+u[ph].name+' ('+ph+')\nMin. 4 characters:');
-  if(np===null) return;
-  if(np.length<4){ alert('Password must be at least 4 characters.'); return; }
-  u[ph].pass = np; saveUsers(u);
-  alert('Password updated for '+u[ph].name+'.');
-}
-function admAdjust(ph){
-  const u = users(); if(!u[ph]) return;
-  const v = prompt('Adjust wallet for '+u[ph].name+'\nCurrent: '+naira(u[ph].wallet)+'\nEnter amount (negative deducts, e.g. -500):','0');
+async function admAdjust(phone, name, bal){
+  const v = prompt('Adjust wallet for '+name+' ('+phone+')\nCurrent: '+naira(bal)+'\nEnter amount (negative deducts, e.g. -500):','0');
   if(v===null) return;
-  const amt = parseInt(v,10);
+  const amt = parseFloat(v);
   if(isNaN(amt)||amt===0){ alert('Enter a non-zero amount.'); return; }
-  u[ph].wallet = (Number(u[ph].wallet)||0) + amt; saveUsers(u);
-  const t = txs(); const mine = t[ph]||[];
-  mine.unshift({type:'fund', desc:'Admin wallet adjustment', amount:Math.abs(amt), dir: amt>0?'in':'out', date:new Date().toLocaleString('en-NG')});
-  t[ph]=mine; saveTxs(t);
-  renderAll(); alert('Wallet updated. New balance: '+naira(u[ph].wallet));
+  try{
+    const j = await aapi('/api/admin/wallet','POST',{phone, amount:Math.abs(amt), action: amt>0?'add':'deduct'});
+    if(!j.ok) throw new Error(j.error);
+    alert('Wallet updated.'); renderAll();
+  }catch(e){ alert(e.message); }
 }
-function admDelete(ph){
-  const u = users(); if(!u[ph]) return;
-  if(!confirm('Delete '+u[ph].name+' ('+ph+') and all their transactions?\nThis cannot be undone.')) return;
-  delete u[ph]; saveUsers(u);
-  const t = txs(); delete t[ph]; saveTxs(t);
-  renderAll();
-}
-
 function renderTx(){
-  const u = users(), t = txs(), phones = Object.keys(u);
-  let html = '';
-  phones.forEach(ph=>{
-    const list = t[ph]||[];
-    if(!list.length) return;
-    html += `<div class="txgroup"><h4>${esc(u[ph].name)} · ${esc(ph)}</h4>` +
-      list.map(x=>`<div class="tx"><div class="t-main"><b>${esc(x.desc)}</b><small>${esc(x.date)}</small></div>
-        <div class="amt ${x.dir}">${x.dir==='in'?'+':'−'}${naira(x.amount)}</div></div>`).join('') + `</div>`;
-  });
-  $('t-tx').innerHTML = html || '<div class="empty">No transactions yet.</div>';
+  const txs=CACHE.txs;
+  if(!txs.length){ $('t-tx').innerHTML='<div class="empty">No transactions yet.</div>'; return; }
+  const byUser = {};
+  txs.forEach(x=>{ (byUser[x.phone||'—']=byUser[x.phone||'—']||[]).push(x); });
+  $('t-tx').innerHTML = Object.keys(byUser).map(ph=>
+    `<div class="txgroup"><h4>${esc(ph)}</h4>` +
+    byUser[ph].map(x=>`<div class="tx"><div class="t-main"><b>${esc(x.description)}</b>
+      <small>${esc(x.created)}${x.status&&x.status!=='successful'?' · '+esc(x.status):''}</small></div>
+      <div class="amt ${x.direction}">${x.direction==='in'?'+':'−'}${naira(x.amount)}</div></div>`).join('')
+    + `</div>`).join('');
 }
-
-function admChangePw(){
-  const cur = $('as-cur').value, nw = $('as-new').value, err = $('as-err');
-  if(cur !== adminPw()){ err.textContent='Current password is wrong.'; return; }
-  if(nw.length<6){ err.textContent='New password must be at least 6 characters.'; return; }
-  DB.write('adminpw', nw);
-  $('as-cur').value=''; $('as-new').value=''; err.textContent='';
-  alert('Admin password updated.');
+async function loadVtpBal(){
+  $('vtp-bal').innerHTML='<div class="empty">Loading…</div>';
+  try{
+    const j = await aapi('/api/admin/vtpass-balance');
+    const c = (j.balance&&j.balance.content&&j.balance.content.wallet)||[];
+    $('vtp-bal').innerHTML = c.length
+      ? c.map(w=>`<div class="tx"><div class="t-main"><b>VTpass wallet</b></div><div class="amt in">${naira(w.balance)}</div></div>`).join('')
+      : '<div class="empty">'+esc(JSON.stringify(j.balance).slice(0,200))+'</div>';
+  }catch(e){ $('vtp-bal').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function seedPrices(){
+  $('price-msg').innerHTML='Matching your price list to VTpass plans…';
+  try{
+    const j = await aapi('/api/admin/seed-prices','POST',{});
+    if(!j.ok) throw new Error(j.error);
+    const bad = j.seeded.filter(s=>s.below_cost);
+    $('price-msg').innerHTML = `<div class="note">Matched ${j.seeded.length} plans. `+
+      (bad.length?`<b style="color:var(--red)">${bad.length} are priced BELOW VTpass cost — you lose money on each sale:</b><br>`+
+        bad.map(b=>esc(b.plan)+` (sell ${naira(b.sell)} / cost ${naira(b.cost)})`).join('<br>')
+       : 'All matched plans are above cost. ✔')+
+      (j.unmatched.length?`<br><br>Unmatched (${j.unmatched.length}) — set manually if needed.`:'')+`</div>`;
+  }catch(e){ $('price-msg').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
+}
+async function costCheck(){
+  $('price-msg').innerHTML='Checking…';
+  try{
+    const j = await aapi('/api/admin/cost-check');
+    if(!j.ok) throw new Error(j.error);
+    $('price-msg').innerHTML = j.losing.length
+      ? `<div class="note"><b style="color:var(--red)">${j.losing.length} plans lose money:</b><br>`+
+        j.losing.map(l=>esc(l.plan)+` — sell ${naira(l.sell)}, cost ${naira(l.cost)} (lose ${naira(l.loss)})`).join('<br')+`</div>`
+      : '<div class="note">No below-cost plans. ✔</div>';
+  }catch(e){ $('price-msg').innerHTML='<div class="empty">'+esc(e.message)+'</div>'; }
 }
 function admExport(){
-  const data = {exportedAt:new Date().toISOString(), users:users(), transactions:txs()};
+  const data = {exportedAt:new Date().toISOString(), users:CACHE.users, transactions:CACHE.txs};
   const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob); a.download = 'sweetvtu-backup.json'; a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href), 2000);
 }
-function admClear(){
-  if(!confirm('Delete ALL users and transactions in this browser?')) return;
-  if(!confirm('Are you really sure? This cannot be undone.')) return;
-  DB.write('users',{}); DB.write('txs',{}); renderAll();
-  alert('All demo data cleared.');
-}
-
-if(DB.read('admin',null)==='1'){ show('a-panel'); renderAll(); }
+if(ABASE && AKEY){ $('ap-base').value=ABASE; (async()=>{ try{ await aapi('/api/admin/users'); show('a-panel'); renderAll(); }catch(e){ show('a-login'); } })(); }
 </script>
 </body>
 </html>
