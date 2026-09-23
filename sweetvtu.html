@@ -488,7 +488,24 @@
     <div class="field"><label>Password</label><input id="si-pass" type="password" placeholder="Your password"></div>
     <div class="err" id="si-err"></div>
     <button class="btn" onclick="doSignin()">Sign In</button>
+    <div class="link"><a onclick="show('v-forgot')">Forgot password?</a></div>
     <div class="link">New here? <a onclick="show('v-signup')">Create account</a></div>
+  </div>
+
+  <div class="view" id="v-forgot">
+    <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div><button class="back" onclick="go('site')">Home</button></div>
+    <h2 style="margin:14px 0 4px">Reset password</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">Enter your account email and we'll send you a 6-digit reset code.</p>
+    <div class="field"><label>Email address</label><input id="fp-email" type="email" placeholder="you@example.com"></div>
+    <div class="err" id="fp-err"></div>
+    <button class="btn" id="fp-sendbtn" onclick="doForgotSend()">Send Code</button>
+    <div id="fp-step2" style="display:none; margin-top:18px">
+      <div class="field"><label>6-digit code</label><input id="fp-code" inputmode="numeric" maxlength="6" placeholder="6-digit code" style="text-align:center;font-size:1.3rem;letter-spacing:.4em"></div>
+      <div class="field"><label>New password</label><input id="fp-pass" type="password" placeholder="New password (min 4 characters)"></div>
+      <div class="err" id="fp-err2"></div>
+      <button class="btn" onclick="doForgotReset()">Reset Password</button>
+    </div>
+    <div class="link">Remembered it? <a onclick="show('v-signin')">Sign in</a></div>
   </div>
 
   <div class="view" id="v-verify">
@@ -726,7 +743,7 @@ function show(id){
   $(id).classList.add('active');
   window.scrollTo(0,0);
   const logged = !!token;
-  $('bottomnav').style.display = (logged && !['v-signup','v-signin','v-verify'].includes(id)) ? 'flex' : 'none';
+  $('bottomnav').style.display = (logged && !['v-signup','v-signin','v-verify','v-forgot'].includes(id)) ? 'flex' : 'none';
   ['dash','fund','hist','prof'].forEach(k => { const b=$('n-'+k); if(b) b.classList.remove('on'); });
   const map = {'v-dash':'n-dash','v-fund':'n-fund','v-history':'n-hist','v-profile':'n-prof'};
   if(map[id]){ const b=$(map[id]); if(b) b.classList.add('on'); }
@@ -898,6 +915,36 @@ async function doSignin(){
     }
     saveToken(j.token); ME=j.user; err.textContent='';
     show('v-dash');
+  }catch(e){ err.textContent=e.message; }
+}
+/* ----- forgot password ----- */
+async function doForgotSend(){
+  const email=$('fp-email').value.trim(), err=$('fp-err'), btn=$('fp-sendbtn');
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err.textContent='Enter a valid email address.';
+  err.textContent='Sending…'; btn.disabled=true;
+  try{
+    const j = await api('/api/forgot-password','POST',{email});
+    err.textContent='';
+    $('fp-step2').style.display='block';
+    $('fp-email').disabled=true; btn.textContent='Code Sent ✓';
+    err.textContent='If this email is registered, a code is on its way.';
+  }catch(e){ err.textContent=e.message; btn.disabled=false; }
+}
+async function doForgotReset(){
+  const email=$('fp-email').value.trim(), code=$('fp-code').value.trim(), pw=$('fp-pass').value;
+  const err=$('fp-err2');
+  if(code.length!==6) return err.textContent='Enter the 6-digit code.';
+  if(pw.length<4) return err.textContent='Password must be at least 4 characters.';
+  err.textContent='Resetting…';
+  try{
+    const r = await api('/api/reset-password','POST',{email, code, new_password:pw});
+    if(!r.ok) return err.textContent=r.error;
+    err.textContent='';
+    $('fp-email').value=''; $('fp-email').disabled=false;
+    $('fp-code').value=''; $('fp-pass').value='';
+    $('fp-step2').style.display='none'; $('fp-sendbtn').disabled=false; $('fp-sendbtn').textContent='Send Code';
+    modal(true,'Password reset','Your password has been changed. Sign in with the new one.');
+    show('v-signin');
   }catch(e){ err.textContent=e.message; }
 }
 /* ----- email verification ----- */
