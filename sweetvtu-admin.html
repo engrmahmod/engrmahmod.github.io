@@ -337,7 +337,17 @@ async function loadOverview(){
   try{
     const b = await aapi('/api/admin/vtpass-balance');
     let balTxt = '—';
-    if(b.ok){ const bal = (b.balance.content||{}).balance; balTxt = (bal==null? JSON.stringify(b.balance).slice(0,60) : naira(bal)); }
+    if(b.ok){
+      if(typeof b.balance === 'number' && isFinite(b.balance)) balTxt = naira(b.balance);
+      else { /* legacy shape fallback: hunt for a numeric balance anywhere */
+        let found = null;
+        const hunt = (o)=>{ if(found!==null||!o||typeof o!=='object') return;
+          for(const k of Object.keys(o)){ const v=o[k];
+            if((k==='balance'||k==='Balance') && v!==null && v!=='' && isFinite(Number(v))){ found=Number(v); return; }
+            hunt(v); } };
+        hunt(b.balance); balTxt = found!==null ? naira(found) : '—';
+      }
+    }
     $('vt-bal').innerHTML = '<div class="rowline"><span class="k">Available</span><b style="font-size:1.4rem;color:var(--gold)">'+(b.ok?balTxt:esc(b.error||'unavailable'))+'</b></div>';
   }catch(e){ $('vt-bal').innerHTML = '<span style="color:var(--muted)">Unavailable</span>'; }
 }
