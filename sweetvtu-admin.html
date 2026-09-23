@@ -72,10 +72,13 @@ h2.vt small{display:block; color:var(--muted); font-size:.8rem; font-weight:400;
 .ucard{display:flex; align-items:center; gap:14px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:14px 16px; margin-bottom:10px; cursor:pointer; transition:border-color .15s}
 .ucard:hover{border-color:var(--acc)}
 .avatar{width:46px; height:46px; border-radius:50%; background:linear-gradient(135deg,var(--acc),var(--acc2)); display:flex; align-items:center; justify-content:center; font-weight:800; font-size:1.2rem; flex-shrink:0}
-.ucard .nm{font-weight:700}
-.ucard .ph{color:var(--muted); font-size:.82rem}
-.ucard .wl{margin-left:auto; text-align:right; font-weight:800; color:var(--gold); flex-shrink:0}
-.vbadge{font-size:.68rem; background:#22c55e22; color:var(--green); border:1px solid #22c55e44; padding:2px 8px; border-radius:12px; margin-left:8px; font-weight:700}
+.ucard .uinfo{flex:1; min-width:0}
+.ucard .nmrow{display:flex; align-items:center; gap:8px; min-width:0}
+.ucard .nm{font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ucard .ph{color:var(--muted); font-size:.82rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.ucard .em{color:var(--muted); font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; opacity:.85}
+.ucard .wl{margin-left:auto; text-align:right; font-weight:800; color:var(--gold); flex-shrink:0; font-size:1.02rem}
+.vbadge{font-size:.68rem; background:#22c55e22; color:var(--green); border:1px solid #22c55e44; padding:2px 8px; border-radius:12px; font-weight:700; white-space:nowrap; flex-shrink:0; display:inline-flex; align-items:center}
 .vbadge.no{background:#ff6b6b18; color:var(--red); border-color:#ff6b6b44}
 /* ---------- modal ---------- */
 .mbg{position:fixed; inset:0; background:#000a; display:none; align-items:flex-start; justify-content:center; z-index:100; padding:20px; overflow-y:auto}
@@ -366,8 +369,8 @@ function renderUserCards(){
   $('u-list').innerHTML = list.length ? list.map(u=>
     '<div class="ucard" onclick="openUser('+u.id+')">'+
     '<div class="avatar">'+esc((u.name||'?')[0].toUpperCase())+'</div>'+
-    '<div><div class="nm">'+esc(u.name)+'<span class="vbadge'+(u.email_verified?'':' no')+'">'+(u.email_verified?'✓ verified':'unverified')+'</span></div>'+
-    '<div class="ph">'+esc(u.phone)+' · '+esc(u.email||'')+'</div></div>'+
+    '<div class="uinfo"><div class="nmrow"><span class="nm">'+esc(u.name)+'</span><span class="vbadge'+(u.email_verified?'':' no')+'">'+(u.email_verified?'✓ verified':'unverified')+'</span></div>'+
+    '<div class="ph">'+esc(u.phone)+'</div><div class="em">'+esc(u.email||'')+'</div></div>'+
     '<div class="wl">'+naira(u.wallet)+'</div></div>'
   ).join('') : '<div class="card">No users found.</div>';
 }
