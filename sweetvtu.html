@@ -655,7 +655,7 @@ async function api(path, method='GET', body=null){
     body: body ? JSON.stringify(body) : null
   });
   const j = await r.json().catch(()=>({ok:false, error:'Server did not respond.'}));
-  if(r.status === 401){ doLogout(true); throw new Error('Session expired. Signed out.'); }
+  if(r.status === 401 && !['/api/login','/api/signup'].includes(path)){ doLogout(true); throw new Error('Session expired. Signed out.'); }
   return j;
 }
 async function refreshMe(){
