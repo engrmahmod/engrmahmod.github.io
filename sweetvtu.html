@@ -582,7 +582,7 @@
     <button class="back" onclick="show('v-dash')">Dashboard</button>
     <div class="app-head"><div class="alogo">Fund <span>Wallet</span></div></div>
     <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Top up your SWEETVTU wallet.</p>
-    <div class="note">Transfer from any Nigerian bank app to your personal account below. Your wallet is credited automatically.</div>
+    <div class="note">Transfer from any Nigerian bank app to your personal account below. After sending, tap the check button to add it to your wallet instantly.</div>
     <div id="fund-acct" style="display:none">
       <div class="field"><label>Account number</label>
         <div style="display:flex;gap:8px">
@@ -598,6 +598,8 @@
         </div>
       </div>
       <div class="note">This account number is yours permanently — save it. Funds usually appear within a few minutes of transfer.</div>
+      <button class="btn" id="fund-sync-btn" onclick="syncFunding(false)" style="margin-top:12px">I've sent the money — check now</button>
+      <div class="err" id="fund-sync-err" style="margin-top:8px"></div>
     </div>
     <div id="fund-get" style="display:none">
       <div class="field" id="fund-bvn-wrap" style="display:none"><label>Your BVN</label><input id="fund-bvn" inputmode="numeric" maxlength="11" placeholder="11-digit BVN"></div>
@@ -1040,6 +1042,7 @@ async function loadFundView(){
       $('fund-bank').value=j.bank_name||'';
       $('fund-acct-name').value=j.account_name||'';
       $('fund-acct').style.display='block';
+      syncFunding(true);
     } else if(j.need_bvn){
       $('fund-bvn-wrap').style.display='block';
       $('fund-get').style.display='block';
@@ -1069,6 +1072,24 @@ async function getFundAccount(){
     }
   }catch(e){ err.textContent=e.message; }
   $('fund-get-btn').disabled=false;
+}
+async function syncFunding(quiet){
+  const err=$('fund-sync-err'); const btn=$('fund-sync-btn');
+  if(!quiet) err.textContent='Checking for your transfer…';
+  if(btn) btn.disabled=true;
+  try{
+    const j=await api('/api/fund-sync','POST',{});
+    if(j.ok){
+      if(ME) ME.wallet=j.balance;
+      if(j.new_transactions>0){
+        err.textContent='';
+        modal(true,'Wallet credited','₦'+Number(j.credited).toLocaleString()+' added to your wallet.');
+      } else if(!quiet){
+        err.textContent='No new transfer found yet. If you just sent it, wait a minute and tap again.';
+      }
+    } else if(!quiet){ err.textContent=j.error||'Could not check. Try again.'; }
+  }catch(e){ if(!quiet) err.textContent=e.message; }
+  if(btn) btn.disabled=false;
 }
 
 /* ----- boot ----- */
