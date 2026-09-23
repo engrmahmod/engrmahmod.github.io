@@ -473,6 +473,8 @@
     <div class="field"><label>Phone number</label><input id="su-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
     <div class="field"><label>Email</label><input id="su-email" type="email" placeholder="you@email.com"></div>
     <div class="field"><label>Password</label><input id="su-pass" type="password" placeholder="Choose a password"></div>
+    <div class="field"><label>Transaction PIN (4 digits)</label><input id="su-pin" inputmode="numeric" maxlength="4" type="password" placeholder="e.g. 1234"></div>
+    <p style="color:var(--muted);font-size:.8rem;margin:-8px 0 16px">You'll enter this PIN before every purchase. Keep it secret.</p>
     <div class="err" id="su-err"></div>
     <button class="btn" onclick="doSignup()">Create Account</button>
     <div class="link">Already have an account? <a onclick="show('v-signin')">Sign in</a></div>
@@ -487,6 +489,16 @@
     <div class="err" id="si-err"></div>
     <button class="btn" onclick="doSignin()">Sign In</button>
     <div class="link">New here? <a onclick="show('v-signup')">Create account</a></div>
+  </div>
+
+  <div class="view" id="v-verify">
+    <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div><button class="back" onclick="go('site')">Home</button></div>
+    <h2 style="margin:14px 0 4px">Check your email</h2>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:20px">We sent a 6-digit code to <b id="vf-email">your email</b>. Enter it below to activate your account.</p>
+    <div class="field"><label>Verification code</label><input id="vf-code" inputmode="numeric" maxlength="6" placeholder="6-digit code" style="text-align:center;font-size:1.3rem;letter-spacing:.4em"></div>
+    <div class="err" id="vf-err"></div>
+    <button class="btn" onclick="doVerify()">Verify & Open Account</button>
+    <div class="link">Didn't get it? <a onclick="doResend()">Resend code</a></div>
   </div>
 
   <div class="view" id="v-dash">
@@ -597,6 +609,11 @@
     </div>
     <div class="tx"><div class="t-ic">📧</div><div class="t-main"><b>Email</b><small id="prof-email">—</small></div></div>
     <div class="tx"><div class="t-ic">💰</div><div class="t-main"><b>Wallet balance</b><small id="prof-bal">—</small></div></div>
+    <div class="tx"><div class="t-ic">🔐</div><div class="t-main"><b>Transaction PIN</b><small>Required before every purchase</small></div></div>
+    <div class="field"><label>Old PIN</label><input id="cp-old" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+    <div class="field"><label>New PIN</label><input id="cp-new" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+    <div class="err" id="cp-err"></div>
+    <button class="btn ghost" onclick="doChangePin()">Change PIN</button>
     <button class="btn ghost" style="margin-top:20px" onclick="doLogout()">Log Out</button>
   </div>
 
@@ -610,6 +627,14 @@
   <div class="modal-bg" id="modal"><div class="modal">
     <div class="m-ic" id="m-ic">✅</div><h3 id="m-title">Success</h3><p id="m-msg"></p>
     <button class="btn" onclick="closeModal()">Done</button>
+  </div></div>
+  <div class="modal-bg" id="pinmodal"><div class="modal">
+    <div class="m-ic">🔐</div><h3>Transaction PIN</h3>
+    <p style="color:var(--muted);font-size:.9rem;margin-bottom:14px">Enter your 4-digit PIN to approve this purchase.</p>
+    <div class="field"><input id="pin-in" type="password" inputmode="numeric" maxlength="4" placeholder="••••" style="text-align:center;font-size:1.4rem;letter-spacing:.5em"></div>
+    <div class="err" id="pin-err"></div>
+    <button class="btn" onclick="pinOk()">Approve</button>
+    <button class="btn ghost" style="margin-top:10px" onclick="pinCancel()">Cancel</button>
   </div></div>
 </div>
 </div><!-- /appmode -->
@@ -677,7 +702,7 @@ function show(id){
   $(id).classList.add('active');
   window.scrollTo(0,0);
   const logged = !!token;
-  $('bottomnav').style.display = (logged && !['v-signup','v-signin'].includes(id)) ? 'flex' : 'none';
+  $('bottomnav').style.display = (logged && !['v-signup','v-signin','v-verify'].includes(id)) ? 'flex' : 'none';
   ['dash','fund','hist','prof'].forEach(k => { const b=$('n-'+k); if(b) b.classList.remove('on'); });
   const map = {'v-dash':'n-dash','v-fund':'n-fund','v-history':'n-hist','v-profile':'n-prof'};
   if(map[id]){ const b=$(map[id]); if(b) b.classList.add('on'); }
@@ -707,17 +732,20 @@ function openSvc(which){ show('v-'+which); }
 /* ----- auth ----- */
 async function doSignup(){
   const name=$('su-name').value.trim(), phone=$('su-phone').value.trim(),
-        email=$('su-email').value.trim(), pass=$('su-pass').value;
+        email=$('su-email').value.trim(), pass=$('su-pass').value, pin=$('su-pin').value.trim();
   const err=$('su-err');
   if(name.length<3) return err.textContent='Please enter your full name.';
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err.textContent='Enter a valid email address.';
   if(pass.length<4) return err.textContent='Password must be at least 4 characters.';
+  if(!/^\d{4}$/.test(pin)) return err.textContent='Create a 4-digit transaction PIN.';
   err.textContent='Creating account…';
   try{
-    const j = await api('/api/signup','POST',{name, phone, email, password:pass});
+    const j = await api('/api/signup','POST',{name, phone, email, password:pass, pin});
     if(!j.ok) return err.textContent=j.error;
-    saveToken(j.token); ME=j.user; err.textContent='';
+    err.textContent='';
+    if(j.verify_required){ startVerify(j.user_id, j.email, j.email_sent); return; }
+    saveToken(j.token); ME=j.user;
     modal(true,'Welcome, '+name.split(' ')[0]+'!','Your SWEETVTU account is ready. Fund your wallet to start buying.');
     show('v-dash');
   }catch(e){ err.textContent=e.message; }
@@ -728,9 +756,72 @@ async function doSignin(){
   err.textContent='Signing in…';
   try{
     const j = await api('/api/login','POST',{phone, password:pass});
-    if(!j.ok) return err.textContent=j.error;
+    if(!j.ok){
+      if(j.verify_required){ err.textContent=''; startVerify(j.user_id, null, true); return; }
+      return err.textContent=j.error;
+    }
     saveToken(j.token); ME=j.user; err.textContent='';
     show('v-dash');
+  }catch(e){ err.textContent=e.message; }
+}
+/* ----- email verification ----- */
+let PENDING_UID=0;
+function startVerify(uid, email, sent){
+  PENDING_UID=uid;
+  if(email) $('vf-email').textContent=email;
+  $('vf-code').value='';
+  $('vf-err').textContent = sent===false ? 'We could not send the email just now. Tap "Resend code".' : '';
+  show('v-verify');
+}
+async function doVerify(){
+  const code=$('vf-code').value.trim(), err=$('vf-err');
+  if(code.length<6) return err.textContent='Enter the 6-digit code from your email.';
+  err.textContent='Verifying…';
+  try{
+    const j=await api('/api/verify-email','POST',{user_id:PENDING_UID, code});
+    if(!j.ok) return err.textContent=j.error;
+    saveToken(j.token); ME=j.user; err.textContent='';
+    modal(true,'Verified! 🎉','Your SWEETVTU account is ready. Fund your wallet to start buying.');
+    show('v-dash');
+  }catch(e){ err.textContent=e.message; }
+}
+async function doResend(){
+  const err=$('vf-err'); err.textContent='Sending…';
+  try{
+    const j=await api('/api/resend-code','POST',{user_id:PENDING_UID});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent='New code sent. Check your email.';
+  }catch(e){ err.textContent=e.message; }
+}
+/* ----- transaction PIN ----- */
+let pinResolve=null;
+function askPin(){
+  return new Promise(res=>{
+    pinResolve=res;
+    $('pin-in').value=''; $('pin-err').textContent='';
+    $('pinmodal').classList.add('show');
+    setTimeout(()=>{ try{$('pin-in').focus();}catch(e){} },150);
+  });
+}
+function pinOk(){
+  const v=$('pin-in').value.trim();
+  if(!/^\d{4}$/.test(v)) return $('pin-err').textContent='Enter your 4-digit PIN.';
+  $('pinmodal').classList.remove('show');
+  if(pinResolve) pinResolve(v); pinResolve=null;
+}
+function pinCancel(){
+  $('pinmodal').classList.remove('show');
+  if(pinResolve) pinResolve(null); pinResolve=null;
+}
+async function doChangePin(){
+  const err=$('cp-err'), old=$('cp-old').value.trim(), nw=$('cp-new').value.trim();
+  if(!/^\d{4}$/.test(nw)) return err.textContent='New PIN must be 4 digits.';
+  err.textContent='Updating…';
+  try{
+    const j=await api('/api/change-pin','POST',{old_pin:old, new_pin:nw});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent=''; $('cp-old').value=''; $('cp-new').value='';
+    modal(true,'Done','Your transaction PIN has been changed.');
   }catch(e){ err.textContent=e.message; }
 }
 function doLogout(silent){
@@ -796,9 +887,10 @@ async function buyData(){
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
   const p=(DATA_CACHE[curNet]||[])[curPlan];
   if(!p) return err.textContent='Plan expired. Reloading…', renderPlans();
+  const pin=await askPin(); if(!pin){err.textContent='';return;}
   err.textContent='Sending…';
   try{
-    const j = await api('/api/buy/data','POST',{network:curNet.toLowerCase(), phone, variation_code:p.variation_code});
+    const j = await api('/api/buy/data','POST',{network:curNet.toLowerCase(), phone, variation_code:p.variation_code, pin});
     if(!j.ok) return err.textContent=j.error;
     err.textContent='';
     modal(true,'Data sent! 🎉', `${p.name} (${naira(p.price)}) sent to ${phone}.`);
@@ -812,10 +904,11 @@ async function buyAirtime(){
         amt=parseInt($('air-amt').value,10);
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
   if(!amt || amt<50) return err.textContent='Minimum airtime is ₦50.';
+  const pin=await askPin(); if(!pin){err.textContent='';return;}
   err.textContent='Sending…';
   try{
     const netMap={'MTN':'mtn','Airtel':'airtel','Glo':'glo','9mobile':'etisalat'};
-    const j = await api('/api/buy/airtime','POST',{network:netMap[net]||'mtn', phone, amount:amt});
+    const j = await api('/api/buy/airtime','POST',{network:netMap[net]||'mtn', phone, amount:amt, pin});
     if(!j.ok) return err.textContent=j.error;
     err.textContent='';
     modal(true,'Recharge sent! 🎉', `${naira(amt)} ${net} airtime sent to ${phone}.`);
@@ -861,8 +954,9 @@ async function buyCable(){
   }
   err.textContent='Subscribing…';
   try{
+    const pin=await askPin(); if(!pin){err.textContent='';return;}
     const j=await api('/api/buy/cable','POST',{provider:prov, billersCode:iuc,
-      variation_code:p.variation_code, phone:ME.phone});
+      variation_code:p.variation_code, phone:ME.phone, pin});
     if(!j.ok) return err.textContent=j.error;
     err.textContent='';
     modal(true,'Subscribed! 🎉', `${p.name} activated on ${iuc}.`);
@@ -907,8 +1001,9 @@ async function buyPower(){
   }
   err.textContent='Processing…';
   try{
+    const pin=await askPin(); if(!pin){err.textContent='';return;}
     const j=await api('/api/buy/power','POST',{serviceID:svc, billersCode:meter,
-      variation_code:type, amount:amt, phone:ME.phone});
+      variation_code:type, amount:amt, phone:ME.phone, pin});
     if(!j.ok) return err.textContent=j.error;
     err.textContent='';
     modal(true,'Bill paid! 🎉', `${naira(amt)} token for meter ${meter}.`+(j.token?` Token: ${j.token}`:' Token sent via SMS by the disco.'));
