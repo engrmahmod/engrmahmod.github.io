@@ -891,7 +891,7 @@ async function renderPlans(){
     const plans=DATA_CACHE[curNet];
     box.innerHTML = plans.length ? plans.map((p,i)=>
       `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})">
-         <div><b>${p.name}</b><small>${curNet} · VTpass</small></div><span>${naira(p.price)}</span>
+         <div><b>${p.name}</b><small>${curNet}</small></div><span>${naira(p.price)}</span>
        </div>`).join('') : '<div class="empty">No plans right now. Try again later.</div>';
   }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
