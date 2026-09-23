@@ -644,10 +644,14 @@
     <button class="btn" onclick="closeModal()">Done</button>
   </div></div>
   <div class="modal-bg" id="rcptmodal"><div class="modal" style="text-align:left">
-    <div style="text-align:center"><div class="m-ic">🧾</div><h3>Transaction Receipt</h3>
+    <div style="text-align:center"><h3>Transaction Receipt</h3>
     <div style="color:var(--muted);font-size:.8rem;letter-spacing:.2em;margin-bottom:10px">SWEETVTU</div></div>
     <div id="rcpt-body"></div>
-    <button class="btn" onclick="closeReceipt()" style="margin-top:14px">Done</button>
+    <div style="display:flex;gap:10px;margin-top:14px">
+      <button class="btn" onclick="downloadReceipt()" style="flex:1">⬇ Download</button>
+      <button class="btn" onclick="shareReceipt()" style="flex:1">📤 Share</button>
+    </div>
+    <button class="btn" onclick="closeReceipt()" style="margin-top:10px;background:var(--card);border:1px solid var(--line)">Close</button>
   </div></div>
   <div class="modal-bg" id="pinmodal"><div class="modal">
     <div class="m-ic">🔐</div><h3>Transaction PIN</h3>
@@ -742,12 +746,13 @@ function modal(ok, title, msg){
 function closeModal(){ $('modal').classList.remove('show'); }
 function openReceipt(i){
   const t=(window.HIST_TXS||[])[i]; if(!t) return;
+  window.CUR_RCPT=t;
   const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
   const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
   const stCol = t.status==='successful' ? '#4ade80' : (t.status==='pending' ? 'var(--gold)' : '#ff6b6b');
   const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.9rem"><span style="color:var(--muted)">${k}</span><b style="text-align:right;word-break:break-all">${v||'—'}</b></div>`;
   $('rcpt-body').innerHTML =
-    `<div style="text-align:center;margin-bottom:8px"><div style="font-size:2rem">${icons[t.type]||'🧾'}</div>
+    `<div style="text-align:center;margin-bottom:8px"><div style="font-size:2rem">${icons[t.type]||''}</div>
      <div style="font-size:1.5rem;font-weight:800;color:${t.direction==='in'?'#4ade80':'var(--gold)'}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div>
      <div style="margin-top:4px"><span style="background:${stCol}22;color:${stCol};padding:3px 12px;border-radius:20px;font-size:.8rem;font-weight:700">${(t.status||'successful').toUpperCase()}</span></div></div>` +
     row('Description', t.description||t.desc) + row('Type', names[t.type]||t.type) +
@@ -756,6 +761,58 @@ function openReceipt(i){
   $('rcptmodal').classList.add('show');
 }
 function closeReceipt(){ $('rcptmodal').classList.remove('show'); }
+function receiptCanvas(){
+  const t=window.CUR_RCPT||{}; const W=600, H=860;
+  const c=document.createElement('canvas'); c.width=W; c.height=H;
+  const x=c.getContext('2d');
+  x.fillStyle='#ffffff'; x.fillRect(0,0,W,H);
+  x.textAlign='center'; x.fillStyle='#7c3aed';
+  x.font='800 40px sans-serif'; x.fillText('SWEETVTU', W/2, 80);
+  x.fillStyle='#666'; x.font='400 22px sans-serif'; x.fillText('Transaction Receipt', W/2, 118);
+  x.strokeStyle='#ccc'; x.setLineDash([8,6]); x.beginPath(); x.moveTo(40,150); x.lineTo(W-40,150); x.stroke(); x.setLineDash([]);
+  const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
+  x.fillStyle = t.direction==='in' ? '#16a34a' : '#b45309';
+  x.font='800 52px sans-serif';
+  x.fillText((t.direction==='in'?'+':'−')+'₦'+Number(t.amount||0).toLocaleString(), W/2, 225);
+  x.fillStyle='#16a34a'; x.font='700 24px sans-serif';
+  x.fillText((t.status||'successful').toUpperCase(), W/2, 265);
+  x.textAlign='left'; x.font='400 24px sans-serif';
+  let y=330;
+  const row=(k,v)=>{ x.fillStyle='#888'; x.fillText(k, 40, y);
+    x.fillStyle='#111'; x.textAlign='right';
+    const s=String(v==null?'—':v); const max=26;
+    x.fillText(s.length>max? s.slice(0,max-1)+'…' : s, W-40, y);
+    x.textAlign='left'; y+=58; };
+  row('Type', names[t.type]||t.type||'—');
+  row('Description', t.description||t.desc||'—');
+  row('Date', t.created||t.date||'—');
+  row('Reference', t.reference||'—');
+  row('Direction', t.direction==='in'?'Credit':'Debit');
+  x.strokeStyle='#ccc'; x.setLineDash([8,6]); x.beginPath(); x.moveTo(40,y+6); x.lineTo(W-40,y+6); x.stroke(); x.setLineDash([]);
+  x.textAlign='center'; x.fillStyle='#888'; x.font='400 20px sans-serif';
+  x.fillText('Thank you for using SWEETVTU', W/2, y+52);
+  return c;
+}
+function downloadReceipt(){
+  const c=receiptCanvas();
+  const a=document.createElement('a');
+  a.download='sweetvtu-receipt-'+((window.CUR_RCPT||{}).reference||'txn')+'.png';
+  a.href=c.toDataURL('image/png'); a.click();
+}
+async function shareReceipt(){
+  const c=receiptCanvas();
+  const done=(blob)=>{
+    const f=new File([blob],'sweetvtu-receipt.png',{type:'image/png'});
+    if(navigator.canShare && navigator.canShare({files:[f]})){
+      navigator.share({files:[f], title:'SWEETVTU Receipt'}).catch(()=>{});
+    } else if(navigator.share){
+      const t=window.CUR_RCPT||{};
+      navigator.share({title:'SWEETVTU Receipt',
+        text:`SWEETVTU receipt: ₦${Number(t.amount||0).toLocaleString()} — ${t.description||''} — Ref ${t.reference||''}`}).catch(()=>{});
+    } else { downloadReceipt(); }
+  };
+  if(c.toBlob) c.toBlob(done,'image/png'); else done(c.toDataURL('image/png'));
+}
 function txHTML(t,i){
   const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
   const st = t.status && t.status!=='successful'
