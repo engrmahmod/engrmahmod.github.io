@@ -177,6 +177,7 @@
   #appmode .view.active{display:block}
   #appmode .demo-badge{position:sticky;top:0;z-index:40;text-align:center;font-size:.72rem;font-weight:800;letter-spacing:2px;
     background:linear-gradient(90deg,var(--gold),#ff9d42);color:#3a2200;padding:6px}
+  #appmode .demo-badge.live{background:linear-gradient(90deg,#00c853,#00e676);color:#04140a}
   #appmode .app-head{padding:22px 0 6px;display:flex;align-items:center;justify-content:space-between}
   #appmode .alogo{font-weight:900;font-size:1.35rem;letter-spacing:1px}
   #appmode .alogo span{color:var(--pink)}
@@ -463,7 +464,7 @@
 <!-- ==================== APP ==================== -->
 <div id="appmode" style="display:none">
 <div class="ashell">
-  <div class="demo-badge">DEMO MODE — REAL PAYMENTS COMING SOON</div>
+  <div class="demo-badge live">&#9679; LIVE — REAL PAYMENTS</div>
 
   <div class="view" id="v-signup">
     <div class="app-head"><div class="alogo">SWEET<span>VTU</span></div><button class="back" onclick="go('site')">Home</button></div>
@@ -541,7 +542,7 @@
   <div class="view" id="v-cable">
     <button class="back" onclick="show('v-dash')">Dashboard</button>
     <div class="banner b-cable"><h2>📺 Cable TV</h2><p>DStv, GOtv &amp; Startimes subscriptions.</p></div>
-    <div class="note">Demo packages shown — real bouquets &amp; prices will appear here.</div>
+    <div class="note">Live bouquets &amp; prices — delivered instantly.</div>
     <div class="field"><label>Provider</label><select id="cab-prov" onchange="renderCabPlans()">
       <option>DStv</option><option>GOtv</option><option>Startimes</option>
     </select></div>
@@ -570,7 +571,7 @@
     <button class="back" onclick="show('v-dash')">Dashboard</button>
     <div class="app-head"><div class="alogo">Fund <span>Wallet</span></div></div>
     <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Top up your SWEETVTU wallet.</p>
-    <div class="note">Demo mode: funds are added instantly for testing. Real bank transfer details will appear here.</div>
+    <div class="note">Pay securely with card or bank transfer via Paystack. Funds land in your wallet automatically.</div>
     <div class="grid" style="margin-bottom:14px">
       <div class="svc" onclick="setFund(1000)"><b>₦1,000</b></div>
       <div class="svc" onclick="setFund(2000)"><b>₦2,000</b></div>
@@ -579,7 +580,7 @@
     </div>
     <div class="field"><label>Custom amount (₦)</label><input id="fund-amt" inputmode="numeric" placeholder="Enter amount"></div>
     <div class="err" id="fund-err"></div>
-    <button class="btn" onclick="doFund()">Add Funds (Demo)</button>
+    <button class="btn" onclick="doFund()">Add Funds Securely</button>
   </div>
 
   <div class="view" id="v-history">
@@ -614,6 +615,7 @@
 </div>
 </div><!-- /appmode -->
 
+<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
 /* ---------- website ---------- */
 function priceTab(which, el){
@@ -632,38 +634,34 @@ const io = new IntersectionObserver(es=>es.forEach(e=>{
 }),{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 
-/* ---------- app ---------- */
-const DB = {
-  read(k,d){ try{ const v = JSON.parse(localStorage.getItem('sv_'+k)); return v==null?d:v }catch(e){ return d } },
-  write(k,v){ localStorage.setItem('sv_'+k, JSON.stringify(v)) }
-};
-let session = DB.read('session', null);
-let curNet = 'MTN', curPlan = null, curCabPlan = null, fundAmtSel = 0;
-
-const DATA_PLANS = {
-  MTN: [
-    {size:'500MB', price:130},{size:'1GB', price:235},{size:'2GB', price:470},
-    {size:'3GB', price:705},{size:'5GB', price:1175},{size:'10GB', price:2350}
-  ],
-  Airtel: [
-    {size:'500MB', price:140},{size:'1GB', price:250},
-    {size:'2GB', price:500},{size:'5GB', price:1250}
-  ]
-};
-const CAB_PLANS = {
-  DStv: [{n:'DStv Padi (demo)',p:1000},{n:'DStv Yanga (demo)',p:2000},{n:'DStv Confam (demo)',p:3500}],
-  GOtv: [{n:'GOtv Smallie (demo)',p:800},{n:'GOtv Jinja (demo)',p:1500},{n:'GOtv Jolli (demo)',p:2500}],
-  Startimes: [{n:'Nova (demo)',p:700},{n:'Basic (demo)',p:1200},{n:'Classic (demo)',p:2000}]
-};
-
+/* ---------- app (LIVE — talks to the SWEETVTU backend) ---------- */
+const API_BASE = 'https://sweetvtu-backend.onrender.com'; // << set to your Render URL after deploy
 const $ = id => document.getElementById(id);
 const naira = n => '₦' + Number(n).toLocaleString('en-NG');
-const users = () => DB.read('users', {});
-const saveUsers = u => DB.write('users', u);
-const txs = () => DB.read('txs', {});
-const saveTxs = t => DB.write('txs', t);
-const me = () => users()[session];
 const validPhone = p => /^0\d{10}$/.test((p||'').trim());
+const me = () => ME;
+
+let token = null;
+try { token = JSON.parse(localStorage.getItem('sv_token')); } catch(e){}
+let ME = null, PAYSTACK_PK = '';
+let curNet = 'MTN', curPlan = null, curCabPlan = null, fundAmtSel = 0;
+let DATA_CACHE = {}, CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
+
+async function api(path, method='GET', body=null){
+  const r = await fetch(API_BASE + path, {
+    method,
+    headers: Object.assign({'Content-Type':'application/json'},
+      token ? {'Authorization':'Bearer '+token} : {}),
+    body: body ? JSON.stringify(body) : null
+  });
+  const j = await r.json().catch(()=>({ok:false, error:'Server did not respond.'}));
+  if(r.status === 401){ doLogout(true); throw new Error('Session expired. Signed out.'); }
+  return j;
+}
+async function refreshMe(){
+  try{ const m = await api('/api/me'); if(m.ok) ME = m.user; }catch(e){}
+}
+function saveToken(t){ token = t; localStorage.setItem('sv_token', JSON.stringify(t)); }
 
 function go(where){
   const site = $('sitemode'), app = $('appmode');
@@ -679,7 +677,7 @@ function show(id){
   document.querySelectorAll('#appmode .view').forEach(v => v.classList.remove('active'));
   $(id).classList.add('active');
   window.scrollTo(0,0);
-  const logged = !!session;
+  const logged = !!token;
   $('bottomnav').style.display = (logged && !['v-signup','v-signin'].includes(id)) ? 'flex' : 'none';
   ['dash','fund','hist','prof'].forEach(k => { const b=$('n-'+k); if(b) b.classList.remove('on'); });
   const map = {'v-dash':'n-dash','v-fund':'n-fund','v-history':'n-hist','v-profile':'n-prof'};
@@ -689,6 +687,7 @@ function show(id){
   if(id==='v-profile') renderProfile();
   if(id==='v-data') renderPlans();
   if(id==='v-cable') renderCabPlans();
+  if(id==='v-power' && !DISCOS.length) loadDiscos();
 }
 function modal(ok, title, msg){
   $('m-ic').textContent = ok ? '✅' : '❌';
@@ -696,19 +695,18 @@ function modal(ok, title, msg){
   $('modal').classList.add('show');
 }
 function closeModal(){ $('modal').classList.remove('show'); }
-function addTx(type, desc, amount, dir){
-  const all = txs(); const mine = all[session] || [];
-  mine.unshift({type, desc, amount, dir, date: new Date().toLocaleString('en-NG')});
-  all[session] = mine; saveTxs(all);
+function txHTML(t){
+  const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
+  const st = t.status && t.status!=='successful'
+    ? ` <small style="color:${t.status==='pending'?'var(--gold)':'#ff6b6b'}">(${t.status})</small>` : '';
+  return `<div class="tx"><div style="display:flex;align-items:center"><div class="t-ic">${icons[t.type]||'🧾'}</div>
+    <div class="t-main"><b>${t.description||t.desc||''}</b><small>${t.created||t.date||''}${st}</small></div></div>
+    <div class="amt ${t.direction}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div></div>`;
 }
-function charge(amount, desc, type){
-  const u = users(); const m = u[session];
-  if(m.wallet < amount) return false;
-  m.wallet -= amount; u[session] = m; saveUsers(u);
-  addTx(type, desc, amount, 'out');
-  return true;
-}
-function doSignup(){
+function openSvc(which){ show('v-'+which); }
+
+/* ----- auth ----- */
+async function doSignup(){
   const name=$('su-name').value.trim(), phone=$('su-phone').value.trim(),
         email=$('su-email').value.trim(), pass=$('su-pass').value;
   const err=$('su-err');
@@ -716,122 +714,257 @@ function doSignup(){
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
   if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return err.textContent='Enter a valid email address.';
   if(pass.length<4) return err.textContent='Password must be at least 4 characters.';
-  const u = users();
-  if(u[phone]) return err.textContent='This number is already registered. Sign in instead.';
-  u[phone] = {name, phone, email, pass, wallet:0, joined:new Date().toLocaleString('en-NG')};
-  saveUsers(u); session=phone; DB.write('session', session);
-  err.textContent=''; modal(true,'Welcome, '+name.split(' ')[0]+'!','Your SWEETVTU account is ready. Fund your wallet to start buying.');
-  show('v-dash');
+  err.textContent='Creating account…';
+  try{
+    const j = await api('/api/signup','POST',{name, phone, email, password:pass});
+    if(!j.ok) return err.textContent=j.error;
+    saveToken(j.token); ME=j.user; err.textContent='';
+    modal(true,'Welcome, '+name.split(' ')[0]+'!','Your SWEETVTU account is ready. Fund your wallet to start buying.');
+    show('v-dash');
+  }catch(e){ err.textContent=e.message; }
 }
-function doSignin(){
+async function doSignin(){
   const phone=$('si-phone').value.trim(), pass=$('si-pass').value;
   const err=$('si-err');
-  const u = users();
-  if(!u[phone] || u[phone].pass!==pass) return err.textContent='Wrong number or password. Try again.';
-  session=phone; DB.write('session', session); err.textContent='';
-  show('v-dash');
+  err.textContent='Signing in…';
+  try{
+    const j = await api('/api/login','POST',{phone, password:pass});
+    if(!j.ok) return err.textContent=j.error;
+    saveToken(j.token); ME=j.user; err.textContent='';
+    show('v-dash');
+  }catch(e){ err.textContent=e.message; }
 }
-function doLogout(){ session=null; DB.write('session', null); go('site'); }
-function renderDash(){
-  const m = me(); if(!m){ go('site'); return; }
-  $('dash-name').textContent = m.name.split(' ')[0];
-  $('dash-bal').textContent = naira(m.wallet);
-  const mine = (txs()[session]||[]).slice(0,5);
-  $('dash-tx').innerHTML = mine.length ? mine.map(txHTML).join('') : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
+function doLogout(silent){
+  token=null; ME=null;
+  try{ localStorage.removeItem('sv_token'); }catch(e){}
+  if(!silent) go('site'); else go('site');
 }
-function txHTML(t){
-  const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
-  return `<div class="tx"><div style="display:flex;align-items:center"><div class="t-ic">${icons[t.type]||'🧾'}</div>
-    <div class="t-main"><b>${t.desc}</b><small>${t.date}</small></div></div>
-    <div class="amt ${t.dir}">${t.dir==='in'?'+':'−'}${naira(t.amount)}</div></div>`;
+
+/* ----- dashboard / history / profile ----- */
+async function renderDash(){
+  await refreshMe();
+  if(!ME){ go('site'); return; }
+  $('dash-name').textContent = ME.name.split(' ')[0];
+  $('dash-bal').textContent = naira(ME.wallet);
+  try{
+    const j = await api('/api/history');
+    const mine = (j.ok?j.transactions:[]).slice(0,5);
+    $('dash-tx').innerHTML = mine.length ? mine.map(txHTML).join('')
+      : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
+  }catch(e){ $('dash-tx').innerHTML='<div class="empty">Could not load transactions.</div>'; }
 }
-function openSvc(which){ show('v-'+which); }
+async function renderHistory(){
+  try{
+    const j = await api('/api/history');
+    const mine = j.ok?j.transactions:[];
+    $('hist-list').innerHTML = mine.length ? mine.map(txHTML).join('')
+      : '<div class="empty">No transactions yet.</div>';
+  }catch(e){ $('hist-list').innerHTML='<div class="empty">Could not load.</div>'; }
+}
+function renderProfile(){
+  if(!ME) return;
+  $('prof-name').textContent=ME.name; $('prof-sub').textContent=ME.phone;
+  $('prof-email').textContent=ME.email; $('prof-bal').textContent=naira(ME.wallet);
+}
+
+/* ----- data ----- */
 function pickNet(n){
   curNet=n; curPlan=null;
   $('tab-mtn').classList.toggle('on', n==='MTN');
   $('tab-airtel').classList.toggle('on', n==='Airtel');
   renderPlans();
 }
-function renderPlans(){
-  $('plan-list').innerHTML = DATA_PLANS[curNet].map((p,i)=>
-    `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})">
-       <div><b>${p.size}</b><small>${curNet} · 30 days</small></div><span>${naira(p.price)}</span>
-     </div>`).join('');
+async function renderPlans(){
+  const box=$('plan-list');
+  box.innerHTML='<div class="empty">Loading live plans…</div>';
+  try{
+    if(!DATA_CACHE[curNet]){
+      const j = await api('/api/data/plans?network='+curNet.toLowerCase());
+      if(!j.ok) throw new Error(j.error||'Could not load plans.');
+      DATA_CACHE[curNet]=j.plans;
+    }
+    const plans=DATA_CACHE[curNet];
+    box.innerHTML = plans.length ? plans.map((p,i)=>
+      `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})">
+         <div><b>${p.name}</b><small>${curNet} · VTpass</small></div><span>${naira(p.price)}</span>
+       </div>`).join('') : '<div class="empty">No plans right now. Try again later.</div>';
+  }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickPlan(i){ curPlan=i; renderPlans(); }
-function buyData(){
+async function buyData(){
   const err=$('data-err'), phone=$('data-phone').value.trim();
   if(curPlan===null) return err.textContent='Please select a data plan.';
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
-  const p = DATA_PLANS[curNet][curPlan];
-  if(!charge(p.price, `${curNet} ${p.size} → ${phone}`, 'data'))
-    return err.textContent='Insufficient balance. Please fund your wallet.';
-  err.textContent='';
-  modal(true,'Data sent! 🎉', `${curNet} ${p.size} (${naira(p.price)}) sent to ${phone}.`);
-  $('data-phone').value=''; curPlan=null; renderPlans();
+  const p=(DATA_CACHE[curNet]||[])[curPlan];
+  if(!p) return err.textContent='Plan expired. Reloading…', renderPlans();
+  err.textContent='Sending…';
+  try{
+    const j = await api('/api/buy/data','POST',{network:curNet.toLowerCase(), phone, variation_code:p.variation_code});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent='';
+    modal(true,'Data sent! 🎉', `${p.name} (${naira(p.price)}) sent to ${phone}.`);
+    $('data-phone').value=''; curPlan=null; renderPlans(); refreshMe();
+  }catch(e){ err.textContent=e.message; }
 }
-function buyAirtime(){
+
+/* ----- airtime ----- */
+async function buyAirtime(){
   const err=$('air-err'), net=$('air-net').value, phone=$('air-phone').value.trim(),
         amt=parseInt($('air-amt').value,10);
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
   if(!amt || amt<50) return err.textContent='Minimum airtime is ₦50.';
-  if(!charge(amt, `${net} airtime ${naira(amt)} → ${phone}`, 'airtime'))
-    return err.textContent='Insufficient balance. Please fund your wallet.';
-  err.textContent='';
-  modal(true,'Recharge sent! 🎉', `${naira(amt)} ${net} airtime sent to ${phone}.`);
-  $('air-phone').value=''; $('air-amt').value='';
+  err.textContent='Sending…';
+  try{
+    const netMap={'MTN':'mtn','Airtel':'airtel','Glo':'glo','9mobile':'etisalat'};
+    const j = await api('/api/buy/airtime','POST',{network:netMap[net]||'mtn', phone, amount:amt});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent='';
+    modal(true,'Recharge sent! 🎉', `${naira(amt)} ${net} airtime sent to ${phone}.`);
+    $('air-phone').value=''; $('air-amt').value=''; refreshMe();
+  }catch(e){ err.textContent=e.message; }
 }
-function renderCabPlans(){
-  const prov=$('cab-prov').value; curCabPlan=null;
-  $('cab-plans').innerHTML = '<div class="field"><label>Package</label></div>' + CAB_PLANS[prov].map((p,i)=>
-    `<div class="plan${curCabPlan===i?' on':''}" onclick="pickCab(${i})">
-       <div><b>${p.n}</b></div><span>${naira(p.p)}</span>
-     </div>`).join('');
+
+/* ----- cable ----- */
+async function renderCabPlans(){
+  const prov=$('cab-prov').value.toLowerCase(); curCabPlan=null; cabVerifiedFor='';
+  const box=$('cab-plans');
+  box.innerHTML='<div class="field"><label>Package</label></div><div class="empty">Loading bouquets…</div>';
+  try{
+    if(!CAB_CACHE[prov]){
+      const j = await api('/api/cable/plans?provider='+prov);
+      if(!j.ok) throw new Error(j.error||'Could not load bouquets.');
+      CAB_CACHE[prov]=j.plans;
+    }
+    const plans=CAB_CACHE[prov];
+    box.innerHTML = '<div class="field"><label>Package</label></div>' + (plans.length?plans.map((p,i)=>
+      `<div class="plan${curCabPlan===i?' on':''}" onclick="pickCab(${i})">
+         <div><b>${p.name}</b></div><span>${naira(p.price)}</span>
+       </div>`).join('') : '<div class="empty">No bouquets right now.</div>');
+  }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickCab(i){ curCabPlan=i; renderCabPlans(); }
-function buyCable(){
-  const err=$('cab-err'), prov=$('cab-prov').value, iuc=$('cab-iuc').value.trim();
+async function buyCable(){
+  const err=$('cab-err'), prov=$('cab-prov').value.toLowerCase(), iuc=$('cab-iuc').value.trim();
   if(curCabPlan===null) return err.textContent='Please select a package.';
   if(iuc.length<8) return err.textContent='Enter a valid smartcard / IUC number.';
-  const p = CAB_PLANS[prov][curCabPlan];
-  if(!charge(p.p, `${prov} ${p.n} → ${iuc}`, 'cable'))
-    return err.textContent='Insufficient balance. Please fund your wallet.';
-  err.textContent='';
-  modal(true,'Subscribed! 🎉', `${prov} (${p.n}) activated on ${iuc}.`);
-  $('cab-iuc').value=''; curCabPlan=null; renderCabPlans();
+  const p=(CAB_CACHE[prov]||[])[curCabPlan];
+  if(!p) return err.textContent='Package expired. Reloading…', renderCabPlans();
+  const key=prov+':'+iuc;
+  if(cabVerifiedFor!==key){
+    err.textContent='Verifying smartcard…';
+    try{
+      const v=await api('/api/verify','POST',{serviceID:prov, billersCode:iuc});
+      if(!v.ok) return err.textContent=v.error;
+      cabVerifiedFor=key;
+      err.textContent='Verified: '+(v.customer||'customer')+'. Tap Subscribe again to confirm.';
+      return;
+    }catch(e){ return err.textContent=e.message; }
+  }
+  err.textContent='Subscribing…';
+  try{
+    const j=await api('/api/buy/cable','POST',{provider:prov, billersCode:iuc,
+      variation_code:p.variation_code, phone:ME.phone});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent='';
+    modal(true,'Subscribed! 🎉', `${p.name} activated on ${iuc}.`);
+    $('cab-iuc').value=''; curCabPlan=null; cabVerifiedFor=''; renderCabPlans(); refreshMe();
+  }catch(e){ err.textContent=e.message; }
 }
-function buyPower(){
-  const err=$('pow-err'), disco=$('pow-disco').value, type=$('pow-type').value,
-        meter=$('pow-meter').value.trim(), amt=parseInt($('pow-amt').value,10);
+
+/* ----- power ----- */
+async function loadDiscos(){
+  try{
+    const j=await api('/api/power/discos');
+    if(!j.ok) throw new Error(j.error);
+    DISCOS=j.discos;
+    const sel=$('pow-disco');
+    sel.innerHTML=DISCOS.map((d,i)=>`<option value="${i}">${d.label}</option>`).join('');
+    sel.onchange=renderDiscoTypes; renderDiscoTypes();
+  }catch(e){ $('pow-err').textContent='Could not load discos: '+e.message; }
+}
+function renderDiscoTypes(){
+  const d=DISCOS[parseInt($('pow-disco').value,10)||0]; if(!d) return;
+  const types=d.types&&d.types.length?d.types:[{variation_code:'prepaid',name:'Prepaid'},{variation_code:'postpaid',name:'Postpaid'}];
+  $('pow-type').innerHTML=types.map(t=>`<option value="${t.variation_code}">${t.name}</option>`).join('');
+}
+async function buyPower(){
+  const err=$('pow-err');
+  const d=DISCOS[parseInt($('pow-disco').value,10)||0];
+  const svc=d?d.serviceID:'kano-electric';
+  const type=$('pow-type').value, meter=$('pow-meter').value.trim(),
+        amt=parseInt($('pow-amt').value,10);
   if(meter.length<8) return err.textContent='Enter a valid meter number.';
   if(!amt || amt<500) return err.textContent='Minimum payment is ₦500.';
-  if(!charge(amt, `${disco} ${type} ${naira(amt)} → ${meter}`, 'power'))
-    return err.textContent='Insufficient balance. Please fund your wallet.';
-  err.textContent='';
-  modal(true,'Bill paid! 🎉', `${naira(amt)} ${type} token for meter ${meter} (${disco}). Token sent via SMS in the live version.`);
-  $('pow-meter').value=''; $('pow-amt').value='';
+  const key=svc+':'+meter+':'+type;
+  if(powVerifiedFor!==key){
+    err.textContent='Verifying meter…';
+    try{
+      const v=await api('/api/verify','POST',{serviceID:svc, billersCode:meter, type});
+      if(!v.ok) return err.textContent=v.error;
+      powVerifiedFor=key;
+      err.textContent='Verified: '+(v.customer||'customer')+'. Tap Pay Bill again to confirm.';
+      return;
+    }catch(e){ return err.textContent=e.message; }
+  }
+  err.textContent='Processing…';
+  try{
+    const j=await api('/api/buy/power','POST',{serviceID:svc, billersCode:meter,
+      variation_code:type, amount:amt, phone:ME.phone});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent='';
+    modal(true,'Bill paid! 🎉', `${naira(amt)} token for meter ${meter}.`+(j.token?` Token: ${j.token}`:' Token sent via SMS by the disco.'));
+    $('pow-meter').value=''; $('pow-amt').value=''; powVerifiedFor=''; refreshMe();
+  }catch(e){ err.textContent=e.message; }
 }
+
+/* ----- funding (Paystack) ----- */
 function setFund(a){ fundAmtSel=a; $('fund-amt').value=a; }
-function doFund(){
+async function doFund(){
   const err=$('fund-err');
-  const amt = parseInt($('fund-amt').value,10) || fundAmtSel;
+  const amt=parseInt($('fund-amt').value,10)||fundAmtSel;
   if(!amt || amt<100) return err.textContent='Minimum funding is ₦100.';
-  const u=users(); u[session].wallet+=amt; saveUsers(u);
-  addTx('fund','Wallet funding (demo)',amt,'in');
-  err.textContent='';
-  modal(true,'Wallet funded! 💰', `${naira(amt)} added to your wallet.`);
-  $('fund-amt').value=''; fundAmtSel=0;
+  if(!PAYSTACK_PK) return err.textContent='Payment key not loaded. Reload the page.';
+  err.textContent='Opening secure payment…';
+  try{
+    const j=await api('/api/fund/initialize','POST',{amount:amt});
+    if(!j.ok) return err.textContent=j.error;
+    err.textContent='';
+    const handler=PaystackPop.setup({
+      key:PAYSTACK_PK, email:ME.email, amount:amt*100, ref:j.reference,
+      callback:async function(resp){
+        err.textContent='Verifying payment…';
+        try{
+          const v=await api('/api/fund/verify','POST',{reference:resp.reference});
+          if(v.ok){ if(v.user) ME=v.user;
+            modal(true,'Wallet funded! 💰', naira(amt)+' added to your wallet.');
+            show('v-dash');
+          } else modal(false,'Payment issue', v.error||'Could not verify payment.');
+        }catch(e){ modal(false,'Payment issue', e.message); }
+        err.textContent=''; $('fund-amt').value=''; fundAmtSel=0;
+      },
+      onClose:function(){ err.textContent='Payment window closed before completion.'; }
+    });
+    handler.openIframe();
+  }catch(e){ err.textContent=e.message; }
 }
-function renderHistory(){
-  const mine = txs()[session]||[];
-  $('hist-list').innerHTML = mine.length ? mine.map(txHTML).join('') : '<div class="empty">No transactions yet.</div>';
+
+/* ----- boot ----- */
+async function boot(){
+  if(API_BASE.indexOf('YOUR-BACKEND')!==-1){ go('site'); return; }
+  try{
+    const c=await fetch(API_BASE+'/api/config').then(r=>r.json());
+    if(c.ok) PAYSTACK_PK=c.paystack_public_key||'';
+  }catch(e){}
+  if(token){
+    try{
+      const m=await api('/api/me');
+      if(m.ok){ ME=m.user; go('v-dash'); return; }
+    }catch(e){}
+    token=null; try{localStorage.removeItem('sv_token');}catch(e){}
+  }
+  go('site');
 }
-function renderProfile(){
-  const m=me(); if(!m) return;
-  $('prof-name').textContent=m.name; $('prof-sub').textContent=m.phone;
-  $('prof-email').textContent=m.email; $('prof-bal').textContent=naira(m.wallet);
-}
-if(session && users()[session]) go('v-dash'); else go('site');
+boot();
 </script>
 </body>
 </html>
