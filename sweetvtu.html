@@ -582,16 +582,29 @@
     <button class="back" onclick="show('v-dash')">Dashboard</button>
     <div class="app-head"><div class="alogo">Fund <span>Wallet</span></div></div>
     <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Top up your SWEETVTU wallet.</p>
-    <div class="note">Pay securely with card or bank transfer via Paystack. Funds land in your wallet automatically.</div>
-    <div class="grid" style="margin-bottom:14px">
-      <div class="svc" onclick="setFund(1000)"><b>₦1,000</b></div>
-      <div class="svc" onclick="setFund(2000)"><b>₦2,000</b></div>
-      <div class="svc" onclick="setFund(5000)"><b>₦5,000</b></div>
-      <div class="svc" onclick="setFund(10000)"><b>₦10,000</b></div>
+    <div class="note">Transfer from any Nigerian bank app to your personal account below. Your wallet is credited automatically.</div>
+    <div id="fund-acct" style="display:none">
+      <div class="field"><label>Account number</label>
+        <div style="display:flex;gap:8px">
+          <input id="fund-acct-no" readonly style="font-size:1.3rem;font-weight:700;letter-spacing:2px">
+          <button class="btn" style="width:auto;padding:10px 16px" onclick="copyFund('fund-acct-no')">Copy</button>
+        </div>
+      </div>
+      <div class="field"><label>Bank</label><input id="fund-bank" readonly></div>
+      <div class="field"><label>Account name</label>
+        <div style="display:flex;gap:8px">
+          <input id="fund-acct-name" readonly>
+          <button class="btn" style="width:auto;padding:10px 16px" onclick="copyFund('fund-acct-name')">Copy</button>
+        </div>
+      </div>
+      <div class="note">This account number is yours permanently — save it. Funds usually appear within a few minutes of transfer.</div>
     </div>
-    <div class="field"><label>Custom amount (₦)</label><input id="fund-amt" inputmode="numeric" placeholder="Enter amount"></div>
-    <div class="err" id="fund-err"></div>
-    <button class="btn" onclick="doFund()">Add Funds Securely</button>
+    <div id="fund-get" style="display:none">
+      <div class="field" id="fund-bvn-wrap" style="display:none"><label>Your BVN</label><input id="fund-bvn" inputmode="numeric" maxlength="11" placeholder="11-digit BVN"></div>
+      <div class="err" id="fund-err"></div>
+      <button class="btn" id="fund-get-btn" onclick="getFundAccount()">Get My Account Number</button>
+    </div>
+    <div class="err" id="fund-err2"></div>
   </div>
 
   <div class="view" id="v-history">
@@ -639,7 +652,6 @@
 </div>
 </div><!-- /appmode -->
 
-<script src="https://js.paystack.co/v1/inline.js"></script>
 <script>
 /* ---------- website ---------- */
 function priceTab(which, el){
@@ -668,7 +680,7 @@ const me = () => ME;
 let token = null;
 try { token = JSON.parse(localStorage.getItem('sv_token')); } catch(e){}
 let ME = null, PAYSTACK_PK = '';
-let curNet = 'MTN', curPlan = null, curCabPlan = null, fundAmtSel = 0;
+let curNet = 'MTN', curPlan = null, curCabPlan = null;
 let DATA_CACHE = {}, CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
 
 async function api(path, method='GET', body=null){
@@ -712,6 +724,7 @@ function show(id){
   if(id==='v-data') renderPlans();
   if(id==='v-cable') renderCabPlans();
   if(id==='v-power' && !DISCOS.length) loadDiscos();
+  if(id==='v-fund') loadFundView();
 }
 function modal(ok, title, msg){
   $('m-ic').textContent = ok ? '✅' : '❌';
@@ -1011,35 +1024,51 @@ async function buyPower(){
   }catch(e){ err.textContent=e.message; }
 }
 
-/* ----- funding (Paystack) ----- */
-function setFund(a){ fundAmtSel=a; $('fund-amt').value=a; }
-async function doFund(){
-  const err=$('fund-err');
-  const amt=parseInt($('fund-amt').value,10)||fundAmtSel;
-  if(!amt || amt<100) return err.textContent='Minimum funding is ₦100.';
-  if(!PAYSTACK_PK) return err.textContent='Payment key not loaded. Reload the page.';
-  err.textContent='Opening secure payment…';
+/* ----- funding (Monnify virtual account) ----- */
+function copyFund(id){ const el=$(id); el.select(); el.setSelectionRange(0,99);
+  try{ document.execCommand('copy'); }catch(e){}
+  if(navigator.clipboard) navigator.clipboard.writeText(el.value).catch(()=>{});
+  modal(true,'Copied','Account details copied.'); }
+async function loadFundView(){
+  $('fund-acct').style.display='none'; $('fund-get').style.display='none';
+  const err=$('fund-err2'); err.textContent='Loading your funding account…';
   try{
-    const j=await api('/api/fund/initialize','POST',{amount:amt});
-    if(!j.ok) return err.textContent=j.error;
+    const j=await api('/api/fund-account','POST',{});
     err.textContent='';
-    const handler=PaystackPop.setup({
-      key:PAYSTACK_PK, email:ME.email, amount:amt*100, ref:j.reference,
-      callback:async function(resp){
-        err.textContent='Verifying payment…';
-        try{
-          const v=await api('/api/fund/verify','POST',{reference:resp.reference});
-          if(v.ok){ if(v.user) ME=v.user;
-            modal(true,'Wallet funded! 💰', naira(amt)+' added to your wallet.');
-            show('v-dash');
-          } else modal(false,'Payment issue', v.error||'Could not verify payment.');
-        }catch(e){ modal(false,'Payment issue', e.message); }
-        err.textContent=''; $('fund-amt').value=''; fundAmtSel=0;
-      },
-      onClose:function(){ err.textContent='Payment window closed before completion.'; }
-    });
-    handler.openIframe();
+    if(j.ok){
+      $('fund-acct-no').value=j.account_number||'';
+      $('fund-bank').value=j.bank_name||'';
+      $('fund-acct-name').value=j.account_name||'';
+      $('fund-acct').style.display='block';
+    } else if(j.need_bvn){
+      $('fund-bvn-wrap').style.display='block';
+      $('fund-get').style.display='block';
+      $('fund-err').textContent=j.error||'';
+    } else if(j.error && j.error.indexOf('not set up')!==-1){
+      err.textContent=j.error;
+    } else {
+      $('fund-get').style.display='block';
+      if(j.error) $('fund-err').textContent=j.error;
+    }
   }catch(e){ err.textContent=e.message; }
+}
+async function getFundAccount(){
+  const err=$('fund-err'); err.textContent='Creating your account…';
+  $('fund-get-btn').disabled=true;
+  try{
+    const bvn=($('fund-bvn').value||'').trim();
+    const j=await api('/api/fund-account','POST',{bvn:bvn});
+    if(j.ok){
+      $('fund-acct-no').value=j.account_number||'';
+      $('fund-bank').value=j.bank_name||'';
+      $('fund-acct-name').value=j.account_name||'';
+      $('fund-acct').style.display='block'; $('fund-get').style.display='none';
+    } else {
+      if(j.need_bvn) $('fund-bvn-wrap').style.display='block';
+      err.textContent=j.error||'Could not create account.';
+    }
+  }catch(e){ err.textContent=e.message; }
+  $('fund-get-btn').disabled=false;
 }
 
 /* ----- boot ----- */
