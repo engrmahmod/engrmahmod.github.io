@@ -132,10 +132,6 @@
         <button class="btn btn-ghost" id="btn-change-password" style="width:100%">Change password</button>
         <p class="status" id="password-status"></p>
       </div>
-      <div class="card" id="card-disconnect">
-        <button class="btn btn-ghost" id="btn-disconnect" style="width:100%">Disconnect GitHub token from this phone</button>
-      </div>
-    </div>
   </div>
 
 </div>
@@ -321,14 +317,6 @@ $('btn-token').addEventListener('click', async () => {
   }
 });
 
-$('btn-disconnect').addEventListener('click', () => {
-  if (!confirm('Remove the GitHub token from this phone?')) return;
-  token = '';
-  localStorage.removeItem(LS_TOKEN);
-  hide('screen-app');
-  show('screen-token');
-});
-
 /* ---------- App ---------- */
 async function startApp() {
   show('screen-app');
@@ -356,7 +344,6 @@ async function startApp() {
     setStatus('gallery-status', 'Load failed: ' + e.message, 'bad');
     return;
   }
-  $('card-disconnect').hidden = proxyMode;
   renderPills();
   fillSettings();
   selectService(galleries.services[0].slug);
