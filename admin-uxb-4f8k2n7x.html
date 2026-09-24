@@ -123,9 +123,14 @@
         <input type="text" id="set-email" placeholder="UxbridgeLimited@gmail.com">
         <label for="set-address">Address</label>
         <input type="text" id="set-address" placeholder="Eastern By pass, Kano, Nigeria">
-        <p class="hint">To change the admin password, edit <code>ADMIN_PASSWORD</code> in the Render dashboard (uxb-admin-proxy → Environment).</p>
         <button class="btn btn-primary" id="btn-save-settings">Save settings</button>
         <p class="status" id="settings-status"></p>
+      </div>
+      <div class="card">
+        <label for="set-password">Change admin password</label>
+        <input type="password" id="set-password" placeholder="New admin password (min 6 characters)" autocomplete="new-password">
+        <button class="btn btn-ghost" id="btn-change-password" style="width:100%">Change password</button>
+        <p class="status" id="password-status"></p>
       </div>
       <div class="card" id="card-disconnect">
         <button class="btn btn-ghost" id="btn-disconnect" style="width:100%">Disconnect GitHub token from this phone</button>
@@ -509,6 +514,22 @@ $('btn-save-settings').addEventListener('click', async () => {
     setStatus('settings-status', 'Save failed: ' + e.message, 'bad');
   }
   $('btn-save-settings').disabled = false;
+});
+
+$('btn-change-password').addEventListener('click', async () => {
+  const npw = $('set-password').value.trim();
+  if (npw.length < 6) { setStatus('password-status', 'Use at least 6 characters.', 'bad'); return; }
+  if (!confirm('Change the admin password now?')) return;
+  setStatus('password-status', 'Changing…', 'busy');
+  $('btn-change-password').disabled = true;
+  try {
+    await proxyApi('/api/change-password', 'POST', { new: npw });
+    $('set-password').value = '';
+    setStatus('password-status', 'Password changed.', 'ok');
+  } catch (e) {
+    setStatus('password-status', 'Change failed: ' + e.message, 'bad');
+  }
+  $('btn-change-password').disabled = false;
 });
 
 boot();
