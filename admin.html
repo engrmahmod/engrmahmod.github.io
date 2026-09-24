@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UX BRIDGE — Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<style>
+  :root { --bg:#0b0f17; --card:#131a27; --line:#243044; --txt:#e8edf5; --mut:#93a0b4; --acc:#f59e0b; --ok:#22c55e; --bad:#ef4444; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--txt); font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:20px 16px 60px; }
+  h1 { font-size:22px; margin:6px 0 2px; }
+  .sub { color:var(--mut); font-size:14px; margin:0 0 18px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:14px; padding:18px; margin-bottom:16px; }
+  label { display:block; font-size:13px; color:var(--mut); margin:12px 0 6px; }
+  input[type=text], input[type=password], input[type=file] { width:100%; padding:12px; border-radius:10px; border:1px solid var(--line); background:#0e1420; color:var(--txt); font-size:15px; }
+  .btn { display:inline-block; border:0; border-radius:10px; padding:13px 20px; font-size:15px; font-weight:700; cursor:pointer; }
+  .btn-primary { background:var(--acc); color:#1a1206; width:100%; margin-top:14px; }
+  .btn-ghost { background:transparent; color:var(--acc); border:1px solid var(--acc); margin-top:10px; }
+  .btn-danger-ghost { background:transparent; color:var(--bad); border:1px solid var(--bad); padding:8px 12px; font-size:13px; border-radius:8px; }
+  .status { font-size:14px; margin-top:12px; min-height:20px; }
+  .status.ok { color:var(--ok); } .status.bad { color:var(--bad); } .status.busy { color:var(--acc); }
+  .tabs { display:flex; gap:8px; margin:16px 0; }
+  .tab { flex:1; padding:12px; text-align:center; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--mut); font-weight:700; cursor:pointer; }
+  .tab.active { background:var(--acc); color:#1a1206; border-color:var(--acc); }
+  .pills { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:14px; }
+  .pill { padding:9px 14px; border-radius:999px; border:1px solid var(--line); background:var(--card); color:var(--txt); font-size:14px; cursor:pointer; }
+  .pill.active { background:var(--acc); color:#1a1206; border-color:var(--acc); font-weight:700; }
+  .pgrid { display:grid; grid-template-columns:repeat(2,1fr); gap:12px; }
+  .pitem { background:#0e1420; border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+  .pitem img { width:100%; height:120px; object-fit:cover; display:block; }
+  .pitem .pbody { padding:8px; }
+  .pitem input[type=text] { padding:8px; font-size:13px; margin-bottom:8px; }
+  .pitem .row { display:flex; justify-content:space-between; align-items:center; }
+  .pitem .fname { font-size:11px; color:var(--mut); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:70%; }
+  .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; }
+  .topbar a { color:var(--acc); font-size:14px; }
+  ol.steps { color:var(--mut); font-size:14px; line-height:1.7; padding-left:20px; }
+  ol.steps code { color:var(--txt); background:#0e1420; padding:2px 6px; border-radius:6px; }
+  .hint { font-size:13px; color:var(--mut); margin-top:10px; line-height:1.6; }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- LOCK SCREEN -->
+  <div id="screen-lock">
+    <h1>UX BRIDGE <span style="color:var(--acc)">Admin</span></h1>
+    <p class="sub">Private area — enter your admin password.</p>
+    <div class="card">
+      <label for="pw">Admin password</label>
+      <input type="password" id="pw" placeholder="••••••••" autocomplete="current-password">
+      <button class="btn btn-primary" id="btn-unlock">Unlock</button>
+      <p class="status" id="lock-status"></p>
+    </div>
+  </div>
+
+  <!-- TOKEN SCREEN -->
+  <div id="screen-token" hidden>
+    <h1>Connect <span style="color:var(--acc)">GitHub</span></h1>
+    <p class="sub">One-time setup — paste a GitHub access token so this page can update your site. The token stays saved on this phone only.</p>
+    <div class="card">
+      <ol class="steps">
+        <li>Open <code>github.com</code> and sign in as <code>engrmahmod</code>.</li>
+        <li>Tap your profile photo → <code>Settings</code>.</li>
+        <li>Scroll to <code>Developer settings</code> → <code>Personal access tokens</code> → <code>Tokens (classic)</code>.</li>
+        <li><code>Generate new token (classic)</code> → note <code>UX Bridge admin</code> → tick the <code>repo</code> box → <code>Generate token</code>.</li>
+        <li>Copy the token (starts with <code>ghp_</code>) and paste it below.</li>
+      </ol>
+      <label for="token">GitHub token</label>
+      <input type="password" id="token" placeholder="ghp_..." autocomplete="off">
+      <button class="btn btn-primary" id="btn-token">Save &amp; connect</button>
+      <p class="status" id="token-status"></p>
+    </div>
+  </div>
+
+  <!-- APP -->
+  <div id="screen-app" hidden>
+    <div class="topbar">
+      <h1 style="margin:0">UX BRIDGE <span style="color:var(--acc)">Admin</span></h1>
+      <div>
+        <a href="index.html" target="_blank" rel="noopener">View site</a>
+        &nbsp;·&nbsp;
+        <a href="#" id="btn-lock">Lock</a>
+      </div>
+    </div>
+    <p class="sub">Changes go live on the website a few minutes after you save.</p>
+
+    <div class="tabs">
+      <div class="tab active" id="tabbtn-galleries">Galleries</div>
+      <div class="tab" id="tabbtn-settings">Settings</div>
+    </div>
+
+    <!-- GALLERIES -->
+    <div id="tab-galleries">
+      <div class="card">
+        <div class="pills" id="service-pills"></div>
+        <div class="pgrid" id="photo-grid"></div>
+        <label for="file-input">Add photos (JPG / PNG / WEBP)</label>
+        <input type="file" id="file-input" accept="image/jpeg,image/png,image/webp" multiple>
+        <button class="btn btn-primary" id="btn-save-gallery">Save gallery</button>
+        <p class="status" id="gallery-status"></p>
+        <p class="hint">Deleting a photo removes it from the gallery. Tip: add a short caption under each new photo before saving.</p>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="tab-settings" hidden>
+      <div class="card">
+        <label for="set-whatsapp">WhatsApp number (digits only, with country code)</label>
+        <input type="text" id="set-whatsapp" placeholder="2349066666633">
+        <label for="set-ng-display">Nigeria number (shown on site)</label>
+        <input type="text" id="set-ng-display" placeholder="09066666633">
+        <label for="set-ng-tel">Nigeria number (for tap-to-call, with +)</label>
+        <input type="text" id="set-ng-tel" placeholder="+2349066666633">
+        <label for="set-uk-display">UK number (shown on site)</label>
+        <input type="text" id="set-uk-display" placeholder="+447721503468">
+        <label for="set-uk-tel">UK number (for tap-to-call, with +)</label>
+        <input type="text" id="set-uk-tel" placeholder="+447721503468">
+        <label for="set-email">Email address</label>
+        <input type="text" id="set-email" placeholder="UxbridgeLimited@gmail.com">
+        <label for="set-address">Address</label>
+        <input type="text" id="set-address" placeholder="Eastern By pass, Kano, Nigeria">
+        <label for="set-password">Admin password</label>
+        <input type="text" id="set-password" placeholder="New admin password">
+        <button class="btn btn-primary" id="btn-save-settings">Save settings</button>
+        <p class="status" id="settings-status"></p>
+      </div>
+      <div class="card">
+        <button class="btn btn-ghost" id="btn-disconnect" style="width:100%">Disconnect GitHub token from this phone</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+/* ---------- Config ---------- */
+const OWNER = 'engrmahmod';
+const REPO = 'engrmahmod.github.io';
+const API = 'https://api.github.com';
+const LS_TOKEN = 'uxb_admin_token';
+
+/* ---------- State ---------- */
+let token = localStorage.getItem(LS_TOKEN) || '';
+let siteConfig = null;
+let galleries = null;      // parsed galleries.json
+let galleriesSha = '';
+let configSha = '';
+let currentSlug = null;
+let editorPhotos = [];     // [{src, caption, file?, objectUrl?}]
+let dirty = false;
+
+/* ---------- Helpers ---------- */
+const $ = (id) => document.getElementById(id);
+function setStatus(id, msg, cls) {
+  const el = $(id);
+  el.textContent = msg;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+function b64encodeUnicode(str) {
+  return btoa(unescape(encodeURIComponent(str)));
+}
+function b64decodeUnicode(b64) {
+  return decodeURIComponent(escape(atob(b64.replace(/\n/g, ''))));
+}
+async function gh(path, method, body) {
+  const res = await fetch(API + path, {
+    method: method || 'GET',
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + token,
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.message || ('GitHub HTTP ' + res.status));
+    err.status = res.status;
+    throw err;
+  }
+  return data;
+}
+async function loadRepoJson(path) {
+  const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path);
+  return { sha: d.sha, data: JSON.parse(b64decodeUnicode(d.content)) };
+}
+async function saveRepoJson(path, sha, obj, message) {
+  const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path, 'PUT', {
+    message: message,
+    content: b64encodeUnicode(JSON.stringify(obj, null, 2) + '\n'),
+    sha: sha,
+  });
+  return d.content.sha;
+}
+function readFileBase64(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(String(r.result).split(',')[1]);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+function show(id) { $(id).hidden = false; }
+function hide(id) { $(id).hidden = true; }
+
+/* ---------- Boot: fetch public config for the password gate ---------- */
+async function boot() {
+  try {
+    const res = await fetch('data/site-config.json', { cache: 'no-store' });
+    if (!res.ok) throw new Error('config not found');
+    siteConfig = await res.json();
+  } catch (e) {
+    setStatus('lock-status', 'Could not load site settings. Check your connection and reload.', 'bad');
+    $('btn-unlock').disabled = true;
+  }
+}
+
+$('btn-unlock').addEventListener('click', () => {
+  const pw = $('pw').value;
+  if (siteConfig && pw === siteConfig.admin_password) {
+    setStatus('lock-status', '', '');
+    $('pw').value = '';
+    enterApp();
+  } else {
+    setStatus('lock-status', 'Wrong password.', 'bad');
+  }
+});
+$('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('btn-unlock').click(); });
+
+function enterApp() {
+  hide('screen-lock');
+  if (!token) {
+    show('screen-token');
+  } else {
+    startApp();
+  }
+}
+
+$('btn-lock').addEventListener('click', (e) => {
+  e.preventDefault();
+  hide('screen-app'); hide('screen-token');
+  show('screen-lock');
+});
+
+/* ---------- Token setup ---------- */
+$('btn-token').addEventListener('click', async () => {
+  const t = $('token').value.trim();
+  if (!t) { setStatus('token-status', 'Paste your token first.', 'bad'); return; }
+  setStatus('token-status', 'Checking token…', 'busy');
+  try {
+    const res = await fetch(API + '/user', {
+      headers: { 'Accept': 'application/vnd.github+json', 'Authorization': 'Bearer ' + t },
+    });
+    if (!res.ok) throw new Error('Token rejected (HTTP ' + res.status + '). Create a new one with the repo box ticked.');
+    token = t;
+    localStorage.setItem(LS_TOKEN, token);
+    $('token').value = '';
+    setStatus('token-status', '', '');
+    hide('screen-token');
+    startApp();
+  } catch (e) {
+    setStatus('token-status', e.message, 'bad');
+  }
+});
+
+$('btn-disconnect').addEventListener('click', () => {
+  if (!confirm('Remove the GitHub token from this phone?')) return;
+  token = '';
+  localStorage.removeItem(LS_TOKEN);
+  hide('screen-app');
+  show('screen-token');
+});
+
+/* ---------- App ---------- */
+async function startApp() {
+  show('screen-app');
+  setStatus('gallery-status', 'Loading galleries…', 'busy');
+  try {
+    const g = await loadRepoJson('data/galleries.json');
+    galleries = g.data; galleriesSha = g.sha;
+    const c = await loadRepoJson('data/site-config.json');
+    // keep the in-memory password in sync (it may have changed)
+    siteConfig = c.data; configSha = c.sha;
+  } catch (e) {
+    if (e.status === 401 || e.status === 403) {
+      token = '';
+      localStorage.removeItem(LS_TOKEN);
+      hide('screen-app');
+      show('screen-token');
+      setStatus('token-status', 'That token no longer works. Please paste a fresh one.', 'bad');
+      return;
+    }
+    setStatus('gallery-status', 'Load failed: ' + e.message, 'bad');
+    return;
+  }
+  renderPills();
+  fillSettings();
+  selectService(galleries.services[0].slug);
+  setStatus('gallery-status', '', '');
+}
+
+function renderPills() {
+  const box = $('service-pills');
+  box.innerHTML = '';
+  galleries.services.forEach((s) => {
+    const b = document.createElement('button');
+    b.className = 'pill' + (s.slug === currentSlug ? ' active' : '');
+    b.textContent = s.name + ' (' + s.photos.length + ')';
+    b.addEventListener('click', () => {
+      if (s.slug === currentSlug) return;
+      if (dirty && !confirm('You have unsaved changes in this gallery. Switch anyway?')) return;
+      selectService(s.slug);
+    });
+    box.appendChild(b);
+  });
+}
+
+function selectService(slug) {
+  currentSlug = slug;
+  const svc = galleries.services.find((s) => s.slug === slug);
+  editorPhotos = svc.photos.map((p) => ({ src: p.src, caption: p.caption, file: null, objectUrl: null }));
+  dirty = false;
+  renderPills();
+  renderGrid();
+  setStatus('gallery-status', '', '');
+}
+
+function renderGrid() {
+  const grid = $('photo-grid');
+  grid.innerHTML = '';
+  editorPhotos.forEach((p, i) => {
+    const div = document.createElement('div');
+    div.className = 'pitem';
+    const img = document.createElement('img');
+    img.src = p.objectUrl || p.src;
+    img.alt = p.caption || '';
+    const body = document.createElement('div');
+    body.className = 'pbody';
+    const cap = document.createElement('input');
+    cap.type = 'text';
+    cap.placeholder = 'Caption…';
+    cap.value = p.caption || '';
+    cap.addEventListener('input', () => { p.caption = cap.value; dirty = true; });
+    const row = document.createElement('div');
+    row.className = 'row';
+    const fname = document.createElement('span');
+    fname.className = 'fname';
+    fname.textContent = p.file ? p.file.name : p.src.split('/').pop();
+    const del = document.createElement('button');
+    del.className = 'btn-danger-ghost';
+    del.textContent = 'Delete';
+    del.addEventListener('click', () => {
+      if (p.objectUrl) URL.revokeObjectURL(p.objectUrl);
+      editorPhotos.splice(i, 1);
+      dirty = true;
+      renderGrid();
+    });
+    row.appendChild(fname); row.appendChild(del);
+    body.appendChild(cap); body.appendChild(row);
+    div.appendChild(img); div.appendChild(body);
+    grid.appendChild(div);
+  });
+}
+
+$('file-input').addEventListener('change', (e) => {
+  const files = Array.from(e.target.files || []);
+  files.forEach((f) => {
+    if (!/^image\/(jpeg|png|webp)$/.test(f.type)) return;
+    editorPhotos.push({
+      src: '', caption: '',
+      file: f, objectUrl: URL.createObjectURL(f),
+    });
+  });
+  e.target.value = '';
+  if (files.length) { dirty = true; renderGrid(); }
+});
+
+$('btn-save-gallery').addEventListener('click', async () => {
+  const svc = galleries.services.find((s) => s.slug === currentSlug);
+  if (!svc) return;
+  setStatus('gallery-status', 'Uploading new photos…', 'busy');
+  $('btn-save-gallery').disabled = true;
+  try {
+    // 1) upload new files
+    for (let i = 0; i < editorPhotos.length; i++) {
+      const p = editorPhotos[i];
+      if (!p.file) continue;
+      const ext = (p.file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z]/g, '') || 'jpg';
+      const dest = 'img/' + svc.img_dir + '/' + svc.slug + '-' + Date.now() + '-' + i + '.' + ext;
+      const content = await readFileBase64(p.file);
+      await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + dest, 'PUT', {
+        message: 'Admin: add photo to ' + svc.name,
+        content: content,
+      });
+      if (p.objectUrl) URL.revokeObjectURL(p.objectUrl);
+      p.src = dest; p.file = null; p.objectUrl = null;
+    }
+    // 2) write galleries.json
+    setStatus('gallery-status', 'Saving gallery…', 'busy');
+    svc.photos = editorPhotos.map((p) => ({ src: p.src, caption: p.caption || '' }));
+    galleriesSha = await saveRepoJson('data/galleries.json', galleriesSha, galleries, 'Admin: update ' + svc.name + ' gallery');
+    dirty = false;
+    renderPills(); renderGrid();
+    setStatus('gallery-status', 'Saved! The site will show it in a few minutes.', 'ok');
+  } catch (e) {
+    setStatus('gallery-status', 'Save failed: ' + e.message, 'bad');
+  }
+  $('btn-save-gallery').disabled = false;
+});
+
+/* ---------- Tabs ---------- */
+$('tabbtn-galleries').addEventListener('click', () => {
+  $('tabbtn-galleries').classList.add('active');
+  $('tabbtn-settings').classList.remove('active');
+  hide('tab-settings'); show('tab-galleries');
+});
+$('tabbtn-settings').addEventListener('click', () => {
+  $('tabbtn-settings').classList.add('active');
+  $('tabbtn-galleries').classList.remove('active');
+  hide('tab-galleries'); show('tab-settings');
+});
+
+/* ---------- Settings ---------- */
+function fillSettings() {
+  const c = siteConfig || {};
+  $('set-whatsapp').value = c.whatsapp_number || '';
+  $('set-ng-display').value = c.phone_ng_display || '';
+  $('set-ng-tel').value = c.phone_ng_tel || '';
+  $('set-uk-display').value = c.phone_uk_display || '';
+  $('set-uk-tel').value = c.phone_uk_tel || '';
+  $('set-email').value = c.email || '';
+  $('set-address').value = c.address || '';
+  $('set-password').value = c.admin_password || '';
+}
+
+$('btn-save-settings').addEventListener('click', async () => {
+  const digits = $('set-whatsapp').value.replace(/\D/g, '');
+  if (!digits) { setStatus('settings-status', 'WhatsApp number is required.', 'bad'); return; }
+  const pw = $('set-password').value.trim();
+  if (!pw) { setStatus('settings-status', 'Admin password cannot be empty.', 'bad'); return; }
+  setStatus('settings-status', 'Saving…', 'busy');
+  $('btn-save-settings').disabled = true;
+  try {
+    siteConfig = {
+      whatsapp_number: digits,
+      phone_ng_display: $('set-ng-display').value.trim(),
+      phone_ng_tel: $('set-ng-tel').value.trim(),
+      phone_uk_display: $('set-uk-display').value.trim(),
+      phone_uk_tel: $('set-uk-tel').value.trim(),
+      email: $('set-email').value.trim(),
+      address: $('set-address').value.trim(),
+      admin_password: pw,
+    };
+    configSha = await saveRepoJson('data/site-config.json', configSha, siteConfig, 'Admin: update site settings');
+    setStatus('settings-status', 'Saved! The site will show it in a few minutes.', 'ok');
+  } catch (e) {
+    setStatus('settings-status', 'Save failed: ' + e.message, 'bad');
+  }
+  $('btn-save-settings').disabled = false;
+});
+
+boot();
+</script>
+</body>
+</html>
