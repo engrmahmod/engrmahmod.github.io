@@ -1,0 +1,552 @@
+{
+  "services": [
+    {
+      "slug": "vehicles",
+      "name": "Vehicles",
+      "tagline": "Cars for sale in Nigeria",
+      "description": "Quality vehicles sourced and supplied — from sedans to SUVs. Tap to see our current stock.",
+      "img_dir": "vehicles",
+      "photos": [
+        {
+          "src": "img/vehicles/v1.jpg",
+          "caption": "Toyota Corolla fleet"
+        },
+        {
+          "src": "img/vehicles/v2.jpg",
+          "caption": "Sedans ready for delivery"
+        },
+        {
+          "src": "img/vehicles/v3.jpg",
+          "caption": "Vehicle warehouse"
+        },
+        {
+          "src": "img/vehicles/v4.jpg",
+          "caption": "Stock lineup"
+        },
+        {
+          "src": "img/vehicles/v5.jpg",
+          "caption": "Fresh arrivals"
+        },
+        {
+          "src": "img/vehicles/v6.jpg",
+          "caption": "Sedans in storage"
+        },
+        {
+          "src": "img/vehicles/v7.jpg",
+          "caption": "Range Rover in container"
+        },
+        {
+          "src": "img/vehicles/v8.jpg",
+          "caption": "Toyota Hilux pickup"
+        },
+        {
+          "src": "img/vehicles/v9.jpg",
+          "caption": "Toyota Hilux front view"
+        },
+        {
+          "src": "img/vehicles/v10.jpg",
+          "caption": "Vehicle supply proposal — 158 units"
+        },
+        {
+          "src": "img/vehicles/v11.jpg",
+          "caption": "UCC dealership partnership"
+        },
+        {
+          "src": "img/vehicles/v12.jpg",
+          "caption": "Car showroom visit"
+        },
+        {
+          "src": "img/vehicles/v13.jpg",
+          "caption": "Cadillac Escalade"
+        },
+        {
+          "src": "img/vehicles/v14.jpg",
+          "caption": "Cadillac Escalade rear view"
+        },
+        {
+          "src": "img/vehicles/v15.jpg",
+          "caption": "Honda Crider stock"
+        },
+        {
+          "src": "img/vehicles/v16.jpg",
+          "caption": "Toyota Hilux GR"
+        },
+        {
+          "src": "img/vehicles/v17.jpg",
+          "caption": "Range Rover secured in container"
+        },
+        {
+          "src": "img/vehicles/v18.jpg",
+          "caption": "UX BRIDGES showroom"
+        },
+        {
+          "src": "img/vehicles/v19.jpg",
+          "caption": "Sedans and SUVs on ground"
+        },
+        {
+          "src": "img/vehicles/v20.jpg",
+          "caption": "Toyota Corolla warehouse stock"
+        },
+        {
+          "src": "img/vehicles/v21.jpg",
+          "caption": "Toyota Hilux GR Launch Edition"
+        },
+        {
+          "src": "img/vehicles/v22.jpg",
+          "caption": "Toyota stock inspection"
+        }
+      ]
+    },
+    {
+      "slug": "trucks",
+      "name": "Trucks",
+      "tagline": "Heavy-duty HOWO trucks",
+      "description": "Heavy-duty trucks and tippers — HOWO and Sinotruk units available for serious work.",
+      "img_dir": "trucks",
+      "photos": [
+        {
+          "src": "img/trucks/t1.jpg",
+          "caption": "HOWO truck head"
+        },
+        {
+          "src": "img/trucks/t2.jpg",
+          "caption": "HOWO tipper"
+        },
+        {
+          "src": "img/trucks/t3.jpg",
+          "caption": "Sinotruk dump truck"
+        },
+        {
+          "src": "img/trucks/t4.jpg",
+          "caption": "HOWO trucks lineup"
+        },
+        {
+          "src": "img/trucks/t5.jpg",
+          "caption": "HOWO chassis"
+        },
+        {
+          "src": "img/trucks/t6.jpg",
+          "caption": "HOWO tipper on site"
+        },
+        {
+          "src": "img/trucks/t7.jpg",
+          "caption": "HOWO chassis rear view"
+        },
+        {
+          "src": "img/trucks/t8.jpg",
+          "caption": "HOWO dump truck"
+        },
+        {
+          "src": "img/trucks/t9.jpg",
+          "caption": "Dump truck delivery inspection"
+        },
+        {
+          "src": "img/trucks/t10.jpg",
+          "caption": "Sinotruk dump trucks"
+        },
+        {
+          "src": "img/trucks/t11.jpg",
+          "caption": "Sinotruk factory visit"
+        },
+        {
+          "src": "img/trucks/t12.jpg",
+          "caption": "Dump truck warehouse"
+        },
+        {
+          "src": "img/trucks/t13.jpg",
+          "caption": "Sinotruk dump truck inspection"
+        },
+        {
+          "src": "img/trucks/t14.jpg",
+          "caption": "HOWO dump truck"
+        },
+        {
+          "src": "img/trucks/t15.jpg",
+          "caption": "Shacman truck handover"
+        },
+        {
+          "src": "img/trucks/t16.jpg",
+          "caption": "Engine inspection at workshop"
+        },
+        {
+          "src": "img/trucks/t17.jpg",
+          "caption": "HOWO dump truck unit"
+        },
+        {
+          "src": "img/trucks/t18.jpg",
+          "caption": "HOWO truck front view"
+        },
+        {
+          "src": "img/trucks/t19.jpg",
+          "caption": "HOWO dump trucks in yard"
+        },
+        {
+          "src": "img/trucks/t20.jpg",
+          "caption": "Sinotruk dump trucks ready"
+        },
+        {
+          "src": "img/trucks/t21.jpg",
+          "caption": "HOWO trucks lineup"
+        },
+        {
+          "src": "img/trucks/t22.jpg",
+          "caption": "HOWO trucks on trailer at sunset"
+        },
+        {
+          "src": "img/trucks/t23.jpg",
+          "caption": "HOWO dump trucks in snow"
+        },
+        {
+          "src": "img/trucks/t24.jpg",
+          "caption": "HOWO trucks in snow yard"
+        },
+        {
+          "src": "img/trucks/t25.jpg",
+          "caption": "LPG tanker trailers"
+        },
+        {
+          "src": "img/trucks/t26.jpg",
+          "caption": "Diesel engine at truck plant"
+        },
+        {
+          "src": "img/trucks/t27.jpg",
+          "caption": "Sinotruk trucks in snow"
+        }
+      ]
+    },
+    {
+      "slug": "cargo",
+      "name": "Cargo",
+      "tagline": "Air, sea & express freight",
+      "description": "China-to-Nigeria freight forwarding by air, sea and express. Track every shipment from dispatch to delivery.",
+      "img_dir": "cargo",
+      "photos": [
+        {
+          "src": "img/cargo/cg1.jpg",
+          "caption": "HOWO tractor chassis at port"
+        },
+        {
+          "src": "img/cargo/cg2.jpg",
+          "caption": "Truck craned onto vessel"
+        },
+        {
+          "src": "img/cargo/cg3.jpg",
+          "caption": "Truck loading at port"
+        },
+        {
+          "src": "img/cargo/cg4.jpg",
+          "caption": "Truck chassis crane lift"
+        },
+        {
+          "src": "img/cargo/cg5.jpg",
+          "caption": "Dump truck crane loading"
+        },
+        {
+          "src": "img/cargo/cg6.jpg",
+          "caption": "Dump truck vessel loading"
+        },
+        {
+          "src": "img/cargo/cg7.jpg",
+          "caption": "Trucks on vessel deck"
+        },
+        {
+          "src": "img/cargo/cg8.jpg",
+          "caption": "Truck crane lift at port"
+        },
+        {
+          "src": "img/cargo/cg9.jpg",
+          "caption": "Stacked trucks on vessel"
+        },
+        {
+          "src": "img/cargo/cg10.jpg",
+          "caption": "Trucks shipped on deck"
+        },
+        {
+          "src": "img/cargo/cg11.jpg",
+          "caption": "Stacked dump trucks on vessel"
+        },
+        {
+          "src": "img/cargo/cg12.jpg",
+          "caption": "Cargo hold — truck beds and parts"
+        },
+        {
+          "src": "img/cargo/cg13.jpg",
+          "caption": "Tractor head unloading at port"
+        }
+      ]
+    },
+    {
+      "slug": "procurement",
+      "name": "Procurement",
+      "tagline": "Sourcing you can trust",
+      "description": "We find and verify suppliers, negotiate pricing and manage purchase orders so you receive exactly what you paid for.",
+      "img_dir": "procurement",
+      "photos": [
+        {
+          "src": "img/procurement/p1.jpg",
+          "caption": "Supplier meeting in China"
+        },
+        {
+          "src": "img/procurement/p2.jpg",
+          "caption": "Factory visit in China"
+        },
+        {
+          "src": "img/procurement/p3.jpg",
+          "caption": "Supplier handshake"
+        },
+        {
+          "src": "img/procurement/p4.jpg",
+          "caption": "Partner meeting"
+        },
+        {
+          "src": "img/procurement/p5.jpg",
+          "caption": "Supplier partnership handshake"
+        },
+        {
+          "src": "img/procurement/p6.jpg",
+          "caption": "Sourcing operations office"
+        },
+        {
+          "src": "img/procurement/p7.jpg",
+          "caption": "Factory partnership"
+        },
+        {
+          "src": "img/procurement/p8.jpg",
+          "caption": "Factory inspection visit"
+        },
+        {
+          "src": "img/procurement/p9.jpg",
+          "caption": "Film blowing machine sourcing"
+        },
+        {
+          "src": "img/procurement/p10.jpg",
+          "caption": "Industrial machines at factory"
+        },
+        {
+          "src": "img/procurement/p11.jpg",
+          "caption": "Machinery supplier visit"
+        },
+        {
+          "src": "img/procurement/p12.jpg",
+          "caption": "Business handshake"
+        },
+        {
+          "src": "img/procurement/p13.jpg",
+          "caption": "Pipe factory visit"
+        },
+        {
+          "src": "img/procurement/p14.jpg",
+          "caption": "Film machines at factory"
+        },
+        {
+          "src": "img/procurement/p15.jpg",
+          "caption": "Pipe extrusion plant"
+        },
+        {
+          "src": "img/procurement/p16.jpg",
+          "caption": "Factory visit with partner"
+        },
+        {
+          "src": "img/procurement/p17.jpg",
+          "caption": "Truck factory visit"
+        },
+        {
+          "src": "img/procurement/p18.jpg",
+          "caption": "Film machine inspection"
+        },
+        {
+          "src": "img/procurement/p19.jpg",
+          "caption": "Electrical cabinet sourcing"
+        },
+        {
+          "src": "img/procurement/p20.jpg",
+          "caption": "Supplier visit"
+        },
+        {
+          "src": "img/procurement/p21.jpg",
+          "caption": "Film blowing machine tower"
+        },
+        {
+          "src": "img/procurement/p22.jpg",
+          "caption": "Partner office meeting"
+        }
+      ]
+    },
+    {
+      "slug": "customs",
+      "name": "Customs",
+      "tagline": "Clearance without stories",
+      "description": "Documentation and customs clearance handled end to end, so your goods move without stories.",
+      "img_dir": "customs",
+      "photos": []
+    },
+    {
+      "slug": "construction",
+      "name": "Construction",
+      "tagline": "Bridges & civil works",
+      "description": "Bridge and civil construction works — concrete, steel reinforcement, marine works and site operations, delivered to spec.",
+      "img_dir": "construction",
+      "photos": [
+        {
+          "src": "img/construction/c1.jpg",
+          "caption": "Cable-stayed pedestrian bridge"
+        },
+        {
+          "src": "img/construction/c2.jpg",
+          "caption": "Concrete pouring on site"
+        },
+        {
+          "src": "img/construction/c3.jpg",
+          "caption": "Steel reinforcement works"
+        },
+        {
+          "src": "img/construction/c4.jpg",
+          "caption": "Marine excavation works"
+        },
+        {
+          "src": "img/construction/c7.jpg",
+          "caption": "Bridge rehabilitation over water"
+        },
+        {
+          "src": "img/construction/c8.jpg",
+          "caption": "Barge operations crew"
+        },
+        {
+          "src": "img/construction/c9.jpg",
+          "caption": "Barge concrete operations"
+        },
+        {
+          "src": "img/construction/c11.jpg",
+          "caption": "CAT 320C excavator"
+        }
+      ]
+    },
+    {
+      "slug": "dam-works",
+      "name": "Dam Works",
+      "tagline": "Dams & hydraulic structures",
+      "description": "Dam construction and hydraulic structures — embankments, spillways, reinforcement and dam fixtures, built to last.",
+      "img_dir": "construction",
+      "photos": [
+        {
+          "src": "img/construction/c5.jpg",
+          "caption": "Riverside dam construction"
+        },
+        {
+          "src": "img/construction/c6.jpg",
+          "caption": "Dam and reservoir"
+        },
+        {
+          "src": "img/construction/c10.jpg",
+          "caption": "Pile cap reinforcement"
+        },
+        {
+          "src": "img/damworks/d1.jpg",
+          "caption": "Aerial view of dam"
+        },
+        {
+          "src": "img/damworks/d2.jpg",
+          "caption": "Dam face and spillway"
+        },
+        {
+          "src": "img/damworks/d3.jpg",
+          "caption": "Dam fixture installation"
+        }
+      ]
+    },
+    {
+      "slug": "solar",
+      "name": "Solar",
+      "tagline": "Solar for office & home",
+      "description": "Solar installations for offices and homes — panels, inverters and battery storage, installed and working.",
+      "img_dir": "solar",
+      "photos": [
+        {
+          "src": "img/solar/s1.jpg",
+          "caption": "Solar panel farm"
+        },
+        {
+          "src": "img/solar/s2.jpg",
+          "caption": "Panel rows installation"
+        },
+        {
+          "src": "img/solar/s3.jpg",
+          "caption": "Inverter setup"
+        },
+        {
+          "src": "img/solar/s4.jpg",
+          "caption": "Battery storage bank"
+        },
+        {
+          "src": "img/solar/s5.jpg",
+          "caption": "Hybrid inverter system"
+        },
+        {
+          "src": "img/solar/s6.jpg",
+          "caption": "Control and distribution"
+        },
+        {
+          "src": "img/solar/s7.jpg",
+          "caption": "Battery rack installation"
+        },
+        {
+          "src": "img/solar/s8.jpg",
+          "caption": "Completed solar setup"
+        }
+      ]
+    },
+    {
+      "slug": "solar-powered-dam",
+      "name": "Solar Powered Dam",
+      "tagline": "Solar-driven water works",
+      "description": "Solar-powered dam and water treatment works — clean energy driving water infrastructure.",
+      "img_dir": "solar-dam",
+      "photos": [
+        {
+          "src": "img/solar-dam/sd1.jpg",
+          "caption": "Treatment plant overview"
+        },
+        {
+          "src": "img/solar-dam/sd2.jpg",
+          "caption": "Clarifier tanks"
+        },
+        {
+          "src": "img/solar-dam/sd3.jpg",
+          "caption": "Plant walkway and tanks"
+        },
+        {
+          "src": "img/solar-dam/sd4.jpg",
+          "caption": "Sedimentation tanks"
+        },
+        {
+          "src": "img/solar-dam/sd5.jpg",
+          "caption": "Tank bridge structure"
+        },
+        {
+          "src": "img/solar-dam/sd6.jpg",
+          "caption": "Plant aerial view"
+        },
+        {
+          "src": "img/solar-dam/sd7.jpg",
+          "caption": "Dam aerial view"
+        }
+      ]
+    },
+    {
+      "slug": "real-estate",
+      "name": "Real Estate",
+      "tagline": "Property, made simple",
+      "description": "Property sourcing and advisory — we help you find, verify and secure real estate opportunities.",
+      "img_dir": "real-estate",
+      "photos": []
+    },
+    {
+      "slug": "staffing",
+      "name": "Staffing",
+      "tagline": "Right people, right roles",
+      "description": "Recruitment and staffing support for your projects and business — the right people in the right roles.",
+      "img_dir": "staffing",
+      "photos": []
+    }
+  ]
+}
