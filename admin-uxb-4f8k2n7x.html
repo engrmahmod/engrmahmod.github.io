@@ -123,12 +123,11 @@
         <input type="text" id="set-email" placeholder="UxbridgeLimited@gmail.com">
         <label for="set-address">Address</label>
         <input type="text" id="set-address" placeholder="Eastern By pass, Kano, Nigeria">
-        <label for="set-password">Admin password</label>
-        <input type="text" id="set-password" placeholder="New admin password">
+        <p class="hint">To change the admin password, edit <code>ADMIN_PASSWORD</code> in the Render dashboard (uxb-admin-proxy → Environment).</p>
         <button class="btn btn-primary" id="btn-save-settings">Save settings</button>
         <p class="status" id="settings-status"></p>
       </div>
-      <div class="card">
+      <div class="card" id="card-disconnect">
         <button class="btn btn-ghost" id="btn-disconnect" style="width:100%">Disconnect GitHub token from this phone</button>
       </div>
     </div>
@@ -143,9 +142,12 @@ const OWNER = 'engrmahmod';
 const REPO = 'engrmahmod.github.io';
 const API = 'https://api.github.com';
 const LS_TOKEN = 'uxb_admin_token';
+const PROXY = 'https://uxb-admin-proxy.onrender.com';
 
 /* ---------- State ---------- */
 let token = localStorage.getItem(LS_TOKEN) || '';
+let session = '';        // proxy session (password-only mode)
+let proxyMode = false;   // true when this device has no GitHub token
 let siteConfig = null;
 let galleries = null;      // parsed galleries.json
 let galleriesSha = '';
@@ -186,16 +188,51 @@ async function gh(path, method, body) {
   return data;
 }
 async function loadRepoJson(path) {
-  const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path);
-  return { sha: d.sha, data: JSON.parse(b64decodeUnicode(d.content)) };
+  if (token) {
+    const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path);
+    return { sha: d.sha, data: JSON.parse(b64decodeUnicode(d.content)) };
+  }
+  const d = await proxyApi('/api/file/' + path);
+  return { sha: d.sha, data: d.data };
 }
 async function saveRepoJson(path, sha, obj, message) {
-  const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path, 'PUT', {
-    message: message,
-    content: b64encodeUnicode(JSON.stringify(obj, null, 2) + '\n'),
-    sha: sha,
+  if (token) {
+    const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path, 'PUT', {
+      message: message,
+      content: b64encodeUnicode(JSON.stringify(obj, null, 2) + '\n'),
+      sha: sha,
+    });
+    return d.content.sha;
+  }
+  const d = await proxyApi('/api/file/' + path, 'PUT', { sha: sha, data: obj, message: message });
+  return d.sha;
+}
+async function uploadFile(dest, content, message) {
+  if (token) {
+    await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + dest, 'PUT', {
+      message: message,
+      content: content,
+    });
+    return;
+  }
+  await proxyApi('/api/upload', 'POST', { path: dest, content: content, message: message });
+}
+async function proxyApi(path, method, body) {
+  const res = await fetch(PROXY + path, {
+    method: method || 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Admin-Session': session,
+    },
+    body: body ? JSON.stringify(body) : undefined,
   });
-  return d.content.sha;
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    const err = new Error(data.error || ('Server HTTP ' + res.status));
+    err.status = res.status;
+    throw err;
+  }
+  return data;
 }
 function readFileBase64(file) {
   return new Promise((resolve, reject) => {
@@ -208,37 +245,48 @@ function readFileBase64(file) {
 function show(id) { $(id).hidden = false; }
 function hide(id) { $(id).hidden = true; }
 
-/* ---------- Boot: fetch public config for the password gate ---------- */
+/* ---------- Boot: wake the admin server while the password is typed ---------- */
 async function boot() {
   try {
-    const res = await fetch('data/site-config.json', { cache: 'no-store' });
-    if (!res.ok) throw new Error('config not found');
-    siteConfig = await res.json();
-  } catch (e) {
-    setStatus('lock-status', 'Could not load site settings. Check your connection and reload.', 'bad');
-    $('btn-unlock').disabled = true;
-  }
+    const res = await fetch(PROXY + '/health');
+    const h = await res.json().catch(() => ({}));
+    if (h && !h.password_set) {
+      setStatus('lock-status', 'Setup not finished: add ADMIN_PASSWORD in the Render dashboard (uxb-admin-proxy → Environment).', 'busy');
+    }
+  } catch (e) { /* server may be waking up; unlock will retry */ }
 }
 
-$('btn-unlock').addEventListener('click', () => {
+$('btn-unlock').addEventListener('click', async () => {
   const pw = $('pw').value;
-  if (siteConfig && pw === siteConfig.admin_password) {
-    setStatus('lock-status', '', '');
+  if (!pw) { setStatus('lock-status', 'Type your password.', 'bad'); return; }
+  setStatus('lock-status', 'Checking…', 'busy');
+  $('btn-unlock').disabled = true;
+  try {
+    const res = await fetch(PROXY + '/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ password: pw }),
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Login failed.');
+    session = data.session;
+    proxyMode = !token; // devices with a saved token keep using GitHub directly
     $('pw').value = '';
+    setStatus('lock-status', '', '');
     enterApp();
-  } else {
-    setStatus('lock-status', 'Wrong password.', 'bad');
+  } catch (e) {
+    setStatus('lock-status',
+      (e instanceof TypeError) ? 'Could not reach the admin server. Check your connection and try again.' : e.message,
+      'bad');
   }
+  $('btn-unlock').disabled = false;
 });
 $('pw').addEventListener('keydown', (e) => { if (e.key === 'Enter') $('btn-unlock').click(); });
 
 function enterApp() {
   hide('screen-lock');
-  if (!token) {
-    show('screen-token');
-  } else {
-    startApp();
-  }
+  hide('screen-token');
+  startApp();
 }
 
 $('btn-lock').addEventListener('click', (e) => {
@@ -284,20 +332,26 @@ async function startApp() {
     const g = await loadRepoJson('data/galleries.json');
     galleries = g.data; galleriesSha = g.sha;
     const c = await loadRepoJson('data/site-config.json');
-    // keep the in-memory password in sync (it may have changed)
     siteConfig = c.data; configSha = c.sha;
   } catch (e) {
-    if (e.status === 401 || e.status === 403) {
+    if ((e.status === 401 || e.status === 403) && token) {
+      // Saved token stopped working — fall back to server mode.
       token = '';
       localStorage.removeItem(LS_TOKEN);
+      proxyMode = true;
+      return startApp();
+    }
+    if (e.status === 401) {
+      // Session expired — back to the lock screen.
       hide('screen-app');
-      show('screen-token');
-      setStatus('token-status', 'That token no longer works. Please paste a fresh one.', 'bad');
+      show('screen-lock');
+      setStatus('lock-status', 'Session ended. Please unlock again.', 'bad');
       return;
     }
     setStatus('gallery-status', 'Load failed: ' + e.message, 'bad');
     return;
   }
+  $('card-disconnect').hidden = proxyMode;
   renderPills();
   fillSettings();
   selectService(galleries.services[0].slug);
@@ -393,10 +447,7 @@ $('btn-save-gallery').addEventListener('click', async () => {
       const ext = (p.file.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z]/g, '') || 'jpg';
       const dest = 'img/' + svc.img_dir + '/' + svc.slug + '-' + Date.now() + '-' + i + '.' + ext;
       const content = await readFileBase64(p.file);
-      await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + dest, 'PUT', {
-        message: 'Admin: add photo to ' + svc.name,
-        content: content,
-      });
+      await uploadFile(dest, content, 'Admin: add photo to ' + svc.name);
       if (p.objectUrl) URL.revokeObjectURL(p.objectUrl);
       p.src = dest; p.file = null; p.objectUrl = null;
     }
@@ -435,14 +486,11 @@ function fillSettings() {
   $('set-uk-tel').value = c.phone_uk_tel || '';
   $('set-email').value = c.email || '';
   $('set-address').value = c.address || '';
-  $('set-password').value = c.admin_password || '';
 }
 
 $('btn-save-settings').addEventListener('click', async () => {
   const digits = $('set-whatsapp').value.replace(/\D/g, '');
   if (!digits) { setStatus('settings-status', 'WhatsApp number is required.', 'bad'); return; }
-  const pw = $('set-password').value.trim();
-  if (!pw) { setStatus('settings-status', 'Admin password cannot be empty.', 'bad'); return; }
   setStatus('settings-status', 'Saving…', 'busy');
   $('btn-save-settings').disabled = true;
   try {
@@ -454,7 +502,6 @@ $('btn-save-settings').addEventListener('click', async () => {
       phone_uk_tel: $('set-uk-tel').value.trim(),
       email: $('set-email').value.trim(),
       address: $('set-address').value.trim(),
-      admin_password: pw,
     };
     configSha = await saveRepoJson('data/site-config.json', configSha, siteConfig, 'Admin: update site settings');
     setStatus('settings-status', 'Saved! The site will show it in a few minutes.', 'ok');
