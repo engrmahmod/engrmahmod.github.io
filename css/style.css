@@ -48,7 +48,7 @@ a { color: inherit; }
   max-width: 1150px; margin: 0 auto; padding: 14px 22px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
 }
-.brand { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+.brand { display: flex; align-items: center; gap: 4px; text-decoration: none; }
 .brand-mark {
   background: linear-gradient(135deg, var(--accent2), var(--accent) 55%, var(--accent-dark));
   color: #fff; font-weight: 800; font-size: 20px;
