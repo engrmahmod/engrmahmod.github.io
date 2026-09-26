@@ -599,7 +599,7 @@
         <div class="chip" id="tab-9mobile" onclick="pickNet('9mobile')">9mobile</div>
       </div>
     </div>
-    <div class="card"><h4>Select Plan</h4><div class="plans" id="plan-list"></div></div>
+    <div class="card"><h4>Select Plan</h4><div class="chips" id="plan-cats" style="margin-bottom:10px"></div><div class="plans" id="plan-list"></div></div>
     <div class="card">
       <div class="field"><label>Phone Number</label><input id="data-phone" inputmode="numeric" maxlength="11" placeholder="0803 123 4567"></div>
     </div>
@@ -771,7 +771,7 @@ let token = null;
 try { token = JSON.parse(localStorage.getItem('sv_token')); } catch(e){}
 let ME = null, PAYSTACK_PK = '';
 let curNet = 'MTN', curPlan = null, curCabPlan = null, curAirNet = 'MTN', curCabProv = 'DStv', curDisco = 0;
-let DATA_CACHE = {}, CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
+let CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
 
 async function api(path, method='GET', body=null){
   const r = await fetch(API_BASE + path, {
@@ -1110,26 +1110,50 @@ function renderProfile(){
 
 /* ----- data ----- */
 function netKey(){ return curNet==='9mobile' ? 'etisalat' : curNet.toLowerCase(); }
+function planCat(name){
+  const n=' '+name.toLowerCase().replace(/-/g,' ')+' ';
+  if(/[^0-9]30 ?days?|monthly/.test(n)) return 'Monthly';
+  if(/[^0-9]7 ?days?|weekly/.test(n)) return 'Weekly';
+  if(/[^0-9]1 ?day\b|[^0-9]2 ?days?\b|daily plan/.test(n)) return 'Daily';
+  return 'Others';
+}
+function cleanPlanName(name){
+  let n=' '+name+' ';
+  n=n.replace(new RegExp('^\\s*'+curNet+'\\s+','i'),' ');
+  n=n.replace(/(^|\s)-?N\s?[\d,]+/gi,' ');
+  n=n.replace(/(^|\s)-?[\d,]+\s*Naira/gi,' ');
+  n=n.replace(/\s+/g,' ').replace(/\s-\s*$/,'').trim();
+  return n||name;
+}
 function pickNet(n){
-  curNet=n; curPlan=null;
+  curNet=n; curPlan=null; curPlanCat=null;
   $('tab-mtn').classList.toggle('on', n==='MTN');
   $('tab-airtel').classList.toggle('on', n==='Airtel');
   $('tab-glo').classList.toggle('on', n==='Glo');
   $('tab-9mobile').classList.toggle('on', n==='9mobile');
   renderPlans();
 }
+let PLAN_CATS = {}, curPlanCat = null, curPlanList = [];
+function pickPlanCat(c){ curPlanCat=c; curPlan=null; renderPlans(); }
 async function renderPlans(){
-  const box=$('plan-list');
-  box.innerHTML='<div class="empty">Loading live plans…</div>';
+  const box=$('plan-list'), catsBox=$('plan-cats');
   try{
-    if(!DATA_CACHE[curNet]){
+    if(!PLAN_CATS[curNet]){
+      box.innerHTML='<div class="empty">Loading live plans…</div>'; catsBox.innerHTML='';
       const j = await api('/api/data/plans?network='+netKey());
       if(!j.ok) throw new Error(j.error||'Could not load plans.');
-      DATA_CACHE[curNet]=j.plans;
+      const cats={};
+      (j.plans||[]).forEach(p=>{ const c=planCat(p.name); (cats[c]=cats[c]||[]).push(p); });
+      PLAN_CATS[curNet]=cats;
     }
-    const plans=DATA_CACHE[curNet];
-    box.innerHTML = plans.length ? plans.map((p,i)=>
-      `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})"><b>${p.name}</b><small>${naira(p.price)}</small></div>`).join('') : '<div class="empty">No plans right now. Try again later.</div>';
+    const cats=PLAN_CATS[curNet];
+    const order=['Daily','Weekly','Monthly','Others'].filter(c=>cats[c]&&cats[c].length);
+    if(!order.length){ catsBox.innerHTML=''; box.innerHTML='<div class="empty">No plans right now. Try again later.</div>'; return; }
+    if(!order.includes(curPlanCat)) curPlanCat=order[0];
+    catsBox.innerHTML=order.map(c=>`<div class="chip${c===curPlanCat?' on':''}" onclick="pickPlanCat('${c}')">${c}</div>`).join('');
+    curPlanList=cats[curPlanCat];
+    box.innerHTML = curPlanList.map((p,i)=>
+      `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})"><b>${cleanPlanName(p.name)}</b><small>${naira(p.price)}</small></div>`).join('');
   }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickPlan(i){ curPlan=i; renderPlans(); }
@@ -1137,7 +1161,7 @@ async function buyData(){
   const err=$('data-err'), phone=$('data-phone').value.trim();
   if(curPlan===null) return err.textContent='Please select a data plan.';
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
-  const p=(DATA_CACHE[curNet]||[])[curPlan];
+  const p=curPlanList[curPlan];
   if(!p) return err.textContent='Plan expired. Reloading…', renderPlans();
   const pin=await askPin(); if(!pin){err.textContent='';return;}
   err.textContent='Sending…';
