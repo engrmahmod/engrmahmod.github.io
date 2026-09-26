@@ -1117,9 +1117,10 @@ function planCat(name){
   if(/[^0-9]1 ?day\b|[^0-9]2 ?days?\b|daily plan/.test(n)) return 'Daily';
   return 'Others';
 }
-function cleanPlanName(name){
+function cleanPlanName(name, pre){
   let n=' '+name+' ';
-  n=n.replace(new RegExp('^\\s*'+curNet+'\\s+','i'),' ');
+  const pfx = (pre===undefined?curNet:pre);
+  if(pfx) n=n.replace(new RegExp('^\\s*'+pfx+'\\s+','i'),' ');
   n=n.replace(/(^|\s)-?N\s?[\d,]+/gi,' ');
   n=n.replace(/(^|\s)-?[\d,]+\s*Naira/gi,' ');
   n=n.replace(/\s+/g,' ').replace(/\s-\s*$/,'').trim();
@@ -1219,7 +1220,7 @@ async function renderCabPlans(){
     }
     const plans=CAB_CACHE[prov];
     box.innerHTML = plans.length?plans.map((p,i)=>
-      `<div class="plan${curCabPlan===i?' on':''}" onclick="pickCab(${i})"><b>${p.name}</b><small>${naira(p.price)}</small></div>`).join('') : '<div class="empty">No bouquets right now.</div>';
+      `<div class="plan${curCabPlan===i?' on':''}" title="${cleanPlanName(p.name,curCabProv).replace(/"/g,'&quot;')}" onclick="pickCab(${i})"><b>${cleanPlanName(p.name,curCabProv)}</b><small>${naira(p.price)}</small></div>`).join('') : '<div class="empty">No bouquets right now.</div>';
   }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickCab(i){ curCabPlan=i; renderCabPlans(); }
