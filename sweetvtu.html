@@ -608,43 +608,50 @@
   </div>
 
   <div class="view" id="v-airtime">
-    <button class="back" onclick="show('v-dash')">Dashboard</button>
-    <div class="banner b-air"><h2>📞 Airtime Top-Up</h2><p>Instant recharge for any network.</p></div>
-    <div class="field"><label>Network</label><select id="air-net">
-      <option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option>
-    </select></div>
-    <div class="field"><label>Phone number</label><input id="air-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
-    <div class="field"><label>Amount (₦)</label><input id="air-amt" inputmode="numeric" placeholder="e.g. 500"></div>
+    <div class="backbar2"><div class="back2" onclick="show('v-dash')">←</div><b>Buy Airtime</b></div>
+    <div class="card"><h4>Select Network</h4>
+      <div class="chips">
+        <div class="chip on" id="tab-air-mtn" onclick="pickAirNet('MTN')">MTN</div>
+        <div class="chip" id="tab-air-airtel" onclick="pickAirNet('Airtel')">Airtel</div>
+        <div class="chip" id="tab-air-glo" onclick="pickAirNet('Glo')">Glo</div>
+        <div class="chip" id="tab-air-9mobile" onclick="pickAirNet('9mobile')">9mobile</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="field"><label>Phone Number</label><input id="air-phone" inputmode="numeric" maxlength="11" placeholder="0803 123 4567"></div>
+      <div class="field" style="margin-top:12px"><label>Amount (₦)</label><input id="air-amt" inputmode="numeric" placeholder="500"></div>
+    </div>
     <div class="err" id="air-err"></div>
-    <button class="btn" onclick="buyAirtime()">Recharge Now</button>
+    <button class="paybtn" onclick="buyAirtime()">Continue →</button>
   </div>
 
   <div class="view" id="v-cable">
-    <button class="back" onclick="show('v-dash')">Dashboard</button>
-    <div class="banner b-cable"><h2>📺 Cable TV</h2><p>DStv, GOtv &amp; Startimes subscriptions.</p></div>
-    <div class="note">Live bouquets &amp; prices — delivered instantly.</div>
-    <div class="field"><label>Provider</label><select id="cab-prov" onchange="renderCabPlans()">
-      <option>DStv</option><option>GOtv</option><option>Startimes</option>
-    </select></div>
-    <div id="cab-plans"></div>
-    <div class="field"><label>Smartcard / IUC number</label><input id="cab-iuc" inputmode="numeric" placeholder="e.g. 1023456789"></div>
+    <div class="backbar2"><div class="back2" onclick="show('v-dash')">←</div><b>TV Subscription</b></div>
+    <div class="card"><h4>Select Provider</h4>
+      <div class="chips">
+        <div class="chip on" id="tab-cab-dstv" onclick="pickCabProv('DStv')">DStv</div>
+        <div class="chip" id="tab-cab-gotv" onclick="pickCabProv('GOtv')">GOtv</div>
+        <div class="chip" id="tab-cab-startimes" onclick="pickCabProv('Startimes')">Startimes</div>
+      </div>
+    </div>
+    <div class="card"><h4>Select Package</h4><div class="plans" id="cab-plans"></div></div>
+    <div class="card">
+      <div class="field"><label>Smartcard / IUC Number</label><input id="cab-iuc" inputmode="numeric" placeholder="e.g. 1023456789"></div>
+    </div>
     <div class="err" id="cab-err"></div>
-    <button class="btn" onclick="buyCable()">Subscribe Now</button>
+    <button class="paybtn" onclick="buyCable()">Continue →</button>
   </div>
 
   <div class="view" id="v-power">
-    <button class="back" onclick="show('v-dash')">Dashboard</button>
-    <div class="banner b-power"><h2>💡 Electricity Bills</h2><p>Pay NEPA bills — prepaid &amp; postpaid.</p></div>
-    <div class="field"><label>Distribution company (DisCo)</label><select id="pow-disco">
-      <option>KEDCO — Kano</option><option>Ikeja Electric</option><option>Eko Electric</option>
-      <option>Abuja Electric</option><option>Ibadan Electric</option><option>PH Electric</option>
-      <option>Kaduna Electric</option><option>Jos Electric</option><option>Enugu Electric</option>
-    </select></div>
-    <div class="field"><label>Meter type</label><select id="pow-type"><option>Prepaid</option><option>Postpaid</option></select></div>
-    <div class="field"><label>Meter number</label><input id="pow-meter" inputmode="numeric" placeholder="e.g. 1234567890"></div>
-    <div class="field"><label>Amount (₦)</label><input id="pow-amt" inputmode="numeric" placeholder="e.g. 2000"></div>
+    <div class="backbar2"><div class="back2" onclick="show('v-dash')">←</div><b>Buy Electricity</b></div>
+    <div class="card"><h4>Select Provider</h4><div class="chips" id="pow-chips"><div class="empty">Loading…</div></div></div>
+    <div class="card">
+      <div class="field"><label>Meter Type</label><select id="pow-type"><option>Prepaid</option><option>Postpaid</option></select></div>
+      <div class="field" style="margin-top:12px"><label>Meter Number</label><input id="pow-meter" inputmode="numeric" placeholder="e.g. 1234567890"></div>
+      <div class="field" style="margin-top:12px"><label>Amount (₦)</label><input id="pow-amt" inputmode="numeric" placeholder="e.g. 2000"></div>
+    </div>
     <div class="err" id="pow-err"></div>
-    <button class="btn" onclick="buyPower()">Pay Bill</button>
+    <button class="paybtn" onclick="buyPower()">Continue →</button>
   </div>
 
   <div class="view" id="v-fund">
@@ -763,7 +770,7 @@ const me = () => ME;
 let token = null;
 try { token = JSON.parse(localStorage.getItem('sv_token')); } catch(e){}
 let ME = null, PAYSTACK_PK = '';
-let curNet = 'MTN', curPlan = null, curCabPlan = null;
+let curNet = 'MTN', curPlan = null, curCabPlan = null, curAirNet = 'MTN', curCabProv = 'DStv', curDisco = 0;
 let DATA_CACHE = {}, CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
 
 async function api(path, method='GET', body=null){
@@ -1144,8 +1151,15 @@ async function buyData(){
 }
 
 /* ----- airtime ----- */
+function pickAirNet(n){
+  curAirNet=n;
+  $('tab-air-mtn').classList.toggle('on', n==='MTN');
+  $('tab-air-airtel').classList.toggle('on', n==='Airtel');
+  $('tab-air-glo').classList.toggle('on', n==='Glo');
+  $('tab-air-9mobile').classList.toggle('on', n==='9mobile');
+}
 async function buyAirtime(){
-  const err=$('air-err'), net=$('air-net').value, phone=$('air-phone').value.trim(),
+  const err=$('air-err'), net=curAirNet, phone=$('air-phone').value.trim(),
         amt=parseInt($('air-amt').value,10);
   if(!validPhone(phone)) return err.textContent='Enter a valid 11-digit phone number.';
   if(!amt || amt<50) return err.textContent='Minimum airtime is ₦50.';
@@ -1162,10 +1176,17 @@ async function buyAirtime(){
 }
 
 /* ----- cable ----- */
+function pickCabProv(p){
+  curCabProv=p; curCabPlan=null; cabVerifiedFor='';
+  $('tab-cab-dstv').classList.toggle('on', p==='DStv');
+  $('tab-cab-gotv').classList.toggle('on', p==='GOtv');
+  $('tab-cab-startimes').classList.toggle('on', p==='Startimes');
+  renderCabPlans();
+}
 async function renderCabPlans(){
-  const prov=$('cab-prov').value.toLowerCase(); curCabPlan=null; cabVerifiedFor='';
+  const prov=curCabProv.toLowerCase();
   const box=$('cab-plans');
-  box.innerHTML='<div class="field"><label>Package</label></div><div class="empty">Loading bouquets…</div>';
+  box.innerHTML='<div class="empty">Loading bouquets…</div>';
   try{
     if(!CAB_CACHE[prov]){
       const j = await api('/api/cable/plans?provider='+prov);
@@ -1173,15 +1194,13 @@ async function renderCabPlans(){
       CAB_CACHE[prov]=j.plans;
     }
     const plans=CAB_CACHE[prov];
-    box.innerHTML = '<div class="field"><label>Package</label></div>' + (plans.length?plans.map((p,i)=>
-      `<div class="plan${curCabPlan===i?' on':''}" onclick="pickCab(${i})">
-         <div><b>${p.name}</b></div><span>${naira(p.price)}</span>
-       </div>`).join('') : '<div class="empty">No bouquets right now.</div>');
+    box.innerHTML = plans.length?plans.map((p,i)=>
+      `<div class="plan${curCabPlan===i?' on':''}" onclick="pickCab(${i})"><b>${p.name}</b><small>${naira(p.price)}</small></div>`).join('') : '<div class="empty">No bouquets right now.</div>';
   }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickCab(i){ curCabPlan=i; renderCabPlans(); }
 async function buyCable(){
-  const err=$('cab-err'), prov=$('cab-prov').value.toLowerCase(), iuc=$('cab-iuc').value.trim();
+  const err=$('cab-err'), prov=curCabProv.toLowerCase(), iuc=$('cab-iuc').value.trim();
   if(curCabPlan===null) return err.textContent='Please select a package.';
   if(iuc.length<8) return err.textContent='Enter a valid smartcard / IUC number.';
   const p=(CAB_CACHE[prov]||[])[curCabPlan];
@@ -1193,7 +1212,7 @@ async function buyCable(){
       const v=await api('/api/verify','POST',{serviceID:prov, billersCode:iuc});
       if(!v.ok) return err.textContent=v.error;
       cabVerifiedFor=key;
-      err.textContent='Verified: '+(v.customer||'customer')+'. Tap Subscribe again to confirm.';
+      err.textContent='Verified: '+(v.customer||'customer')+'. Tap Continue again to confirm.';
       return;
     }catch(e){ return err.textContent=e.message; }
   }
@@ -1215,19 +1234,23 @@ async function loadDiscos(){
     const j=await api('/api/power/discos');
     if(!j.ok) throw new Error(j.error);
     DISCOS=j.discos;
-    const sel=$('pow-disco');
-    sel.innerHTML=DISCOS.map((d,i)=>`<option value="${i}">${d.label}</option>`).join('');
-    sel.onchange=renderDiscoTypes; renderDiscoTypes();
+    $('pow-chips').innerHTML=DISCOS.map((d,i)=>`<div class="chip${i===0?' on':''}" onclick="pickDisco(${i})">${d.label}</div>`).join('');
+    curDisco=0; renderDiscoTypes();
   }catch(e){ $('pow-err').textContent='Could not load discos: '+e.message; }
 }
+function pickDisco(i){
+  curDisco=i; powVerifiedFor='';
+  [...$('pow-chips').children].forEach((c,j)=>c.classList.toggle('on', j===i));
+  renderDiscoTypes();
+}
 function renderDiscoTypes(){
-  const d=DISCOS[parseInt($('pow-disco').value,10)||0]; if(!d) return;
+  const d=DISCOS[curDisco]; if(!d) return;
   const types=d.types&&d.types.length?d.types:[{variation_code:'prepaid',name:'Prepaid'},{variation_code:'postpaid',name:'Postpaid'}];
   $('pow-type').innerHTML=types.map(t=>`<option value="${t.variation_code}">${t.name}</option>`).join('');
 }
 async function buyPower(){
   const err=$('pow-err');
-  const d=DISCOS[parseInt($('pow-disco').value,10)||0];
+  const d=DISCOS[curDisco];
   const svc=d?d.serviceID:'kano-electric';
   const type=$('pow-type').value, meter=$('pow-meter').value.trim(),
         amt=parseInt($('pow-amt').value,10);
@@ -1240,7 +1263,7 @@ async function buyPower(){
       const v=await api('/api/verify','POST',{serviceID:svc, billersCode:meter, type});
       if(!v.ok) return err.textContent=v.error;
       powVerifiedFor=key;
-      err.textContent='Verified: '+(v.customer||'customer')+'. Tap Pay Bill again to confirm.';
+      err.textContent='Verified: '+(v.customer||'customer')+'. Tap Continue again to confirm.';
       return;
     }catch(e){ return err.textContent=e.message; }
   }
