@@ -272,6 +272,19 @@
   #appmode .modal .btn{margin-top:10px}
   #appmode .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:12px 14px;font-size:.82rem;margin:14px 0}
   #appmode .err{color:#dc2626;font-size:.85rem;margin-top:10px;min-height:20px;text-align:center}
+  #appmode .vacc{background:linear-gradient(120deg,#0a2472,#1f6feb 55%,#3b82f6);border-radius:24px;padding:24px 22px;color:#fff;margin:14px 0;box-shadow:0 18px 44px rgba(31,111,235,.35);position:relative;overflow:hidden}
+  #appmode .vacc::after{content:'';position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.09)}
+  #appmode .vacc small{opacity:.75;font-size:.72rem;letter-spacing:1.5px;font-weight:700;position:relative;z-index:2}
+  #appmode .vacc input{display:block;width:100%;background:transparent;border:none;color:#fff;font-family:inherit;padding:0;margin:0;outline:none;position:relative;z-index:2}
+  #appmode .vacc input.vbank{font-weight:800;font-size:1.15rem;margin:4px 0 8px}
+  #appmode .vacc input.vnum{font-size:1.55rem;font-weight:800;letter-spacing:2px;margin-bottom:6px}
+  #appmode .vacc input.vname{opacity:.85;font-size:.82rem;letter-spacing:1px;font-weight:600}
+  #appmode .copyrow{display:flex;gap:10px;margin-top:16px;position:relative;z-index:2}
+  #appmode .copybtn{flex:1;text-align:center;padding:12px;border-radius:14px;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);color:#fff;font-weight:700;font-size:.82rem;cursor:pointer}
+  #appmode .copybtn:active{transform:scale(.97)}
+  #appmode .howcard{background:#fff;border:1px solid #e6edf7;border-radius:20px;padding:20px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(20,40,90,.05)}
+  #appmode .howcard h4{font-size:.95rem;margin-bottom:10px;color:#0f1e3d}
+  #appmode .howcard p{font-size:.86rem;color:#5b6b8c;line-height:1.9}
 </style>
 </head>
 <body>
@@ -631,27 +644,29 @@
   <div class="view" id="v-fund">
     <button class="back" onclick="show('v-dash')">Dashboard</button>
     <div class="app-head"><div class="alogo">Fund <span>Wallet</span></div></div>
-    <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px">Top up your SWEETVTU wallet.</p>
-    <div class="note">Transfer from any Nigerian bank app to your personal account below. After sending, tap the check button to add it to your wallet instantly.</div>
     <div id="fund-acct" style="display:none">
-      <div class="field"><label>Account number</label>
-        <div style="display:flex;gap:8px">
-          <input id="fund-acct-no" readonly style="font-size:1.3rem;font-weight:700;letter-spacing:2px">
-          <button class="btn" style="width:auto;padding:10px 16px" onclick="copyFund('fund-acct-no')">Copy</button>
+      <div class="vacc">
+        <small>YOUR PERMANENT ACCOUNT</small>
+        <input id="fund-bank" class="vbank" readonly>
+        <input id="fund-acct-no" class="vnum" readonly>
+        <input id="fund-acct-name" class="vname" readonly>
+        <div class="copyrow">
+          <div class="copybtn" onclick="copyFund('fund-acct-no')">📋 Copy Number</div>
+          <div class="copybtn" onclick="copyFund('fund-bank')">🏦 Copy Bank</div>
         </div>
       </div>
-      <div class="field"><label>Bank</label><input id="fund-bank" readonly></div>
-      <div class="field"><label>Account name</label>
-        <div style="display:flex;gap:8px">
-          <input id="fund-acct-name" readonly>
-          <button class="btn" style="width:auto;padding:10px 16px" onclick="copyFund('fund-acct-name')">Copy</button>
-        </div>
+      <div class="howcard">
+        <h4>How it works</h4>
+        <p>1. Transfer any amount to the account above from your bank app.<br>2. Your wallet is credited automatically in seconds.<br>3. Tap the button below if it takes longer than 2 minutes.</p>
       </div>
-      <div class="note">This account number is yours permanently — save it. Funds usually appear within a few minutes of transfer.</div>
-      <button class="btn" id="fund-sync-btn" onclick="syncFunding(false)" style="margin-top:12px">I've sent the money — check now</button>
+      <button class="btn" id="fund-sync-btn" onclick="syncFunding(false)">I've sent the money — check now</button>
       <div class="err" id="fund-sync-err" style="margin-top:8px"></div>
     </div>
     <div id="fund-get" style="display:none">
+      <div class="howcard">
+        <h4>Get your permanent account</h4>
+        <p>You will get your own personal account number. Any transfer to it lands in your wallet automatically.</p>
+      </div>
       <div class="field" id="fund-bvn-wrap" style="display:none"><label>Your BVN</label><input id="fund-bvn" inputmode="numeric" maxlength="11" placeholder="11-digit BVN"></div>
       <div class="err" id="fund-err"></div>
       <button class="btn" id="fund-get-btn" onclick="getFundAccount()">Get My Account Number</button>
