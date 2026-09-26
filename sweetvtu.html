@@ -207,14 +207,6 @@
   #appmode .stat .si{font-size:1.3rem;margin-bottom:6px}
   #appmode .stat b{display:block;font-size:1.05rem;color:#0f1e3d}
   #appmode .stat small{color:#7b8aa5;font-size:.7rem}
-  #appmode .nets{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  #appmode .net{background:#fff;border:1px solid #e6edf7;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 18px rgba(20,40,90,.05)}
-  #appmode .ndot{width:10px;height:10px;border-radius:50%;flex-shrink:0;background:#94a3b8}
-  #appmode .ok{background:#16a34a;box-shadow:0 0 8px rgba(22,163,74,.5)}
-  #appmode .warn{background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.5)}
-  #appmode .bad{background:#ef4444;box-shadow:0 0 8px rgba(239,68,68,.5)}
-  #appmode .net b{font-size:.85rem;display:block;color:#0f1e3d}
-  #appmode .net small{font-size:.68rem;color:#7b8aa5}
   #appmode .field{margin-bottom:14px}
   #appmode .field label{display:block;font-size:.8rem;color:#5b6b8c;margin-bottom:6px;font-weight:700}
   #appmode .field input,#appmode .field select{width:100%;background:#f8fafc;border:1.5px solid #e2e9f4;color:#0f1e3d;
@@ -578,8 +570,6 @@
       <div class="svc" onclick="openSvc('power')"><div class="sic b-pow2">💡</div><b>Electricity</b><small>All DisCos</small></div>
       <div class="svc" onclick="openSvc('cable')"><div class="sic b-cab2">📺</div><b>Cable TV</b><small>DStv · GOtv</small></div>
     </div>
-    <div class="sec-title">Network Status <span class="sec-link" id="net-live">Checking…</span></div>
-    <div class="nets" id="dash-nets"></div>
     <div class="sec-title">Recent Transactions <span class="sec-link" onclick="show('v-history')">View All →</span></div>
     <div id="dash-tx"></div>
   </div>
@@ -1076,19 +1066,6 @@ async function renderDash(){
     $('dash-tx').innerHTML = mine.length ? mine.map((t,k)=>txHTML(t,k)).join('')
       : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
   }catch(e){ $('dash-tx').innerHTML='<div class="empty">Could not load transactions.</div>'; }
-  loadNetStatus();
-}
-async function loadNetStatus(){
-  const box=$('dash-nets'), tag=$('net-live');
-  if(!box) return;
-  const dot={operational:'ok',degraded:'warn',down:'bad',nodata:''};
-  const lbl={operational:'Operational',degraded:'Slow today',down:'Having issues',nodata:'No recent data'};
-  try{
-    const j=await api('/api/network-status');
-    if(!j.ok||!j.networks) throw 0;
-    box.innerHTML=j.networks.map(n=>'<div class="net"><span class="ndot '+dot[n.status]+'"></span><div><b>'+n.network+'</b><small>'+lbl[n.status]+'</small></div></div>').join('');
-    tag.textContent='Live · last 48h of orders';
-  }catch(e){ box.innerHTML=''; tag.textContent='Unavailable'; }
 }
 async function renderHistory(){
   try{
