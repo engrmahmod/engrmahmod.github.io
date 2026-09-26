@@ -286,11 +286,11 @@
   #appmode .chips{display:flex;gap:8px;flex-wrap:wrap}
   #appmode .chip{padding:10px 18px;border-radius:999px;border:1.5px solid #e2e9f4;font-weight:700;font-size:.85rem;cursor:pointer;background:#f8fafc;color:#0f1e3d}
   #appmode .chip.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
-  #appmode .plans{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
-  #appmode .plans .plan{display:block;border:1.5px solid #e2e9f4;border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;background:#f8fafc;color:#0f1e3d;margin-bottom:0}
+  #appmode .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  #appmode .plans .plan{display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:92px;border:1.5px solid #e2e9f4;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;background:#f8fafc;color:#0f1e3d;margin-bottom:0;overflow:hidden}
   #appmode .plans .plan.on{border-color:#1f6feb;background:#eaf1fe}
-  #appmode .plans .plan b{display:block;font-size:.82rem}
-  #appmode .plans .plan small{color:#1f6feb;font-weight:800;font-size:.78rem}
+  #appmode .plans .plan b{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;font-size:.76rem;line-height:1.35;overflow-wrap:anywhere}
+  #appmode .plans .plan small{color:#1f6feb;font-weight:800;font-size:.78rem;margin-top:4px}
   #appmode .paybtn{width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(120deg,#1f6feb,#3b82f6);color:#fff;font-weight:800;font-size:1rem;cursor:pointer;margin-top:6px;box-shadow:0 12px 28px rgba(31,111,235,.35);font-family:inherit}
   #appmode .paybtn:active{transform:scale(.98)}
 </style>
@@ -1153,7 +1153,7 @@ async function renderPlans(){
     catsBox.innerHTML=order.map(c=>`<div class="chip${c===curPlanCat?' on':''}" onclick="pickPlanCat('${c}')">${c}</div>`).join('');
     curPlanList=cats[curPlanCat];
     box.innerHTML = curPlanList.map((p,i)=>
-      `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})"><b>${cleanPlanName(p.name)}</b><small>${naira(p.price)}</small></div>`).join('');
+      `<div class="plan${curPlan===i?' on':''}" title="${cleanPlanName(p.name).replace(/"/g,'&quot;')}" onclick="pickPlan(${i})"><b>${cleanPlanName(p.name)}</b><small>${naira(p.price)}</small></div>`).join('');
   }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickPlan(i){ curPlan=i; renderPlans(); }
