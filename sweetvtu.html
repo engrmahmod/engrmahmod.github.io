@@ -278,6 +278,21 @@
   #appmode .howcard{background:#fff;border:1px solid #e6edf7;border-radius:20px;padding:20px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(20,40,90,.05)}
   #appmode .howcard h4{font-size:.95rem;margin-bottom:10px;color:#0f1e3d}
   #appmode .howcard p{font-size:.86rem;color:#5b6b8c;line-height:1.9}
+  #appmode .backbar2{display:flex;align-items:center;gap:12px;padding:14px 0 4px}
+  #appmode .back2{width:38px;height:38px;border-radius:12px;background:#fff;border:1px solid #e6edf7;display:flex;align-items:center;justify-content:center;font-size:1.1rem;cursor:pointer;box-shadow:0 4px 12px rgba(20,40,90,.06);color:#0f1e3d}
+  #appmode .backbar2 b{font-size:1.25rem;color:#0f1e3d}
+  #appmode .card{background:#fff;border:1px solid #e6edf7;border-radius:20px;padding:18px 16px;margin:14px 0;box-shadow:0 6px 18px rgba(20,40,90,.05)}
+  #appmode .card h4{font-size:.9rem;margin-bottom:12px;color:#0f1e3d}
+  #appmode .chips{display:flex;gap:8px;flex-wrap:wrap}
+  #appmode .chip{padding:10px 18px;border-radius:999px;border:1.5px solid #e2e9f4;font-weight:700;font-size:.85rem;cursor:pointer;background:#f8fafc;color:#0f1e3d}
+  #appmode .chip.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
+  #appmode .plans{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+  #appmode .plans .plan{display:block;border:1.5px solid #e2e9f4;border-radius:14px;padding:12px 6px;text-align:center;cursor:pointer;background:#f8fafc;color:#0f1e3d;margin-bottom:0}
+  #appmode .plans .plan.on{border-color:#1f6feb;background:#eaf1fe}
+  #appmode .plans .plan b{display:block;font-size:.82rem}
+  #appmode .plans .plan small{color:#1f6feb;font-weight:800;font-size:.78rem}
+  #appmode .paybtn{width:100%;padding:16px;border:none;border-radius:16px;background:linear-gradient(120deg,#1f6feb,#3b82f6);color:#fff;font-weight:800;font-size:1rem;cursor:pointer;margin-top:6px;box-shadow:0 12px 28px rgba(31,111,235,.35);font-family:inherit}
+  #appmode .paybtn:active{transform:scale(.98)}
 </style>
 </head>
 <body>
@@ -575,16 +590,21 @@
   </div>
 
   <div class="view" id="v-data">
-    <button class="back" onclick="show('v-dash')">Dashboard</button>
-    <div class="banner b-data"><h2>📶 Buy Data</h2><p>Cheap SME data — delivered in seconds.</p></div>
-    <div class="net-tabs">
-      <div class="net-tab on" id="tab-mtn" onclick="pickNet('MTN')">MTN</div>
-      <div class="net-tab" id="tab-airtel" onclick="pickNet('Airtel')">Airtel</div>
+    <div class="backbar2"><div class="back2" onclick="show('v-dash')">←</div><b>Buy Data</b></div>
+    <div class="card"><h4>Select Network</h4>
+      <div class="chips">
+        <div class="chip on" id="tab-mtn" onclick="pickNet('MTN')">MTN</div>
+        <div class="chip" id="tab-airtel" onclick="pickNet('Airtel')">Airtel</div>
+        <div class="chip" id="tab-glo" onclick="pickNet('Glo')">Glo</div>
+        <div class="chip" id="tab-9mobile" onclick="pickNet('9mobile')">9mobile</div>
+      </div>
     </div>
-    <div id="plan-list"></div>
-    <div class="field"><label>Recipient phone number</label><input id="data-phone" inputmode="numeric" maxlength="11" placeholder="0803..."></div>
+    <div class="card"><h4>Select Plan</h4><div class="plans" id="plan-list"></div></div>
+    <div class="card">
+      <div class="field"><label>Phone Number</label><input id="data-phone" inputmode="numeric" maxlength="11" placeholder="0803 123 4567"></div>
+    </div>
     <div class="err" id="data-err"></div>
-    <button class="btn" onclick="buyData()">Buy Now</button>
+    <button class="paybtn" onclick="buyData()">Continue →</button>
   </div>
 
   <div class="view" id="v-airtime">
@@ -1082,10 +1102,13 @@ function renderProfile(){
 }
 
 /* ----- data ----- */
+function netKey(){ return curNet==='9mobile' ? 'etisalat' : curNet.toLowerCase(); }
 function pickNet(n){
   curNet=n; curPlan=null;
   $('tab-mtn').classList.toggle('on', n==='MTN');
   $('tab-airtel').classList.toggle('on', n==='Airtel');
+  $('tab-glo').classList.toggle('on', n==='Glo');
+  $('tab-9mobile').classList.toggle('on', n==='9mobile');
   renderPlans();
 }
 async function renderPlans(){
@@ -1093,15 +1116,13 @@ async function renderPlans(){
   box.innerHTML='<div class="empty">Loading live plans…</div>';
   try{
     if(!DATA_CACHE[curNet]){
-      const j = await api('/api/data/plans?network='+curNet.toLowerCase());
+      const j = await api('/api/data/plans?network='+netKey());
       if(!j.ok) throw new Error(j.error||'Could not load plans.');
       DATA_CACHE[curNet]=j.plans;
     }
     const plans=DATA_CACHE[curNet];
     box.innerHTML = plans.length ? plans.map((p,i)=>
-      `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})">
-         <div><b>${p.name}</b><small>${curNet}</small></div><span>${naira(p.price)}</span>
-       </div>`).join('') : '<div class="empty">No plans right now. Try again later.</div>';
+      `<div class="plan${curPlan===i?' on':''}" onclick="pickPlan(${i})"><b>${p.name}</b><small>${naira(p.price)}</small></div>`).join('') : '<div class="empty">No plans right now. Try again later.</div>';
   }catch(e){ box.innerHTML='<div class="empty">'+e.message+'</div>'; }
 }
 function pickPlan(i){ curPlan=i; renderPlans(); }
@@ -1114,7 +1135,7 @@ async function buyData(){
   const pin=await askPin(); if(!pin){err.textContent='';return;}
   err.textContent='Sending…';
   try{
-    const j = await api('/api/buy/data','POST',{network:curNet.toLowerCase(), phone, variation_code:p.variation_code, pin});
+    const j = await api('/api/buy/data','POST',{network:netKey(), phone, variation_code:p.variation_code, pin});
     if(!j.ok) return err.textContent=j.error;
     err.textContent='';
     modal(true,'Data sent! 🎉', `${p.name} (${naira(p.price)}) sent to ${phone}.`);
