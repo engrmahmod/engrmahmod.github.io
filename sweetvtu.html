@@ -171,86 +171,107 @@
   .reveal.in{opacity:1;transform:none}
 
   /* ================= APP (scoped) ================= */
-  #appmode{background:var(--bg)}
-  #appmode .ashell{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:var(--bg)}
+  /* ==================== APP (light) ==================== */
+  #appmode{background:#eef3fa}
+  #appmode .ashell{max-width:480px;margin:0 auto;min-height:100vh;position:relative;background:#eef3fa;color:#0f1e3d}
   #appmode .view{display:none;padding:0 20px 110px;animation:fade .25s ease}
   #appmode .view.active{display:block}
-  #appmode .demo-badge{position:sticky;top:0;z-index:40;text-align:center;font-size:.72rem;font-weight:800;letter-spacing:2px;
-    background:linear-gradient(90deg,var(--gold),#ff9d42);color:#3a2200;padding:6px}
-  #appmode .demo-badge.live{background:linear-gradient(90deg,#00c853,#00e676);color:#04140a}
   #appmode .app-head{padding:22px 0 6px;display:flex;align-items:center;justify-content:space-between}
-  #appmode .alogo{font-weight:900;font-size:1.35rem;letter-spacing:1px}
-  #appmode .alogo span{color:var(--pink)}
-  #appmode .hello{color:var(--muted);font-size:.9rem}
-  #appmode .hello b{color:var(--text)}
-  #appmode .wallet{margin:16px 0;background:linear-gradient(135deg,#ff4d88,#b04dff 60%,#5b2ee5);border-radius:var(--radius);
-    padding:24px 22px;box-shadow:0 14px 40px rgba(255,77,136,.3);position:relative;overflow:hidden}
-  #appmode .wallet::after{content:'';position:absolute;right:-40px;top:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,.12)}
-  #appmode .wallet small{opacity:.85;font-size:.8rem;letter-spacing:1px}
-  #appmode .wallet .bal{font-size:2.2rem;font-weight:900;margin:4px 0 14px}
-  #appmode .wallet .row{display:flex;gap:10px}
-  #appmode .wbtn{flex:1;text-align:center;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);color:#fff;
-    padding:11px;border-radius:12px;font-weight:800;font-size:.9rem;cursor:pointer}
+  #appmode .alogo{font-weight:900;font-size:1.35rem;letter-spacing:1px;color:#0f1e3d}
+  #appmode .alogo span{color:#1f6feb}
+  #appmode .aava{width:42px;height:42px;border-radius:50%;background:#1f3a6e;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.05rem;box-shadow:0 6px 16px rgba(31,58,110,.3)}
+  #appmode .hello{color:#5b6b8c;font-size:.95rem;margin:12px 0 2px}
+  #appmode .hello b{color:#0f1e3d}
+  #appmode .wallet{margin:10px 0 4px;background:linear-gradient(120deg,#0a2472,#1f6feb 55%,#3b82f6);border-radius:24px;
+    padding:24px 22px;box-shadow:0 18px 44px rgba(31,111,235,.35);position:relative;overflow:hidden;color:#fff}
+  #appmode .wallet::after{content:'';position:absolute;right:-60px;top:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.09)}
+  #appmode .wallet .wrow{display:flex;align-items:center;gap:10px;margin-bottom:4px;position:relative;z-index:2}
+  #appmode .wallet .wic{width:40px;height:40px;border-radius:13px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:1.25rem}
+  #appmode .wallet small{opacity:.9;font-size:.74rem;letter-spacing:1.5px;font-weight:700}
+  #appmode .wallet .bal{font-size:2rem;font-weight:800;margin:4px 0 16px;position:relative;z-index:2}
+  #appmode .wallet .row{display:flex;gap:10px;position:relative;z-index:2}
+  #appmode .wbtn{flex:1;text-align:center;padding:13px;border-radius:14px;font-weight:800;font-size:.88rem;cursor:pointer;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.45);color:#fff}
   #appmode .wbtn:active{transform:scale(.97)}
-  #appmode .sec-title{font-size:1.05rem;font-weight:800;margin:22px 0 12px}
+  #appmode .wbtn-w{background:#fff;color:#1f6feb;border:none;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+  #appmode .sec-title{font-size:1.02rem;font-weight:800;margin:22px 0 12px;color:#0f1e3d;display:flex;justify-content:space-between;align-items:center}
+  #appmode .sec-link{font-size:.8rem;color:#1f6feb;font-weight:700;cursor:pointer}
   #appmode .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  #appmode .svc{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 14px;text-align:center;cursor:pointer;transition:transform .15s}
+  #appmode .svc{background:#fff;border:1px solid #e6edf7;border-radius:20px;padding:18px 14px;text-align:center;cursor:pointer;transition:transform .15s;box-shadow:0 6px 18px rgba(20,40,90,.05)}
   #appmode .svc:active{transform:scale(.96)}
-  #appmode .svc .ic{font-size:2rem;margin-bottom:8px}
-  #appmode .svc b{font-size:.92rem;display:block}
-  #appmode .svc small{color:var(--muted);font-size:.75rem}
+  #appmode .svc .sic{width:50px;height:50px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.55rem;margin:0 auto 10px;color:#fff}
+  #appmode .b-data2{background:#1f6feb} #appmode .b-air2{background:#16a34a} #appmode .b-pow2{background:#f59e0b} #appmode .b-cab2{background:#8b5cf6}
+  #appmode .svc b{font-size:.9rem;display:block;color:#0f1e3d}
+  #appmode .svc small{color:#7b8aa5;font-size:.72rem}
+  #appmode .stats2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  #appmode .stat{background:#fff;border:1px solid #e6edf7;border-radius:18px;padding:16px 14px;box-shadow:0 6px 18px rgba(20,40,90,.05)}
+  #appmode .stat .si{font-size:1.3rem;margin-bottom:6px}
+  #appmode .stat b{display:block;font-size:1.05rem;color:#0f1e3d}
+  #appmode .stat small{color:#7b8aa5;font-size:.7rem}
+  #appmode .nets{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  #appmode .net{background:#fff;border:1px solid #e6edf7;border-radius:16px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 6px 18px rgba(20,40,90,.05)}
+  #appmode .ndot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+  #appmode .ok{background:#16a34a;box-shadow:0 0 8px rgba(22,163,74,.5)}
+  #appmode .warn{background:#f59e0b;box-shadow:0 0 8px rgba(245,158,11,.5)}
+  #appmode .net b{font-size:.85rem;display:block;color:#0f1e3d}
+  #appmode .net small{font-size:.68rem;color:#7b8aa5}
   #appmode .field{margin-bottom:14px}
-  #appmode .field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-weight:700}
-  #appmode .field input,#appmode .field select{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--text);
-    padding:14px;border-radius:12px;font-size:1rem;outline:none}
-  #appmode .field input:focus,#appmode .field select:focus{border-color:var(--pink)}
-  #appmode .btn{width:100%;padding:16px;border:none;border-radius:14px;font-size:1.02rem;font-weight:900;cursor:pointer;
-    background:linear-gradient(135deg,var(--pink),#c93a72);color:#fff;box-shadow:0 10px 26px rgba(255,77,136,.35);margin-top:6px}
+  #appmode .field label{display:block;font-size:.8rem;color:#5b6b8c;margin-bottom:6px;font-weight:700}
+  #appmode .field input,#appmode .field select{width:100%;background:#f8fafc;border:1.5px solid #e2e9f4;color:#0f1e3d;
+    padding:14px;border-radius:14px;font-size:1rem;outline:none;font-family:inherit}
+  #appmode .field input:focus,#appmode .field select:focus{border-color:#1f6feb;background:#fff}
+  #appmode .field input[readonly]{background:#eef2f8}
+  #appmode .btn{width:100%;padding:16px;border:none;border-radius:16px;font-size:1.02rem;font-weight:800;cursor:pointer;
+    background:linear-gradient(120deg,#1f6feb,#3b82f6);color:#fff;box-shadow:0 12px 28px rgba(31,111,235,.35);margin-top:6px;font-family:inherit}
   #appmode .btn:active{transform:scale(.98)}
-  #appmode .btn.ghost{background:transparent;border:1px solid var(--line);box-shadow:none;color:var(--text)}
-  #appmode .link{text-align:center;margin-top:16px;color:var(--muted);font-size:.92rem}
-  #appmode .link a{color:var(--pink2);font-weight:800;text-decoration:none;cursor:pointer}
+  #appmode .btn.ghost{background:#fff;border:1.5px solid #e2e9f4;box-shadow:none;color:#0f1e3d}
+  #appmode .btn:disabled{opacity:.6}
+  #appmode .link{text-align:center;margin-top:16px;color:#5b6b8c;font-size:.92rem}
+  #appmode .link a{color:#1f6feb;font-weight:800;text-decoration:none;cursor:pointer}
   #appmode .net-tabs{display:flex;gap:10px;margin-bottom:16px}
-  #appmode .net-tab{flex:1;text-align:center;padding:12px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:800;cursor:pointer}
-  #appmode .net-tab.on{border-color:var(--pink);background:#3a1c4e;color:#fff}
-  #appmode .plan{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer}
-  #appmode .plan.on{border-color:var(--pink);background:#3a1c4e}
+  #appmode .net-tab{flex:1;text-align:center;padding:12px;border-radius:14px;background:#fff;border:1.5px solid #e2e9f4;font-weight:800;cursor:pointer;color:#0f1e3d}
+  #appmode .net-tab.on{border-color:#1f6feb;background:#eaf1fe;color:#1f6feb}
+  #appmode .plan{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1.5px solid #e2e9f4;
+    border-radius:14px;padding:15px 16px;margin-bottom:10px;cursor:pointer;color:#0f1e3d}
+  #appmode .plan.on{border-color:#1f6feb;background:#eaf1fe}
   #appmode .plan b{font-size:1.05rem}
-  #appmode .plan span{color:var(--gold);font-weight:800}
-  #appmode .plan small{display:block;color:var(--muted);font-size:.75rem}
-  #appmode .banner{border-radius:var(--radius);padding:22px;margin:16px 0;color:#fff}
+  #appmode .plan span{color:#1f6feb;font-weight:800}
+  #appmode .plan small{display:block;color:#7b8aa5;font-size:.75rem}
+  #appmode .banner{border-radius:20px;padding:22px;margin:16px 0;color:#fff}
   #appmode .banner h2{font-size:1.3rem;margin-bottom:4px}
   #appmode .banner p{font-size:.88rem;opacity:.9}
-  #appmode .b-data{background:linear-gradient(135deg,#ff4d88,#a83a6e)}
-  #appmode .b-air{background:linear-gradient(135deg,#e8a020,#b06a00)}
-  #appmode .b-cable{background:linear-gradient(135deg,#5b2ee5,#2e7de5)}
-  #appmode .b-power{background:linear-gradient(135deg,#d6a400,#8a6d00)}
-  #appmode .back{background:none;border:none;color:var(--muted);font-size:.95rem;margin:14px 0 0;cursor:pointer;font-weight:700}
+  #appmode .b-data{background:linear-gradient(135deg,#1f6feb,#3b82f6)}
+  #appmode .b-air{background:linear-gradient(135deg,#16a34a,#0d7a3a)}
+  #appmode .b-cable{background:linear-gradient(135deg,#8b5cf6,#6d28d9)}
+  #appmode .b-power{background:linear-gradient(135deg,#f59e0b,#c77e0a)}
+  #appmode .back{background:none;border:none;color:#5b6b8c;font-size:.95rem;margin:14px 0 0;cursor:pointer;font-weight:700;font-family:inherit}
   #appmode .back::before{content:'← '}
-  #appmode .tx{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);
-    border-radius:14px;padding:14px 16px;margin-bottom:10px}
-  #appmode .tx .t-ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;background:var(--card2);margin-right:12px}
-  #appmode .tx .t-main{flex:1}
-  #appmode .tx b{font-size:.92rem;display:block}
-  #appmode .tx small{color:var(--muted);font-size:.75rem}
-  #appmode .tx .amt{font-weight:900}
-  #appmode .tx .amt.out{color:var(--red)} #appmode .tx .amt.in{color:var(--green)}
-  #appmode .empty{text-align:center;color:var(--muted);padding:40px 0}
-  #appmode .anav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:50;
-    background:rgba(21,10,36,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
-    display:flex;padding:10px 6px calc(10px + env(safe-area-inset-bottom))}
-  #appmode .anav button{flex:1;background:none;border:none;color:var(--muted);font-size:.68rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+  #appmode .tx{display:flex;justify-content:space-between;align-items:center;background:#fff;border:1px solid #e6edf7;
+    border-radius:16px;padding:13px 14px;margin-bottom:10px;box-shadow:0 4px 14px rgba(20,40,90,.04)}
+  #appmode .tx .t-ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;background:#eaf1fe;margin-right:12px;flex-shrink:0}
+  #appmode .tx .c-data{background:#1f6feb;color:#fff} #appmode .tx .c-air{background:#16a34a;color:#fff}
+  #appmode .tx .c-cab{background:#8b5cf6;color:#fff} #appmode .tx .c-pow{background:#f59e0b;color:#fff}
+  #appmode .tx .c-fund{background:#0ea5e9;color:#fff}
+  #appmode .tx .t-main{flex:1;min-width:0}
+  #appmode .tx b{font-size:.88rem;display:block;color:#0f1e3d}
+  #appmode .tx small{color:#7b8aa5;font-size:.73rem}
+  #appmode .tx .amt{font-weight:800;white-space:nowrap}
+  #appmode .tx .amt.out{color:#dc2626} #appmode .tx .amt.in{color:#16a34a}
+  #appmode .empty{text-align:center;color:#7b8aa5;padding:40px 0;line-height:1.8}
+  #appmode .anav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);width:calc(100% - 36px);max-width:444px;z-index:50;
+    background:rgba(255,255,255,.96);backdrop-filter:blur(18px);border:1px solid #e2e9f4;border-radius:24px;
+    display:flex;padding:10px;box-shadow:0 18px 50px rgba(20,40,90,.18)}
+  #appmode .anav button{flex:1;background:none;border:none;color:#8aa0c2;font-size:.62rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0;border-radius:16px;font-family:inherit}
   #appmode .anav button .ni{font-size:1.35rem}
-  #appmode .anav button.on{color:var(--pink)}
-  #appmode .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
+  #appmode .anav button.on{background:#e3edff;color:#1f6feb}
+  #appmode .modal-bg{position:fixed;inset:0;background:rgba(10,20,40,.5);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
   #appmode .modal-bg.show{display:flex}
-  #appmode .modal{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px 24px;max-width:380px;width:100%;text-align:center;animation:fade .25s}
+  #appmode .modal{background:#fff;border:1px solid #e6edf7;border-radius:24px;padding:30px 24px;max-width:380px;width:100%;text-align:center;animation:fade .25s;color:#0f1e3d;box-shadow:0 30px 80px rgba(20,40,90,.25)}
   #appmode .modal .m-ic{font-size:3rem;margin-bottom:12px}
-  #appmode .modal h3{margin-bottom:8px}
-  #appmode .modal p{color:var(--muted);font-size:.92rem;margin-bottom:20px}
-  #appmode .note{background:#2b1b10;border:1px solid #6b4a1f;color:#ffcf7a;border-radius:12px;padding:12px 14px;font-size:.82rem;margin:14px 0}
-  #appmode .err{color:var(--red);font-size:.85rem;margin-top:10px;min-height:20px;text-align:center}
+  #appmode .modal h3{margin-bottom:8px;color:#0f1e3d}
+  #appmode .modal p{color:#5b6b8c;font-size:.92rem;margin-bottom:20px}
+  #appmode .modal .btn{margin-top:10px}
+  #appmode .note{background:#fffbeb;border:1px solid #fde68a;color:#92400e;border-radius:12px;padding:12px 14px;font-size:.82rem;margin:14px 0}
+  #appmode .err{color:#dc2626;font-size:.85rem;margin-top:10px;min-height:20px;text-align:center}
 </style>
 </head>
 <body>
@@ -520,25 +541,37 @@
 
   <div class="view" id="v-dash">
     <div class="app-head">
-      <div><div class="hello">Hello,</div><div class="hello"><b id="dash-name">—</b> 👋</div></div>
       <div class="alogo">SWEET<span>VTU</span></div>
+      <div class="aava" id="dash-ava">M</div>
     </div>
+    <div class="hello">Hello, <b id="dash-name">—</b> 👋</div>
     <div class="wallet">
-      <small>WALLET BALANCE</small>
+      <div class="wrow"><div class="wic">👛</div><small>WALLET BALANCE</small></div>
       <div class="bal" id="dash-bal">₦0</div>
       <div class="row">
-        <div class="wbtn" onclick="show('v-fund')">＋ Fund Wallet</div>
+        <div class="wbtn wbtn-w" onclick="show('v-fund')">＋ Fund Wallet</div>
         <div class="wbtn" onclick="show('v-history')">🧾 History</div>
       </div>
     </div>
-    <div class="sec-title">Buy &amp; Pay</div>
-    <div class="grid">
-      <div class="svc" onclick="openSvc('data')"><div class="ic">📶</div><b>Buy Data</b><small>MTN · Airtel</small></div>
-      <div class="svc" onclick="openSvc('airtime')"><div class="ic">📞</div><b>Airtime</b><small>All networks</small></div>
-      <div class="svc" onclick="openSvc('cable')"><div class="ic">📺</div><b>Cable TV</b><small>DStv · GOtv</small></div>
-      <div class="svc" onclick="openSvc('power')"><div class="ic">💡</div><b>Electricity</b><small>NEPA bills</small></div>
+    <div class="stats2">
+      <div class="stat"><div class="si">💸</div><b id="dash-spent">₦0</b><small>Total spending</small></div>
+      <div class="stat"><div class="si">🧾</div><b id="dash-count">0</b><small>Total transactions</small></div>
     </div>
-    <div class="sec-title">Recent transactions</div>
+    <div class="sec-title">Quick Services</div>
+    <div class="grid">
+      <div class="svc" onclick="openSvc('airtime')"><div class="sic b-air2">📞</div><b>Buy Airtime</b><small>All networks</small></div>
+      <div class="svc" onclick="openSvc('data')"><div class="sic b-data2">📶</div><b>Buy Data</b><small>MTN · Airtel</small></div>
+      <div class="svc" onclick="openSvc('power')"><div class="sic b-pow2">💡</div><b>Electricity</b><small>All DisCos</small></div>
+      <div class="svc" onclick="openSvc('cable')"><div class="sic b-cab2">📺</div><b>Cable TV</b><small>DStv · GOtv</small></div>
+    </div>
+    <div class="sec-title">Network Status <span class="sec-link">All systems normal</span></div>
+    <div class="nets">
+      <div class="net"><span class="ndot ok"></span><div><b>MTN</b><small>Operational</small></div></div>
+      <div class="net"><span class="ndot ok"></span><div><b>Airtel</b><small>Operational</small></div></div>
+      <div class="net"><span class="ndot warn"></span><div><b>Glo</b><small>Slow today</small></div></div>
+      <div class="net"><span class="ndot ok"></span><div><b>9mobile</b><small>Operational</small></div></div>
+    </div>
+    <div class="sec-title">Recent Transactions <span class="sec-link" onclick="show('v-history')">View All →</span></div>
     <div id="dash-tx"></div>
   </div>
 
@@ -766,11 +799,11 @@ function openReceipt(i){
   window.CUR_RCPT=t;
   const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
   const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
-  const stCol = t.status==='successful' ? '#4ade80' : (t.status==='pending' ? 'var(--gold)' : '#ff6b6b');
-  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:.9rem"><span style="color:var(--muted)">${k}</span><b style="text-align:right;word-break:break-all">${v||'—'}</b></div>`;
+  const stCol = t.status==='successful' ? '#16a34a' : (t.status==='pending' ? '#f59e0b' : '#dc2626');
+  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #e2e9f4;font-size:.9rem"><span style="color:#7b8aa5">${k}</span><b style="text-align:right;word-break:break-all;color:#0f1e3d">${v||'—'}</b></div>`;
   $('rcpt-body').innerHTML =
     `<div style="text-align:center;margin-bottom:8px"><div style="font-size:2rem">${icons[t.type]||''}</div>
-     <div style="font-size:1.5rem;font-weight:800;color:${t.direction==='in'?'#4ade80':'var(--gold)'}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div>
+     <div style="font-size:1.5rem;font-weight:800;color:${t.direction==='in'?'#16a34a':'#b45309'}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div>
      <div style="margin-top:4px"><span style="background:${stCol}22;color:${stCol};padding:3px 12px;border-radius:20px;font-size:.8rem;font-weight:700">${(t.status||'successful').toUpperCase()}</span></div></div>` +
     row('Description', t.description||t.desc) + row('Type', names[t.type]||t.type) +
     row('Date', t.created||t.date) + row('Reference', t.reference) +
@@ -874,9 +907,10 @@ async function shareReceipt(){
 }
 function txHTML(t,i){
   const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
+  const cols={data:'c-data',airtime:'c-air',cable:'c-cab',power:'c-pow',fund:'c-fund'};
   const st = t.status && t.status!=='successful'
-    ? ` <small style="color:${t.status==='pending'?'var(--gold)':'#ff6b6b'}">(${t.status})</small>` : '';
-  return `<div class="tx" onclick="openReceipt(${i})" style="cursor:pointer"><div style="display:flex;align-items:center"><div class="t-ic">${icons[t.type]||'🧾'}</div>
+    ? ` <small style="color:${t.status==='pending'?'#f59e0b':'#dc2626'}">(${t.status})</small>` : '';
+  return `<div class="tx" onclick="openReceipt(${i})" style="cursor:pointer"><div style="display:flex;align-items:center"><div class="t-ic ${cols[t.type]||''}">${icons[t.type]||'🧾'}</div>
     <div class="t-main"><b>${t.description||t.desc||''}</b><small>${t.created||t.date||''}${st}</small></div></div>
     <div class="amt ${t.direction}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div></div>`;
 }
@@ -1018,10 +1052,15 @@ async function renderDash(){
   await refreshMe();
   if(!ME){ go('site'); return; }
   $('dash-name').textContent = ME.name.split(' ')[0];
+  $('dash-ava').textContent = (ME.name.trim()[0]||'M').toUpperCase();
   $('dash-bal').textContent = naira(ME.wallet);
   try{
     const j = await api('/api/history');
     window.HIST_TXS = j.ok?j.transactions:[];
+    let spent = 0;
+    window.HIST_TXS.forEach(t=>{ if(t.direction!=='in') spent += Number(t.amount)||0; });
+    $('dash-spent').textContent = naira(spent);
+    $('dash-count').textContent = window.HIST_TXS.length;
     const mine = window.HIST_TXS.slice(0,5);
     $('dash-tx').innerHTML = mine.length ? mine.map((t,k)=>txHTML(t,k)).join('')
       : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
