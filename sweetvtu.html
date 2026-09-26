@@ -286,6 +286,8 @@
   #appmode .chips{display:flex;gap:8px;flex-wrap:wrap}
   #appmode .chip{padding:10px 18px;border-radius:999px;border:1.5px solid #e2e9f4;font-weight:700;font-size:.85rem;cursor:pointer;background:#f8fafc;color:#0f1e3d}
   #appmode .chip.on{background:#1f6feb;border-color:#1f6feb;color:#fff}
+  #appmode #pow-chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  #appmode #pow-chips .chip{margin:0;text-align:center;padding:10px 6px;font-size:.8rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   #appmode .plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   #appmode .plans .plan{display:flex;flex-direction:column;justify-content:center;min-width:0;min-height:92px;border:1.5px solid #e2e9f4;border-radius:14px;padding:10px 6px;text-align:center;cursor:pointer;background:#f8fafc;color:#0f1e3d;margin-bottom:0;overflow:hidden}
   #appmode .plans .plan.on{border-color:#1f6feb;background:#eaf1fe}
@@ -1259,7 +1261,7 @@ async function loadDiscos(){
     const j=await api('/api/power/discos');
     if(!j.ok) throw new Error(j.error);
     DISCOS=j.discos;
-    $('pow-chips').innerHTML=DISCOS.map((d,i)=>`<div class="chip${i===0?' on':''}" onclick="pickDisco(${i})">${d.label}</div>`).join('');
+    $('pow-chips').innerHTML=DISCOS.map((d,i)=>`<div class="chip${i===0?' on':''}" title="${d.label}" onclick="pickDisco(${i})">${d.label.replace(' Electric','')}</div>`).join('');
     curDisco=0; renderDiscoTypes();
   }catch(e){ $('pow-err').textContent='Could not load discos: '+e.message; }
 }
