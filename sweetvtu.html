@@ -27,12 +27,15 @@
   #sitemode .navlinks{display:flex;gap:22px;font-size:.88rem;font-weight:700;color:#5b6b8c}
   #sitemode .navlinks a{text-decoration:none;cursor:pointer}
   #sitemode .nav-cta{background:#1f6feb;color:#fff;font-weight:800;padding:10px 24px;border-radius:999px;font-size:.88rem;cursor:pointer;border:none;font-family:inherit}
-  #sitemode .burger{display:none}
+  #sitemode .burger{display:none;background:none;border:none;color:#0f1e3d;font-size:1.6rem;cursor:pointer}
+  #sitemode .m-signin{display:none}
   @media(max-width:640px){
-    #sitemode nav .wrap{padding:12px 14px;gap:8px}
-    #sitemode .logo{font-size:1.05rem}
-    #sitemode .navlinks{display:flex;gap:12px;font-size:.74rem}
-    #sitemode .nav-cta{display:inline-block;padding:8px 16px;font-size:.76rem}
+    #sitemode nav .wrap{padding:12px 18px}
+    #sitemode .navlinks{display:none;position:absolute;top:100%;left:0;right:0;background:#fff;flex-direction:column;padding:18px 22px;gap:16px;border-bottom:1px solid #e4eaf5;box-shadow:0 12px 24px rgba(20,40,90,.08);font-size:.95rem}
+    #sitemode .navlinks.open{display:flex}
+    #sitemode .burger{display:block}
+    #sitemode .nav-cta{display:none}
+    #sitemode .m-signin{display:block;background:#1f6feb;color:#fff !important;text-align:center;font-weight:800;padding:13px;border-radius:999px}
   }
   #sitemode .hero{padding:38px 0 8px;text-align:center}
   #sitemode .badge{display:inline-block;background:#e3edff;color:#1f6feb;border-radius:999px;padding:8px 20px;font-size:.72rem;font-weight:800;letter-spacing:1.5px;margin-bottom:18px}
@@ -231,9 +234,11 @@
   <div class="wrap">
     <a class="logo" onclick="go('site')">SWEET<span>VTU</span></a>
     <div class="navlinks" id="navlinks">
-      <a href="#s-services">Services</a><a href="#s-pricing">Prices</a><a href="#s-faq">FAQ</a>
+      <a href="#s-services" onclick="document.getElementById('navlinks').classList.remove('open')">Services</a><a href="#s-pricing" onclick="document.getElementById('navlinks').classList.remove('open')">Prices</a><a href="#s-faq" onclick="document.getElementById('navlinks').classList.remove('open')">FAQ</a>
+      <a class="m-signin" onclick="go('v-signin')">Sign In</a>
     </div>
     <button class="nav-cta" onclick="go('v-signin')">Sign In</button>
+    <button class="burger" onclick="document.getElementById('navlinks').classList.toggle('open')">☰</button>
   </div>
 </nav>
 
