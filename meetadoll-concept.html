@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meetadoll Exhibition — 5th Edition: The Homecoming | Concept</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,800;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0e0609; --bg2:#160b10; --card:#1d1015; --line:#3a1f28;
+  --maroon:#8e1428; --maroon2:#b01e35;
+  --gold:#e0b45c; --gold2:#f3d189; --cream:#f8f1e4; --muted:#c9aea8;
+  --wa:#25d366;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--cream);font-family:'Inter',system-ui,sans-serif;line-height:1.6;overflow-x:hidden}
+h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1140px;margin:0 auto;padding:0 20px}
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(14,6,9,.88);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1140px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;letter-spacing:.5px}
+.brand img{width:40px;height:40px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.brand small{display:block;font-weight:500;color:var(--muted);font-size:11px;letter-spacing:2px}
+.nav-links{display:flex;gap:22px;font-size:14px;font-weight:500;color:var(--muted)}
+.nav-links a:hover{color:var(--gold)}
+.btn{display:inline-block;background:linear-gradient(135deg,var(--maroon2),var(--maroon));color:#fff;font-weight:700;padding:12px 26px;border-radius:999px;border:1px solid #d13a52;font-size:14px;letter-spacing:.4px;transition:transform .2s,box-shadow .2s}
+.btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(176,30,53,.45)}
+.btn.gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#3a2200;border-color:#f7e0a8}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--cream)}
+.burger{display:none;background:none;border:1px solid var(--line);color:var(--cream);border-radius:8px;padding:8px 12px;font-size:18px}
+/* HERO */
+.hero{min-height:100svh;display:flex;align-items:center;position:relative;background:url('meetadoll-assets/meetadoll-event.jpg') center/cover no-repeat #000}
+.hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(14,6,9,.72) 0%,rgba(14,6,9,.55) 45%,rgba(14,6,9,.96) 100%)}
+.hero-in{position:relative;z-index:2;text-align:center;padding:120px 20px 70px;max-width:900px;margin:0 auto}
+.eyebrow{display:inline-block;font-size:12px;letter-spacing:4px;font-weight:700;color:var(--gold2);border:1px solid rgba(224,180,92,.5);padding:8px 18px;border-radius:999px;margin-bottom:22px;background:rgba(14,6,9,.5)}
+.hero h1{font-size:clamp(42px,8vw,84px);line-height:1.05;font-weight:800;margin-bottom:16px}
+.hero h1 em{color:var(--gold2);font-style:italic}
+.hero p.sub{color:#f3e6d4;font-size:clamp(15px,2.4vw,19px);max-width:640px;margin:0 auto 10px}
+.hero .meta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:22px 0 30px;color:var(--muted);font-size:14px}
+.hero .meta span{background:rgba(14,6,9,.6);border:1px solid var(--line);padding:8px 16px;border-radius:999px}
+.count{display:flex;gap:10px;justify-content:center;margin:0 0 34px;flex-wrap:wrap}
+.count .cell{background:rgba(20,10,14,.78);border:1px solid var(--line);border-radius:14px;min-width:78px;padding:14px 8px;backdrop-filter:blur(6px)}
+.count .num{font-family:'Playfair Display',serif;font-size:32px;font-weight:800;color:var(--gold2)}
+.count .lbl{font-size:11px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.hero-cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+/* MARQUEE */
+.marquee{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--maroon);overflow:hidden;white-space:nowrap;padding:12px 0}
+.marquee span{display:inline-block;font-weight:700;letter-spacing:3px;font-size:13px;color:#ffe9c9;padding:0 26px;animation:scroll 22s linear infinite}
+@keyframes scroll{to{transform:translateX(-50%)}}
+/* SECTIONS */
+section{padding:84px 0}
+.sec-head{text-align:center;max-width:680px;margin:0 auto 48px}
+.sec-head .kicker{color:var(--gold);font-size:12px;letter-spacing:4px;font-weight:700;text-transform:uppercase;margin-bottom:12px}
+.sec-head h2{font-size:clamp(30px,5vw,46px);font-weight:800;margin-bottom:12px}
+.sec-head h2 em{color:var(--gold2);font-style:italic}
+.sec-head p{color:var(--muted)}
+/* STATS */
+.stats{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;text-align:center}
+.stat-grid .n{font-family:'Playfair Display',serif;font-size:clamp(30px,5vw,48px);font-weight:800;color:var(--gold2)}
+.stat-grid .t{color:var(--muted);font-size:13px;letter-spacing:1px;text-transform:uppercase;margin-top:6px}
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center}
+.about-grid img{border-radius:20px;border:1px solid var(--line);box-shadow:0 24px 60px rgba(0,0,0,.5)}
+.about-grid h2{font-size:clamp(28px,4.5vw,40px);margin-bottom:16px}
+.about-grid h2 em{color:var(--gold2);font-style:italic}
+.about-grid p{color:var(--muted);margin-bottom:14px}
+.check li{list-style:none;color:var(--cream);margin:10px 0;padding-left:30px;position:relative}
+.check li::before{content:'✓';position:absolute;left:0;color:var(--gold);font-weight:800}
+/* ARTISTS */
+.artist-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.artist{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;transition:transform .25s}
+.artist:hover{transform:translateY(-6px)}
+.artist img{width:100%;height:340px;object-fit:cover;object-position:top}
+.artist .info{padding:18px;text-align:center}
+.artist .info h3{font-size:21px;margin-bottom:4px}
+.artist .info p{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase}
+/* STALLS */
+.stall-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:920px;margin:0 auto}
+.stall{background:linear-gradient(160deg,var(--card),#241219);border:1px solid var(--line);border-radius:22px;padding:34px 30px;position:relative;overflow:hidden}
+.stall.pop{border-color:var(--gold)}
+.stall .tag{position:absolute;top:18px;right:18px;background:var(--gold);color:#3a2200;font-size:11px;font-weight:800;letter-spacing:1.5px;padding:6px 14px;border-radius:999px}
+.stall h3{font-size:26px;margin-bottom:6px}
+.stall .cat{color:var(--gold);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
+.stall .price{font-family:'Playfair Display',serif;font-size:44px;font-weight:800;color:var(--gold2);margin-bottom:4px}
+.stall .per{color:var(--muted);font-size:13px;margin-bottom:20px}
+.bar{height:10px;background:#2c1620;border-radius:99px;overflow:hidden;margin:8px 0 6px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--maroon2),var(--gold));border-radius:99px}
+.stall .left{font-size:13px;color:var(--muted);margin-bottom:22px}
+.stall ul{list-style:none;margin-bottom:24px}
+.stall ul li{padding:8px 0 8px 28px;position:relative;color:#e9d9c6;font-size:14px;border-bottom:1px dashed #33202a}
+.stall ul li:last-child{border:none}
+.stall ul li::before{content:'✦';position:absolute;left:4px;color:var(--gold)}
+.stall .btn{width:100%;text-align:center}
+.note{text-align:center;color:var(--muted);font-size:13px;margin-top:26px}
+/* AGENDA */
+.days{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:920px;margin:0 auto}
+.day{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:30px}
+.day h3{font-size:24px;margin-bottom:4px}
+.day .date{color:var(--gold);font-size:13px;letter-spacing:2px;margin-bottom:20px;text-transform:uppercase}
+.slot{display:flex;gap:14px;padding:14px 0;border-top:1px solid #2c1a22}
+.slot .time{color:var(--gold2);font-weight:700;font-size:13px;min-width:86px}
+.slot .what{font-size:14px;color:#e9d9c6}
+.soon-box{max-width:920px;margin:28px auto 0;text-align:center;border:1px dashed var(--gold);border-radius:18px;padding:28px;background:rgba(224,180,92,.05)}
+.soon-box p{color:var(--muted);margin-bottom:16px}
+/* SPONSORS */
+.sponsors{background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}
+.sp-row{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin:34px 0}
+.sp{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:22px 34px;font-family:'Playfair Display',serif;font-size:20px;color:var(--muted);letter-spacing:1px}
+/* FAQ */
+.faq{max-width:760px;margin:0 auto}
+.faq details{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.faq summary{cursor:pointer;padding:18px 22px;font-weight:600;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:'+';color:var(--gold);font-size:22px;font-weight:700}
+.faq details[open] summary::after{content:'–'}
+.faq .a{padding:0 22px 20px;color:var(--muted);font-size:14px}
+/* CONTACT */
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:920px;margin:0 auto}
+.c-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px}
+.c-card h3{font-size:22px;margin-bottom:18px}
+.c-row{display:flex;align-items:center;gap:14px;padding:12px 0;border-bottom:1px solid #2c1a22;font-size:15px}
+.c-row:last-child{border:none}
+.c-row .ic{width:42px;height:42px;border-radius:12px;background:#2a141d;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.c-row small{display:block;color:var(--muted);font-size:12px}
+.c-row a:hover{color:var(--gold)}
+.wa-float{position:fixed;bottom:22px;right:22px;z-index:90;width:58px;height:58px;border-radius:50%;background:var(--wa);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 10px 28px rgba(37,211,102,.45)}
+/* FOOTER */
+footer{border-top:1px solid var(--line);background:#0a0406;padding:56px 0 30px}
+.f-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:32px;margin-bottom:36px}
+.f-grid h4{font-size:13px;letter-spacing:2px;color:var(--gold);margin-bottom:16px;text-transform:uppercase}
+.f-grid a{display:block;color:var(--muted);font-size:14px;padding:5px 0}
+.f-grid a:hover{color:var(--gold)}
+.f-brand img{width:52px;height:52px;object-fit:cover;border-radius:12px;margin-bottom:14px;border:1px solid var(--line)}
+.f-brand p{color:var(--muted);font-size:14px;max-width:320px}
+.f-bottom{border-top:1px solid var(--line);padding-top:24px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--muted);font-size:13px}
+@media(max-width:820px){
+  .nav-links{display:none;position:absolute;top:100%;left:0;right:0;background:#140a0e;flex-direction:column;padding:18px 20px;gap:14px;border-bottom:1px solid var(--line)}
+  .nav-links.open{display:flex}
+  .burger{display:block}
+  .nav-cta{display:none}
+  .about-grid,.stall-grid,.days,.contact-grid,.f-grid{grid-template-columns:1fr}
+  .artist-grid{grid-template-columns:repeat(2,1fr)}
+  .artist img{height:240px}
+  .stat-grid{grid-template-columns:repeat(2,1fr);gap:26px}
+  section{padding:64px 0}
+}
+@media(max-width:460px){.artist-grid{grid-template-columns:1fr 1fr}.artist img{height:200px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="brand" href="#top"><img src="meetadoll-assets/meetadoll-logo.jpg" alt="Meetadoll"><span>MEETADOLL<small>EXHIBITION</small></span></a>
+    <div class="nav-links" id="navLinks">
+      <a href="#about">About</a><a href="#artists">Artists</a><a href="#stalls">Stalls</a><a href="#agenda">Agenda</a><a href="#faq">FAQ</a><a href="#contact">Contact</a>
+    </div>
+    <a class="btn nav-cta" href="#stalls">Reserve a Stall</a>
+    <button class="burger" id="burger" aria-label="Menu">☰</button>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="hero-in">
+    <span class="eyebrow">5TH EDITION · THE HOMECOMING</span>
+    <h1>Meetadoll <em>Exhibition</em></h1>
+    <p class="sub">Two days of marketplace magic — vendor stalls, fashion runways, live music and cultural showcases, all under one roof.</p>
+    <div class="meta">
+      <span>📅 5 – 6 December 2026</span>
+      <span>🕙 10:00 AM – 10:00 PM</span>
+      <span>📍 Umar Musa Yar'adua Hall, Kaduna</span>
+    </div>
+    <div class="count" id="countdown">
+      <div class="cell"><div class="num" id="cd-d">–</div><div class="lbl">Days</div></div>
+      <div class="cell"><div class="num" id="cd-h">–</div><div class="lbl">Hours</div></div>
+      <div class="cell"><div class="num" id="cd-m">–</div><div class="lbl">Minutes</div></div>
+      <div class="cell"><div class="num" id="cd-s">–</div><div class="lbl">Seconds</div></div>
+    </div>
+    <div class="hero-cta">
+      <a class="btn gold" href="#stalls">Reserve a Stall</a>
+      <a class="btn ghost" href="#artists">See the Lineup</a>
+    </div>
+  </div>
+</header>
+
+<div class="marquee"><span>FASHION ✦ FOOD ✦ MUSIC ✦ CULTURE ✦ 130 VENDOR STALLS ✦ DEC 5–6 KADUNA ✦ FASHION ✦ FOOD ✦ MUSIC ✦ CULTURE ✦ 130 VENDOR STALLS ✦ DEC 5–6 KADUNA ✦&nbsp;</span></div>
+
+<section class="stats" style="padding:56px 0">
+  <div class="wrap stat-grid">
+    <div><div class="n">5th</div><div class="t">Edition</div></div>
+    <div><div class="n">130</div><div class="t">Vendor Stalls</div></div>
+    <div><div class="n">6</div><div class="t">Star Artists</div></div>
+    <div><div class="n">4</div><div class="t">Past Editions</div></div>
+  </div>
+</section>
+
+<section id="about">
+  <div class="wrap about-grid">
+    <img src="meetadoll-assets/meetadoll-event.jpg" alt="Meetadoll Exhibition crowd">
+    <div>
+      <div class="sec-head" style="text-align:left;margin:0 0 20px"><div class="kicker">About the event</div></div>
+      <h2>Nigeria's homecoming for <em>vendors &amp; creatives</em></h2>
+      <p>Meetadoll Exhibition is where small businesses meet big stages. For two days, 130 vendors showcase fashion, food, beauty and lifestyle to thousands of shoppers — wrapped in runway shows, live performances and cultural displays.</p>
+      <ul class="check">
+        <li>130 curated vendor stalls across 2 tiers</li>
+        <li>Live music from 6 headline artists</li>
+        <li>Fashion runway &amp; cultural showcases</li>
+        <li>4 successful editions: Kaduna 2023–2025, Abuja 2026</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="artists" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Live on stage</div><h2>The <em>lineup</em></h2><p>Six headline acts lighting up the Homecoming stage.</p></div>
+    <div class="artist-grid">
+      <div class="artist"><img src="meetadoll-assets/meetadoll-artist-danmusa.jpg" alt="Dan Musa" loading="lazy"><div class="info"><h3>Dan Musa</h3><p>Performing Live</p></div></div>
+      <div class="artist"><img src="meetadoll-assets/meetadoll-artist-boyskiddo.jpg" alt="Boyskiddo" loading="lazy"><div class="info"><h3>Boyskiddo</h3><p>Performing Live</p></div></div>
+      <div class="artist"><img src="meetadoll-assets/meetadoll-artist-badman.jpg" alt="Badman Binladin" loading="lazy"><div class="info"><h3>Badman Binladin</h3><p>Performing Live</p></div></div>
+      <div class="artist"><img src="meetadoll-assets/meetadoll-artist-khairat.jpg" alt="Khairat Abdullahi" loading="lazy"><div class="info"><h3>Khairat Abdullahi</h3><p>Performing Live</p></div></div>
+      <div class="artist"><img src="meetadoll-assets/meetadoll-artist-msquare.jpg" alt="Msquare Nnah" loading="lazy"><div class="info"><h3>Msquare Nnah</h3><p>Performing Live</p></div></div>
+      <div class="artist"><img src="meetadoll-assets/meetadoll-artist-ado.jpg" alt="Ado Gwanja" loading="lazy"><div class="info"><h3>Ado Gwanja</h3><p>Performing Live</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="stalls">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Vendor stalls</div><h2>Claim your <em>spot</em></h2><p>Only <strong style="color:var(--gold2)">130 stalls</strong> for the whole event. When they're gone, they're gone.</p></div>
+    <div class="stall-grid">
+      <div class="stall pop">
+        <span class="tag">MOST POPULAR</span>
+        <h3>Tier 1</h3><div class="cat">Fashion · Beauty · Lifestyle</div>
+        <div class="price">₦250,000</div><div class="per">per stall · 2 days</div>
+        <div class="bar"><i style="width:91%"></i></div>
+        <div class="left"><strong style="color:var(--gold2)">68 of 75</strong> stalls left</div>
+        <ul>
+          <li>Prime hall floor position</li>
+          <li>Table, chairs &amp; branding space</li>
+          <li>Featured in event promotions</li>
+          <li>2 vendor access passes</li>
+        </ul>
+        <a class="btn gold" href="https://wa.me/2348120201518?text=Hello%20Meetadoll!%20I%20want%20to%20reserve%20a%20Tier%201%20stall%20(Fashion%20%2F%20Others)%20for%20the%205th%20Edition." target="_blank" rel="noopener">Reserve Tier 1 on WhatsApp</a>
+      </div>
+      <div class="stall">
+        <h3>Tier 2</h3><div class="cat">Food &amp; Drinks</div>
+        <div class="price">₦210,000</div><div class="per">per stall · 2 days</div>
+        <div class="bar"><i style="width:93%"></i></div>
+        <div class="left"><strong style="color:var(--gold2)">51 of 55</strong> stalls left</div>
+        <ul>
+          <li>Dedicated food court zone</li>
+          <li>Table, chairs &amp; serving setup</li>
+          <li>Featured in event promotions</li>
+          <li>2 vendor access passes</li>
+        </ul>
+        <a class="btn" href="https://wa.me/2348120201518?text=Hello%20Meetadoll!%20I%20want%20to%20reserve%20a%20Tier%202%20stall%20(Food)%20for%20the%205th%20Edition." target="_blank" rel="noopener">Reserve Tier 2 on WhatsApp</a>
+      </div>
+    </div>
+    <p class="note">Reservations are held for 15 minutes while you complete payment securely via Paystack. Full terms apply.</p>
+  </div>
+</section>
+
+<section id="agenda" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Two days</div><h2>The <em>agenda</em></h2><p>Marketplace by day, stage lights by night.</p></div>
+    <div class="days">
+      <div class="day"><h3>Day 1</h3><div class="date">Saturday · 5 December</div>
+        <div class="slot"><div class="time">10:00 AM</div><div class="what">Gates open — vendor market begins</div></div>
+        <div class="slot"><div class="time">02:00 PM</div><div class="what">Fashion runway showcase</div></div>
+        <div class="slot"><div class="time">05:00 PM</div><div class="what">Cultural performances</div></div>
+        <div class="slot"><div class="time">07:00 PM</div><div class="what">Live music — headline acts</div></div>
+      </div>
+      <div class="day"><h3>Day 2</h3><div class="date">Sunday · 6 December</div>
+        <div class="slot"><div class="time">10:00 AM</div><div class="what">Gates open — vendor market continues</div></div>
+        <div class="slot"><div class="time">01:00 PM</div><div class="what">SME spotlight &amp; brand features</div></div>
+        <div class="slot"><div class="time">05:00 PM</div><div class="what">Runway finale</div></div>
+        <div class="slot"><div class="time">08:00 PM</div><div class="what">Closing concert — all artists</div></div>
+      </div>
+    </div>
+    <div class="soon-box">
+      <p>Full performance schedule with artist set times drops soon.</p>
+      <a class="btn ghost" href="https://wa.me/2348120201518?text=Hello%20Meetadoll!%20Notify%20me%20when%20the%20full%20schedule%20is%20out." target="_blank" rel="noopener">Notify me on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<section class="sponsors">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Partners</div><h2>Proudly <em>sponsored</em></h2><p>The brands backing the Homecoming.</p></div>
+    <div class="sp-row">
+      <div class="sp">Your Brand</div><div class="sp">Your Brand</div><div class="sp">Your Brand</div><div class="sp">Your Brand</div>
+    </div>
+    <a class="btn gold" href="https://wa.me/2348120201518?text=Hello%20Meetadoll!%20I%20want%20to%20discuss%20sponsorship%20for%20the%205th%20Edition." target="_blank" rel="noopener">Become a Sponsor</a>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Good to know</div><h2>Vendor <em>FAQ</em></h2></div>
+    <div class="faq">
+      <details><summary>How do I reserve a stall?</summary><div class="a">Tap any Reserve button to chat with us on WhatsApp, or create an account and pick your tier. Your stall is held for 15 minutes while you complete payment securely via Paystack.</div></details>
+      <details><summary>What's the difference between Tier 1 and Tier 2?</summary><div class="a">Tier 1 (₦250,000) is for fashion, beauty and lifestyle vendors in prime hall positions. Tier 2 (₦210,000) is for food and drinks vendors in the dedicated food court zone. Both include table, chairs, setup space and 2 vendor passes for both days.</div></details>
+      <details><summary>Can I get a refund if I cancel?</summary><div class="a">Refund terms are stated in our Terms &amp; Conditions — please read them before paying. Chat with us on WhatsApp and we'll walk you through the policy for your situation.</div></details>
+      <details><summary>When can vendors set up?</summary><div class="a">Setup details, load-in times and stall rules are shared with confirmed vendors ahead of the event. Gates open to shoppers at 10:00 AM daily.</div></details>
+      <details><summary>Is there an entry fee for shoppers?</summary><div class="a">Follow @meetadoll_exhibition on Instagram and TikTok for ticketing and gate announcements as the date approaches.</div></details>
+    </div>
+  </div>
+</section>
+
+<section id="contact" style="background:var(--bg2);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sec-head"><div class="kicker">Talk to us</div><h2>Get in <em>touch</em></h2><p>Stall enquiries, sponsorships, partnerships — we reply fast.</p></div>
+    <div class="contact-grid">
+      <div class="c-card"><h3>Contact</h3>
+        <div class="c-row"><div class="ic">💬</div><div><small>WhatsApp / Phone</small><a href="https://wa.me/2348120201518" target="_blank" rel="noopener">0812 020 1518</a></div></div>
+        <div class="c-row"><div class="ic">✉️</div><div><small>Email</small><a href="mailto:meetadollmanagement@gmail.com">meetadollmanagement@gmail.com</a></div></div>
+        <div class="c-row"><div class="ic">📸</div><div><small>Instagram</small><a href="https://instagram.com/meetadoll_exhibition" target="_blank" rel="noopener">@meetadoll_exhibition</a></div></div>
+        <div class="c-row"><div class="ic">🎵</div><div><small>TikTok</small><a href="https://tiktok.com/@meetadoll_exhibition" target="_blank" rel="noopener">@meetadoll_exhibition</a></div></div>
+      </div>
+      <div class="c-card"><h3>Venue</h3>
+        <div class="c-row"><div class="ic">📍</div><div><small>Event venue</small>Umar Musa Yar'adua Hall, Kaduna State</div></div>
+        <div class="c-row"><div class="ic">📅</div><div><small>Date &amp; time</small>5 – 6 December 2026 · 10:00 AM – 10:00 PM daily</div></div>
+        <div class="c-row"><div class="ic">👤</div><div><small>Organiser</small>Hauwa Manga, Nigeria</div></div>
+        <div style="margin-top:18px"><a class="btn" style="width:100%;text-align:center" href="https://www.google.com/maps/search/?api=1&query=Umar+Musa+Yar%27adua+Hall+Kaduna" target="_blank" rel="noopener">Open in Google Maps</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="f-grid">
+      <div class="f-brand"><img src="meetadoll-assets/meetadoll-logo.jpg" alt="Meetadoll"><p>Meetadoll Exhibition — Nigeria's homecoming for vendors, fashion, music and culture. 5th Edition: December 5–6, 2026, Kaduna.</p></div>
+      <div><h4>Explore</h4><a href="#about">About</a><a href="#artists">Artists</a><a href="#stalls">Vendor Stalls</a><a href="#agenda">Agenda</a><a href="#faq">FAQ</a></div>
+      <div><h4>Contact</h4><a href="https://wa.me/2348120201518" target="_blank" rel="noopener">WhatsApp: 0812 020 1518</a><a href="mailto:meetadollmanagement@gmail.com">meetadollmanagement@gmail.com</a><a href="https://instagram.com/meetadoll_exhibition" target="_blank" rel="noopener">Instagram</a><a href="https://tiktok.com/@meetadoll_exhibition" target="_blank" rel="noopener">TikTok</a></div>
+    </div>
+    <div class="f-bottom"><span>© 2026 Meetadoll Exhibition. All rights reserved.</span><span>Developed By Engr Mahmod</span></div>
+  </div>
+</footer>
+
+<a class="wa-float" href="https://wa.me/2348120201518?text=Hello%20Meetadoll!" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">💬</a>
+
+<script>
+document.getElementById('burger').addEventListener('click',function(){document.getElementById('navLinks').classList.toggle('open')});
+document.querySelectorAll('#navLinks a').forEach(function(a){a.addEventListener('click',function(){document.getElementById('navLinks').classList.remove('open')})});
+var target=new Date('2026-12-05T10:00:00+01:00').getTime();
+function tick(){
+  var d=target-Date.now();
+  if(d<0)d=0;
+  document.getElementById('cd-d').textContent=Math.floor(d/864e5);
+  document.getElementById('cd-h').textContent=String(Math.floor(d/36e5)%24).padStart(2,'0');
+  document.getElementById('cd-m').textContent=String(Math.floor(d/6e4)%60).padStart(2,'0');
+  document.getElementById('cd-s').textContent=String(Math.floor(d/1e3)%60).padStart(2,'0');
+}
+tick();setInterval(tick,1000);
+</script>
+</body>
+</html>
