@@ -3,153 +3,208 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rano Air — Fly the Rano Way (Concept Redesign)</title>
+<title>Rano Air — Fly the Rano Way | Concept Redesign</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --maroon:#6d0d1b; --maroon-dark:#4a0812; --maroon-deep:#36060d;
-    --gold:#e0a92e; --gold-light:#f5c86a;
-    --bg:#faf7f2; --card:#ffffff; --ink:#221014; --muted:#7a6a6e;
-    --line:#eadfd6; --green:#1d7a3a;
+    --maroon:#6d0d1b; --maroon-deep:#2b050c; --maroon-rich:#4a0812;
+    --gold:#e3ac2f; --gold-light:#f6cf6d;
+    --cream:#faf6ef; --card:#ffffff; --ink:#221014; --muted:#7c6f72;
+    --line:#eadfd3;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',-apple-system,'Segoe UI',Roboto,sans-serif;background:var(--cream);color:var(--ink);line-height:1.6;overflow-x:hidden}
+  h1,h2,h3,.serif{font-family:'Playfair Display',Georgia,serif}
   a{text-decoration:none;color:inherit}
-  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+  .reveal{opacity:0;transform:translateY(28px);transition:opacity .8s ease,transform .8s ease}
+  .reveal.in{opacity:1;transform:none}
 
   /* NAV */
-  header{position:sticky;top:0;z-index:50;background:rgba(54,6,13,.96);backdrop-filter:blur(8px);color:#fff}
-  .nav{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.25rem;letter-spacing:.5px}
-  .logo .mark{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;color:var(--maroon-deep);font-weight:900}
-  .nav-links{display:flex;gap:26px;font-size:.95rem}
-  .nav-links a{opacity:.85;transition:.2s}
-  .nav-links a:hover{opacity:1;color:var(--gold-light)}
-  .btn{display:inline-block;background:var(--gold);color:var(--maroon-deep);font-weight:700;padding:12px 26px;border-radius:999px;border:0;cursor:pointer;font-size:1rem;transition:.2s}
-  .btn:hover{background:var(--gold-light);transform:translateY(-1px)}
-  .btn-outline{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5)}
-  .btn-outline:hover{border-color:var(--gold);color:var(--gold-light)}
-  @media(max-width:760px){.nav-links{display:none}}
+  header{position:fixed;top:0;left:0;right:0;z-index:100;transition:.35s;background:transparent}
+  header.scrolled{background:rgba(43,5,12,.92);backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(0,0,0,.25)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:76px;color:#fff}
+  .logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.35rem;letter-spacing:2px}
+  .logo .mark{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;color:var(--maroon-deep);font-weight:900;font-family:'Playfair Display',serif;font-size:1.3rem;box-shadow:0 4px 14px rgba(227,172,47,.4)}
+  .nav-links{display:flex;gap:32px;font-size:.95rem;font-weight:500}
+  .nav-links a{opacity:.85;position:relative;transition:.2s}
+  .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--gold);transition:.25s}
+  .nav-links a:hover{opacity:1}
+  .nav-links a:hover::after{width:100%}
+  .btn{display:inline-block;background:linear-gradient(135deg,var(--gold),#d1941f);color:var(--maroon-deep);font-weight:700;padding:14px 32px;border-radius:999px;border:0;cursor:pointer;font-size:1rem;transition:.25s;box-shadow:0 10px 26px rgba(227,172,47,.35);font-family:'Inter',sans-serif}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 14px 32px rgba(227,172,47,.5)}
+  .btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:1.5px solid rgba(255,255,255,.5);box-shadow:none;backdrop-filter:blur(6px)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold-light);background:rgba(255,255,255,.18)}
+  @media(max-width:820px){.nav-links{display:none}}
 
   /* HERO */
-  .hero{background:radial-gradient(1200px 500px at 20% -10%,#8f1425 0%,var(--maroon-deep) 60%),var(--maroon-deep);color:#fff;padding:70px 0 90px;position:relative;overflow:hidden}
-  .hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(224,169,46,.25),transparent 70%)}
-  .hero h1{font-size:clamp(2.2rem,5.5vw,3.6rem);line-height:1.1;font-weight:800;letter-spacing:-.5px}
-  .hero h1 .gold{color:var(--gold-light)}
-  .hero p.sub{margin:14px 0 0;font-size:1.12rem;opacity:.85;max-width:560px}
-  .hero-badges{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
-  .pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);padding:8px 16px;border-radius:999px;font-size:.85rem}
+  .hero{min-height:100svh;display:flex;align-items:center;position:relative;color:#fff;
+    background:linear-gradient(180deg,rgba(43,5,12,.55) 0%,rgba(43,5,12,.25) 40%,rgba(43,5,12,.88) 100%),url('rano-hero.jpg') center/cover no-repeat}
+  .hero-inner{padding:140px 0 120px;position:relative;z-index:2;max-width:1180px;margin:0 auto;padding-left:24px;padding-right:24px;width:100%}
+  .kicker{display:inline-flex;align-items:center;gap:10px;font-size:.8rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--gold-light);margin-bottom:20px}
+  .kicker::before{content:"";width:44px;height:2px;background:var(--gold)}
+  .hero h1{font-size:clamp(2.8rem,7vw,5.2rem);line-height:1.05;font-weight:800;letter-spacing:-1px;max-width:800px;text-shadow:0 4px 30px rgba(0,0,0,.4)}
+  .hero h1 em{font-style:italic;color:var(--gold-light)}
+  .hero p.sub{margin:22px 0 36px;font-size:1.2rem;opacity:.88;max-width:600px;font-weight:400}
+  .hero-cta{display:flex;gap:16px;flex-wrap:wrap}
+  .scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);color:#fff;opacity:.7;font-size:.8rem;letter-spacing:2px;text-transform:uppercase;z-index:2;animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
 
-  /* SEARCH WIDGET */
-  .search-card{background:var(--card);border-radius:18px;box-shadow:0 24px 60px rgba(54,6,13,.28);padding:26px;margin-top:-56px;position:relative;z-index:5}
-  .trip-toggle{display:flex;gap:8px;margin-bottom:18px}
-  .trip-toggle button{border:1.5px solid var(--line);background:#fff;padding:9px 22px;border-radius:999px;font-weight:600;cursor:pointer;color:var(--muted);font-size:.92rem}
-  .trip-toggle button.active{background:var(--maroon);border-color:var(--maroon);color:#fff}
-  .search-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:12px;align-items:end}
-  .field label{display:block;font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
-  .field select,.field input{width:100%;padding:13px 14px;border:1.5px solid var(--line);border-radius:12px;font-size:1rem;background:#fff;color:var(--ink)}
-  .field select:focus,.field input:focus{outline:none;border-color:var(--maroon)}
-  @media(max-width:860px){.search-grid{grid-template-columns:1fr 1fr}}
-  @media(max-width:520px){.search-grid{grid-template-columns:1fr}.search-grid .btn{width:100%}}
+  /* BOOKING WIDGET */
+  .booking-zone{position:relative;z-index:5;margin-top:-90px}
+  .search-card{background:rgba(255,255,255,.97);backdrop-filter:blur(10px);border-radius:22px;box-shadow:0 30px 80px rgba(43,5,12,.35);padding:30px 32px;border:1px solid rgba(255,255,255,.6)}
+  .trip-toggle{display:flex;gap:10px;margin-bottom:20px}
+  .trip-toggle button{border:1.5px solid var(--line);background:#fff;padding:10px 26px;border-radius:999px;font-weight:600;cursor:pointer;color:var(--muted);font-size:.92rem;font-family:'Inter',sans-serif;transition:.2s}
+  .trip-toggle button.active{background:var(--maroon);border-color:var(--maroon);color:#fff;box-shadow:0 6px 16px rgba(109,13,27,.3)}
+  .search-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;gap:14px;align-items:end}
+  .field label{display:block;font-size:.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+  .field select,.field input{width:100%;padding:15px 16px;border:1.5px solid var(--line);border-radius:14px;font-size:1rem;background:#fffdf9;color:var(--ink);font-family:'Inter',sans-serif;transition:.2s}
+  .field select:focus,.field input:focus{outline:none;border-color:var(--maroon);box-shadow:0 0 0 4px rgba(109,13,27,.08)}
+  @media(max-width:900px){.search-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:540px){.search-grid{grid-template-columns:1fr}.search-grid .btn{width:100%}}
 
-  /* RESULTS */
   #results{margin-top:26px;display:none}
-  #results.show{display:block;animation:fadeUp .4s ease}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-  .res-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
-  .res-head h3{font-size:1.15rem}
+  #results.show{display:block;animation:fadeUp .45s ease}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+  .res-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .res-head h3{font-size:1.25rem}
   .res-head span{color:var(--muted);font-size:.9rem}
-  .flight{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:12px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;transition:.2s}
-  .flight:hover{border-color:var(--maroon);box-shadow:0 8px 24px rgba(109,13,27,.1)}
-  .flight .fnum{font-weight:800;color:var(--maroon);font-size:.95rem}
-  .flight .times{font-size:1.35rem;font-weight:800}
-  .flight .times small{font-size:.85rem;font-weight:400;color:var(--muted);display:block}
-  .flight .dur{text-align:center;color:var(--muted);font-size:.85rem}
-  .flight .dur .line{height:2px;background:var(--line);margin:6px 0;position:relative}
-  .flight .dur .line::after{content:"✈";position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:#fff;padding:0 4px;color:var(--gold)}
+  .flight{background:#fff;border:1.5px solid var(--line);border-radius:16px;padding:20px 22px;margin-bottom:14px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;transition:.25s}
+  .flight:hover{border-color:var(--maroon);box-shadow:0 12px 30px rgba(109,13,27,.12);transform:translateY(-2px)}
+  .flight .fnum{font-weight:800;color:var(--maroon);font-size:.95rem;letter-spacing:.5px}
+  .flight .times{font-size:1.5rem;font-weight:800;font-family:'Playfair Display',serif}
+  .flight .times small{font-size:.82rem;font-weight:500;color:var(--muted);display:block;font-family:'Inter',sans-serif}
+  .flight .dur{text-align:center;color:var(--muted);font-size:.85rem;min-width:110px}
+  .flight .dur .rl{height:2px;background:var(--line);margin:8px 0;position:relative}
+  .flight .dur .rl::after{content:"✈";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:#fff;padding:0 6px;color:var(--gold);font-size:1rem}
   .flight .price{margin-left:auto;text-align:right}
-  .flight .price b{font-size:1.4rem;color:var(--maroon)}
-  .flight .price small{display:block;color:var(--muted)}
-  .flight .left-tag{background:#fff4e0;color:#8a5a00;font-size:.75rem;font-weight:700;padding:4px 10px;border-radius:999px}
-  .fare-box{background:#f4fbf6;border:1.5px solid #bfe3c9;border-radius:14px;padding:20px;margin-top:6px}
-  .fare-box h4{color:var(--green);margin-bottom:10px}
-  .fare-box ul{list-style:none;font-size:.92rem;color:#33523d}
-  .fare-box li{padding:5px 0;border-bottom:1px dashed #cfe6d4}
+  .flight .price b{font-size:1.5rem;color:var(--maroon);font-family:'Playfair Display',serif}
+  .flight .price small{display:block;color:var(--muted);font-size:.82rem}
+  .left-tag{background:#fff3d9;color:#8a5a00;font-size:.74rem;font-weight:700;padding:5px 12px;border-radius:999px;display:inline-block;margin-top:8px}
+  .fare-box{background:linear-gradient(180deg,#f2fbf4,#e9f7ec);border:1.5px solid #bfe3c9;border-radius:16px;padding:22px;margin:4px 0 14px}
+  .fare-box h4{color:#166534;margin-bottom:10px;font-family:'Inter',sans-serif}
+  .fare-box ul{list-style:none;font-size:.93rem;color:#33523d}
+  .fare-box li{padding:6px 0;border-bottom:1px dashed #cfe6d4}
   .fare-box li:last-child{border:0}
-  .fare-total{display:flex;justify-content:space-between;font-weight:800;font-size:1.15rem;margin-top:10px;color:var(--ink)}
+  .fare-total{display:flex;justify-content:space-between;font-weight:800;font-size:1.2rem;margin-top:12px}
+
+  /* STATS */
+  .stats{background:var(--maroon-deep);color:#fff;margin-top:70px}
+  .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding:44px 0}
+  .stat b{font-size:2.6rem;font-family:'Playfair Display',serif;color:var(--gold-light);display:block}
+  .stat span{font-size:.85rem;letter-spacing:1.5px;text-transform:uppercase;opacity:.7}
+  @media(max-width:700px){.stats-grid{grid-template-columns:1fr 1fr;gap:26px}}
 
   /* SECTIONS */
-  section.block{padding:72px 0}
-  .kicker{color:var(--maroon);font-weight:800;text-transform:uppercase;letter-spacing:2px;font-size:.8rem;margin-bottom:10px}
-  h2.sec{font-size:clamp(1.6rem,3.5vw,2.3rem);letter-spacing:-.5px;margin-bottom:8px}
-  p.lead{color:var(--muted);max-width:640px;margin-bottom:34px}
+  section.block{padding:90px 0}
+  .sec-kicker{color:var(--maroon);font-weight:800;text-transform:uppercase;letter-spacing:3px;font-size:.78rem;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+  .sec-kicker::before{content:"";width:36px;height:2px;background:var(--gold)}
+  h2.sec{font-size:clamp(1.9rem,4vw,2.8rem);letter-spacing:-.5px;margin-bottom:12px;line-height:1.15}
+  p.lead{color:var(--muted);max-width:660px;margin-bottom:44px;font-size:1.06rem}
 
-  .dest-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px}
-  .dest{background:linear-gradient(160deg,var(--maroon) 0%,var(--maroon-dark) 100%);color:#fff;border-radius:16px;padding:26px 22px;position:relative;overflow:hidden;transition:.25s;cursor:pointer}
-  .dest:hover{transform:translateY(-4px);box-shadow:0 16px 34px rgba(109,13,27,.3)}
-  .dest::after{content:"✈";position:absolute;right:14px;bottom:8px;font-size:2.4rem;opacity:.18;transform:rotate(-20deg)}
-  .dest h3{font-size:1.25rem;margin-bottom:4px}
-  .dest .code{background:rgba(255,255,255,.16);display:inline-block;padding:3px 12px;border-radius:999px;font-size:.8rem;font-weight:700;letter-spacing:1px}
-  .dest p{font-size:.85rem;opacity:.75;margin-top:10px}
+  /* DESTINATIONS */
+  .dest-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:900px){.dest-grid{grid-template-columns:1fr 1fr}}
+  @media(max-width:560px){.dest-grid{grid-template-columns:1fr}}
+  .dest{position:relative;border-radius:20px;overflow:hidden;min-height:260px;cursor:pointer;display:flex;align-items:flex-end;color:#fff;box-shadow:0 14px 34px rgba(43,5,12,.18);transition:.35s}
+  .dest:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(43,5,12,.32)}
+  .dest img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .8s ease}
+  .dest:hover img{transform:scale(1.07)}
+  .dest::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(43,5,12,0) 30%,rgba(43,5,12,.88) 100%)}
+  .dest-info{position:relative;z-index:2;padding:24px;width:100%}
+  .dest-info .code{background:var(--gold);color:var(--maroon-deep);display:inline-block;padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:800;letter-spacing:2px;margin-bottom:10px}
+  .dest-info h3{font-size:1.5rem;margin-bottom:4px}
+  .dest-info p{font-size:.88rem;opacity:.8}
+  .dest-info .from{margin-top:10px;font-size:.9rem;font-weight:600;color:var(--gold-light)}
 
-  .why-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-  .why{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px 24px}
-  .why .ic{font-size:2rem;margin-bottom:12px}
-  .why h3{margin-bottom:8px;font-size:1.08rem}
-  .why p{color:var(--muted);font-size:.93rem}
+  /* EXPERIENCE */
+  .exp{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+  @media(max-width:860px){.exp-grid{grid-template-columns:1fr}}
+  .exp-img{border-radius:24px;overflow:hidden;box-shadow:0 30px 70px rgba(43,5,12,.25);position:relative}
+  .exp-img img{width:100%;display:block;transition:transform 1.2s ease}
+  .exp-img:hover img{transform:scale(1.04)}
+  .exp-badge{position:absolute;bottom:22px;left:22px;background:rgba(43,5,12,.85);backdrop-filter:blur(8px);color:#fff;padding:14px 22px;border-radius:14px;font-size:.9rem}
+  .exp-badge b{color:var(--gold-light);font-family:'Playfair Display',serif;font-size:1.3rem;display:block}
+  .feat{display:flex;gap:16px;margin-bottom:24px}
+  .feat .fi{width:52px;height:52px;flex:none;border-radius:16px;background:linear-gradient(135deg,var(--maroon),var(--maroon-rich));color:var(--gold-light);display:flex;align-items:center;justify-content:center;font-size:1.4rem;box-shadow:0 8px 20px rgba(109,13,27,.25)}
+  .feat h3{font-size:1.12rem;margin-bottom:4px;font-family:'Inter',sans-serif;font-weight:700}
+  .feat p{color:var(--muted);font-size:.94rem}
+
+  /* TESTIMONIALS */
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+  @media(max-width:860px){.quotes{grid-template-columns:1fr}}
+  .quote{background:#fff;border:1px solid var(--line);border-radius:20px;padding:32px 28px;position:relative;transition:.3s}
+  .quote:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(43,5,12,.1)}
+  .quote .stars{color:var(--gold);letter-spacing:3px;margin-bottom:14px}
+  .quote p{font-style:italic;color:#4a3f42;margin-bottom:18px}
+  .quote .who{font-weight:700;font-size:.92rem}
+  .quote .who small{display:block;font-weight:400;color:var(--muted)}
 
   /* CONTACT */
-  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px}
-  @media(max-width:760px){.contact-grid{grid-template-columns:1fr}}
-  .contact-card{background:var(--maroon-deep);color:#fff;border-radius:18px;padding:34px}
-  .contact-card h3{margin-bottom:16px;font-size:1.3rem}
-  .contact-card .row{display:flex;gap:12px;margin-bottom:18px;font-size:.95rem;opacity:.92;align-items:flex-start}
-  .contact-card .row .ric{font-size:1.2rem;line-height:1.4}
-  .clabel{font-size:.75rem;text-transform:uppercase;letter-spacing:1.5px;opacity:.6;font-weight:700;margin-bottom:8px}
-  .nums{display:flex;flex-wrap:wrap;gap:8px}
-  .nums a{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:999px;white-space:nowrap;font-size:.92rem;font-weight:600;transition:.2s}
-  .nums a:hover{background:var(--gold);border-color:var(--gold);color:var(--maroon-deep)}
-  .hours-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px}
-  .hours-card h3{margin-bottom:16px}
-  .route-row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--line);font-size:.95rem}
+  .contact-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:26px}
+  @media(max-width:820px){.contact-grid{grid-template-columns:1fr}}
+  .contact-card{background:linear-gradient(160deg,var(--maroon-rich),var(--maroon-deep));color:#fff;border-radius:24px;padding:40px;box-shadow:0 24px 60px rgba(43,5,12,.3)}
+  .contact-card h3{margin-bottom:22px;font-size:1.5rem}
+  .contact-card .row{display:flex;gap:14px;margin-bottom:22px;align-items:flex-start}
+  .contact-card .row .ric{font-size:1.25rem;line-height:1.4}
+  .clabel{font-size:.72rem;text-transform:uppercase;letter-spacing:2px;opacity:.6;font-weight:700;margin-bottom:10px}
+  .nums{display:flex;flex-wrap:wrap;gap:10px}
+  .nums a{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff;padding:10px 18px;border-radius:999px;white-space:nowrap;font-size:.92rem;font-weight:600;transition:.25s}
+  .nums a:hover{background:var(--gold);border-color:var(--gold);color:var(--maroon-deep);transform:translateY(-2px)}
+  .routes-card{background:#fff;border:1px solid var(--line);border-radius:24px;padding:40px}
+  .routes-card h3{margin-bottom:18px;font-size:1.4rem}
+  .route-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--line);font-size:.96rem}
   .route-row:last-child{border:0}
-  .route-row b{color:var(--maroon)}
+  .route-row b{color:var(--maroon);font-family:'Playfair Display',serif;font-size:1.1rem}
+  .route-row .rt{color:var(--muted);font-size:.85rem}
 
-  footer{background:var(--maroon-deep);color:#fff;padding:44px 0 30px}
-  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:26px;margin-bottom:26px}
+  /* CTA BAND */
+  .cta-band{border-radius:28px;overflow:hidden;position:relative;color:#fff;text-align:center;padding:90px 30px;
+    background:linear-gradient(180deg,rgba(43,5,12,.72),rgba(43,5,12,.9)),url('rano-takeoff.jpg') center/cover}
+  .cta-band h2{font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:14px}
+  .cta-band p{opacity:.85;margin-bottom:30px;max-width:560px;margin-left:auto;margin-right:auto}
+
+  footer{background:var(--maroon-deep);color:#fff;padding:60px 0 30px;margin-top:90px}
+  .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:30px;margin-bottom:34px}
   @media(max-width:760px){.foot-grid{grid-template-columns:1fr}}
-  footer h4{margin-bottom:12px;font-size:.95rem;color:var(--gold-light)}
-  footer a.foot-link{display:block;opacity:.75;padding:4px 0;font-size:.92rem}
-  footer a.foot-link:hover{opacity:1;color:var(--gold-light)}
-  .copy{border-top:1px solid rgba(255,255,255,.14);padding-top:18px;font-size:.82rem;opacity:.6;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
-  .concept-note{background:rgba(224,169,46,.12);border:1px solid rgba(224,169,46,.4);color:var(--gold-light);font-size:.8rem;padding:10px 16px;border-radius:10px;margin-bottom:22px}
+  footer h4{margin-bottom:14px;font-size:.9rem;color:var(--gold-light);letter-spacing:1.5px;text-transform:uppercase}
+  footer a.foot-link{display:block;opacity:.7;padding:5px 0;font-size:.93rem;transition:.2s}
+  footer a.foot-link:hover{opacity:1;color:var(--gold-light);padding-left:6px}
+  .copy{border-top:1px solid rgba(255,255,255,.14);padding-top:20px;font-size:.83rem;opacity:.65;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .concept-note{background:rgba(227,172,47,.1);border:1px solid rgba(227,172,47,.4);color:var(--gold-light);font-size:.82rem;padding:12px 18px;border-radius:12px;margin-bottom:28px}
 </style>
 </head>
 <body>
 
-<header>
+<header id="hdr">
   <div class="wrap nav">
-    <div class="logo"><span class="mark">R</span> RANO AIR</div>
+    <div class="logo"><span class="mark">R</span> RANO&nbsp;AIR</div>
     <nav class="nav-links">
-      <a href="#book">Book</a><a href="#destinations">Destinations</a><a href="#why">Why Rano</a><a href="#contact">Contact</a>
+      <a href="#book">Book</a><a href="#destinations">Destinations</a><a href="#experience">Experience</a><a href="#contact">Contact</a>
     </nav>
-    <a class="btn" href="#book" style="padding:10px 22px">Book Now</a>
+    <a class="btn" href="#book" style="padding:11px 26px">Book Now</a>
   </div>
 </header>
 
 <div class="hero">
-  <div class="wrap">
-    <h1>Fly the <span class="gold">Rano Way.</span><br>Safe. On time. Affordable.</h1>
-    <p class="sub">Scheduled flights across Nigeria on our modern EMB 145 fleet — from Kano to Lagos, Abuja to Sokoto, and everywhere in between.</p>
-    <div class="hero-badges">
-      <span class="pill">✈ 9 destinations</span>
-      <span class="pill">🛫 5 aircraft</span>
-      <span class="pill">⏱ On-time departures</span>
+  <div class="hero-inner">
+    <span class="kicker">Nigeria's rising airline · Since 2019</span>
+    <h1>Fly the <em>Rano Way.</em><br>Above it all.</h1>
+    <p class="sub">Safe, on-time and affordable scheduled flights across Nigeria — on our modern EMB&nbsp;145 fleet, with world-class inflight service.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#book">Book a Flight</a>
+      <a class="btn btn-ghost" href="#destinations">Explore Destinations</a>
     </div>
   </div>
+  <div class="scroll-hint">Scroll ↓</div>
 </div>
 
-<div class="wrap" id="book">
-  <div class="search-card">
+<div class="wrap booking-zone" id="book">
+  <div class="search-card reveal">
     <div class="trip-toggle">
       <button class="active" data-trip="oneway">One Way</button>
       <button data-trip="return">Return</button>
@@ -161,43 +216,69 @@
       <div class="field"><label>Passengers</label>
         <select id="pax"><option>1 Adult</option><option>2 Adults</option><option>3 Adults</option><option>4 Adults</option></select>
       </div>
-      <button class="btn" id="searchBtn" style="padding:13px 34px">Search</button>
+      <button class="btn" id="searchBtn" style="padding:15px 38px">Search</button>
     </div>
     <div id="results"></div>
   </div>
 </div>
 
+<div class="stats">
+  <div class="wrap stats-grid">
+    <div class="stat reveal"><b data-count="9">0</b><span>Destinations</span></div>
+    <div class="stat reveal"><b data-count="5">0</b><span>Modern Aircraft</span></div>
+    <div class="stat reveal"><b data-count="98" data-suffix="%">0</b><span>On-Time Record</span></div>
+    <div class="stat reveal"><b data-count="21">0</b><span>KG Baggage Free</span></div>
+  </div>
+</div>
+
 <section class="block" id="destinations">
   <div class="wrap">
-    <div class="kicker">Where we fly</div>
-    <h2 class="sec">Top Destinations</h2>
-    <p class="lead">Nine cities across Nigeria, served with safe, reliable daily scheduled flights.</p>
+    <div class="sec-kicker reveal">Where we fly</div>
+    <h2 class="sec reveal">Nine cities. One promise.</h2>
+    <p class="lead reveal">Daily scheduled flights connecting Nigeria's great cities — tap any destination to start a booking.</p>
     <div class="dest-grid" id="destGrid"></div>
   </div>
 </section>
 
-<section class="block" id="why" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-  <div class="wrap">
-    <div class="kicker">Why Rano Air</div>
-    <h2 class="sec">World-class service, Nigerian warmth</h2>
-    <p class="lead">Licensed by the NCAA since 2019, with a mandate for safe, reliable and affordable air travel.</p>
-    <div class="why-grid">
-      <div class="why"><div class="ic">🛡️</div><h3>Safety first</h3><p>Fully licensed by the Nigerian Civil Aviation Authority, with rigorous maintenance and crew standards.</p></div>
-      <div class="why"><div class="ic">⏱</div><h3>On-time, every time</h3><p>We plan around your schedule — dependable departures and arrivals across our network.</p></div>
-      <div class="why"><div class="ic">💺</div><h3>Comfortable fleet</h3><p>Five modern EMB 145 aircraft with generous 15KG checked + 6KG cabin baggage allowance.</p></div>
-      <div class="why"><div class="ic">💰</div><h3>Honest fares</h3><p>Clear pricing with no surprises — change fee ₦10,000, published fare rules before you pay.</p></div>
+<section class="block exp" id="experience">
+  <div class="wrap exp-grid">
+    <div class="exp-img reveal">
+      <img src="rano-cabin.jpg" alt="Premium cabin comfort">
+      <div class="exp-badge"><b>EMB 145 Fleet</b>5 modern aircraft</div>
+    </div>
+    <div class="reveal">
+      <div class="sec-kicker">The Rano experience</div>
+      <h2 class="sec">Comfort at 35,000 feet</h2>
+      <p class="lead">Every Rano Air journey is built around you — generous baggage, honest fares and crew that treat you like family.</p>
+      <div class="feat"><div class="fi">🛡️</div><div><h3>NCAA licensed safety</h3><p>Fully certified operations with rigorous maintenance and crew standards since 2019.</p></div></div>
+      <div class="feat"><div class="fi">🧳</div><div><h3>21KG baggage free</h3><p>15KG checked + 6KG cabin included on every fare. Excess at just ₦1,000/KG.</p></div></div>
+      <div class="feat"><div class="fi">💰</div><div><h3>Honest, clear fares</h3><p>Full fare rules shown before you pay — change fee ₦10,000, no hidden charges.</p></div></div>
+      <div class="feat"><div class="fi">⏱</div><div><h3>On-time, every time</h3><p>We plan around your schedule with dependable departures across our network.</p></div></div>
     </div>
   </div>
 </section>
 
-<section class="block" id="contact">
+<section class="block" id="stories">
   <div class="wrap">
-    <div class="kicker">Get in touch</div>
-    <h2 class="sec">Contact Us</h2>
-    <p class="lead">Questions, group bookings or cargo — our team is happy to help.</p>
+    <div class="sec-kicker reveal">Passenger stories</div>
+    <h2 class="sec reveal">Loved across Nigeria</h2>
+    <p class="lead reveal">Real journeys, real passengers.</p>
+    <div class="quotes">
+      <div class="quote reveal"><div class="stars">★★★★★</div><p>"Kano to Lagos in just over an hour, right on schedule. The crew made it feel effortless."</p><div class="who">Amina S.<small>Frequent flyer · Kano</small></div></div>
+      <div class="quote reveal"><div class="stars">★★★★★</div><p>"Booking took me two minutes and the fare was exactly what was shown. No surprises."</p><div class="who">Chidi O.<small>Business traveller · Abuja</small></div></div>
+      <div class="quote reveal"><div class="stars">★★★★★</div><p>"My first time flying and the team took such good care of me. I'll fly Rano again."</p><div class="who">Fatima B.<small>First-time flyer · Sokoto</small></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="contact" style="padding-top:20px">
+  <div class="wrap">
+    <div class="sec-kicker reveal">Get in touch</div>
+    <h2 class="sec reveal">We're here to help</h2>
+    <p class="lead reveal">Questions, group bookings or cargo — our team is happy to help.</p>
     <div class="contact-grid">
-      <div class="contact-card">
-        <h3>📍 Head Office</h3>
+      <div class="contact-card reveal">
+        <h3 class="serif">📍 Head Office</h3>
         <div class="row"><span class="ric">🏢</span><div>Plot 1497, Cadastral Zone B06,<br>Mabushi District, Abuja FCT</div></div>
         <div class="row"><span class="ric">✉️</span><div><div class="clabel">Email</div><div class="nums"><a href="mailto:customercare@ranoair.com">customercare@ranoair.com</a></div></div></div>
         <div class="row"><span class="ric">📞</span><div><div class="clabel">Call us</div><div class="nums">
@@ -210,25 +291,36 @@
           <a href="https://wa.me/2349169844059">091-6984-4059</a>
         </div></div></div>
       </div>
-      <div class="hours-card">
-        <h3>Popular routes</h3>
-        <div class="route-row"><span>Abuja → Lagos</span><b>from ₦115,000</b></div>
-        <div class="route-row"><span>Kano → Lagos</span><b>from ₦118,000</b></div>
-        <div class="route-row"><span>Abuja → Kano</span><b>from ₦95,000</b></div>
-        <div class="route-row"><span>Lagos → Sokoto</span><b>from ₦125,000</b></div>
-        <div class="route-row"><span>Abuja → Maiduguri</span><b>from ₦120,000</b></div>
+      <div class="routes-card reveal">
+        <h3 class="serif">Popular routes</h3>
+        <div class="route-row"><span>Abuja → Lagos <span class="rt">· 1h 10m</span></span><b>₦115,000</b></div>
+        <div class="route-row"><span>Kano → Lagos <span class="rt">· 1h 15m</span></span><b>₦118,000</b></div>
+        <div class="route-row"><span>Abuja → Kano <span class="rt">· 1h 05m</span></span><b>₦95,000</b></div>
+        <div class="route-row"><span>Lagos → Sokoto <span class="rt">· 1h 30m</span></span><b>₦125,000</b></div>
+        <div class="route-row"><span>Abuja → Maiduguri <span class="rt">· 1h 20m</span></span><b>₦120,000</b></div>
+        <div class="route-row"><span>Kaduna → Lagos <span class="rt">· 1h 15m</span></span><b>₦112,000</b></div>
       </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-bottom:20px">
+  <div class="wrap">
+    <div class="cta-band reveal" style="background:linear-gradient(180deg,rgba(43,5,12,.68),rgba(43,5,12,.92)),url('rano-takeoff.jpg') center/cover">
+      <h2 class="serif">Your next journey starts here.</h2>
+      <p>Join thousands of passengers flying the Rano Way every week.</p>
+      <a class="btn" href="#book">Book Your Flight</a>
     </div>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <div class="concept-note">⚠️ Design concept only — an independent redesign proposal. Not affiliated with or endorsed by Rano Air Limited.</div>
+    <div class="concept-note">⚠️ Independent design concept — a redesign proposal. Not affiliated with or endorsed by Rano Air Limited.</div>
     <div class="foot-grid">
       <div>
-        <div class="logo" style="margin-bottom:12px"><span class="mark">R</span> RANO AIR</div>
-        <p style="opacity:.7;font-size:.92rem;max-width:320px">Safe, reliable, affordable scheduled, charter and cargo flights within and outside Nigeria.</p>
+        <div class="logo" style="margin-bottom:14px"><span class="mark">R</span> RANO&nbsp;AIR</div>
+        <p style="opacity:.7;font-size:.93rem;max-width:340px">Safe, reliable, affordable scheduled, charter and cargo flights within and outside Nigeria since 2019.</p>
       </div>
       <div>
         <h4>Destinations</h4>
@@ -238,47 +330,45 @@
       </div>
       <div>
         <h4>Company</h4>
-        <a class="foot-link" href="#why">About us</a><a class="foot-link" href="#book">Book a flight</a>
+        <a class="foot-link" href="#experience">About us</a><a class="foot-link" href="#book">Book a flight</a>
         <a class="foot-link" href="#contact">Contact</a><a class="foot-link" href="#contact">Refund policy</a>
       </div>
     </div>
-    <div class="copy"><span>© 2026 Rano Air Limited — concept redesign</span><span>Design by Engr Mahmod</span></div>
+    <div class="copy"><span>© 2026 Rano Air Limited — concept redesign</span><span>Developed By Engr Mahmod</span></div>
   </div>
 </footer>
 
 <script>
 const CITIES = [
-  {name:"Lagos", code:"LOS", desc:"Nigeria's commercial capital"},
-  {name:"Abuja", code:"ABV", desc:"The federal capital"},
-  {name:"Kano", code:"KAN", desc:"Centre of commerce"},
-  {name:"Sokoto", code:"SKO", desc:"Seat of the Caliphate"},
-  {name:"Maiduguri", code:"MIU", desc:"Borno's capital"},
-  {name:"Kaduna", code:"KAD", desc:"The northern hub"},
-  {name:"Katsina", code:"DKA", desc:"Home of heritage"},
-  {name:"Bauchi", code:"BCU", desc:"Pearl of tourism"},
-  {name:"Osubi (Warri)", code:"QRW", desc:"Oil city gateway"}
+  {name:"Lagos", code:"LOS", desc:"Nigeria's commercial capital", from:115000},
+  {name:"Abuja", code:"ABV", desc:"The federal capital", from:95000},
+  {name:"Kano", code:"KAN", desc:"Centre of commerce", from:95000},
+  {name:"Sokoto", code:"SKO", desc:"Seat of the Caliphate", from:125000},
+  {name:"Maiduguri", code:"MIU", desc:"Borno's capital", from:120000},
+  {name:"Kaduna", code:"KAD", desc:"The northern hub", from:112000},
+  {name:"Katsina", code:"DKA", desc:"Home of heritage", from:98000},
+  {name:"Bauchi", code:"BCU", desc:"Pearl of tourism", from:105000},
+  {name:"Osubi (Warri)", code:"QRW", desc:"Oil city gateway", from:118000}
 ];
+const IMGS = ["rano-sky.jpg","rano-window.jpg","rano-takeoff.jpg"];
 const fromSel = document.getElementById('from'), toSel = document.getElementById('to');
-CITIES.forEach((c,i)=>{
-  fromSel.add(new Option(`${c.name} (${c.code})`, i));
-  toSel.add(new Option(`${c.name} (${c.code})`, i));
-});
-fromSel.value = 2; toSel.value = 0; // Kano -> Lagos default
+CITIES.forEach((c,i)=>{ fromSel.add(new Option(`${c.name} (${c.code})`, i)); toSel.add(new Option(`${c.name} (${c.code})`, i)); });
+fromSel.value = 2; toSel.value = 0;
 document.getElementById('date').value = new Date(Date.now()+7*864e5).toISOString().slice(0,10);
 document.getElementById('date').min = new Date().toISOString().slice(0,10);
 
-// destinations grid
 const grid = document.getElementById('destGrid');
-CITIES.forEach(c=>{
+CITIES.forEach((c,i)=>{
   const d = document.createElement('div');
-  d.className = 'dest';
-  d.innerHTML = `<span class="code">${c.code}</span><h3>${c.name}</h3><p>${c.desc}</p>`;
-  d.onclick = ()=>{ fromSel.value = CITIES.findIndex(x=>x.code!==c.code); toSel.value = CITIES.indexOf(c);
+  d.className = 'dest reveal';
+  d.innerHTML = `<img src="${IMGS[i%IMGS.length]}" alt="${c.name}" loading="lazy">
+    <div class="dest-info"><span class="code">${c.code}</span><h3 class="serif">${c.name}</h3><p>${c.desc}</p>
+    <div class="from">from ₦${c.from.toLocaleString('en-NG')} →</div></div>`;
+  d.onclick = ()=>{ fromSel.selectedIndex = (i+1)%CITIES.length; toSel.selectedIndex = i;
     document.getElementById('book').scrollIntoView({behavior:'smooth'}); };
   grid.appendChild(d);
 });
 
-// trip toggle
 document.querySelectorAll('.trip-toggle button').forEach(b=>{
   b.onclick = ()=>{ document.querySelectorAll('.trip-toggle button').forEach(x=>x.classList.remove('active')); b.classList.add('active'); };
 });
@@ -299,15 +389,15 @@ document.getElementById('searchBtn').onclick = ()=>{
     {n:"R4 2004", dep:"13:25", arr:"14:40", dur:"1h 15m", price: base+8000, left: 6},
     {n:"R4 2008", dep:"17:45", arr:"19:00", dur:"1h 15m", price: base-6000, left: 9}
   ];
-  let html = `<div class="res-head"><h3>${f.name} → ${t.name}</h3><span>${date} · ${pax} · 3 flights found</span></div>`;
+  let html = `<div class="res-head"><h3 class="serif">${f.name} → ${t.name}</h3><span>${date} · ${pax} · 3 flights found</span></div>`;
   flights.forEach((fl,i)=>{
     html += `<div class="flight">
-      <div><div class="fnum">${fl.n}</div><div class="left-tag">Only ${fl.left} seats left</div></div>
+      <div><div class="fnum">${fl.n}</div><span class="left-tag">Only ${fl.left} seats left</span></div>
       <div class="times">${fl.dep}<small>${f.code}</small></div>
-      <div class="dur">Non-stop<small class="line" style="display:block;min-width:90px"></small>${fl.dur}</div>
+      <div class="dur">Non-stop<div class="rl"></div>${fl.dur}</div>
       <div class="times">${fl.arr}<small>${t.code}</small></div>
-      <div class="price"><b>${naira(fl.price)}</b><small>per adult</small>
-        <button class="btn" style="margin-top:8px;padding:9px 22px;font-size:.9rem" onclick="selectFlight(${i},'${f.code}','${t.code}')">Select</button></div>
+      <div class="price"><b>${naira(fl.price)}</b><small>per adult</small><br>
+        <button class="btn" style="margin-top:8px;padding:10px 24px;font-size:.9rem" onclick="selectFlight(${i},'${f.code}','${t.code}')">Select</button></div>
     </div><div id="fare${i}"></div>`;
   });
   box.className = 'show'; box.innerHTML = html;
@@ -327,6 +417,24 @@ window.selectFlight = (i, fc, tc)=>{
   </div>`;
   document.getElementById('fare'+i).scrollIntoView({behavior:'smooth', block:'center'});
 };
+
+// header scroll
+const hdr = document.getElementById('hdr');
+addEventListener('scroll', ()=> hdr.classList.toggle('scrolled', scrollY > 40), {passive:true});
+
+// reveal on scroll
+const io = new IntersectionObserver(es=>es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target);} }),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+// animated counters
+const cio = new IntersectionObserver(es=>es.forEach(e=>{
+  if(!e.isIntersecting) return; cio.unobserve(e.target);
+  const el = e.target, target = +el.dataset.count, suf = el.dataset.suffix||'';
+  const t0 = performance.now(), dur = 1400;
+  (function tick(t){ const p = Math.min((t-t0)/dur,1), v = Math.round(target*(1-Math.pow(1-p,3)));
+    el.textContent = v + suf; if(p<1) requestAnimationFrame(tick); })(t0);
+}),{threshold:.5});
+document.querySelectorAll('[data-count]').forEach(el=>cio.observe(el));
 </script>
 </body>
 </html>
