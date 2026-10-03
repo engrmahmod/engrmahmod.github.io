@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Umza Air — Booking Flow Concept</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  :root{
+    --green:#178040; --green-dark:#0d5c2d; --green-deep:#083d1e;
+    --gold:#e2a81d; --gold-soft:#fdf3dd;
+    --ink:#10231a; --mut:#5d6f63; --line:#e3ece7; --bg:#f2f6f3; --card:#ffffff;
+  }
+  html,body{background:#0b1510}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,Arial,sans-serif;color:var(--ink);
+    display:flex;justify-content:center;min-height:100vh}
+  .phone{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;
+    padding-bottom:110px;box-shadow:0 0 60px rgba(0,0,0,.5)}
+  /* header */
+  .topbar{position:sticky;top:0;z-index:20;background:linear-gradient(135deg,var(--green-dark),var(--green) 60%,#1f9a4e);
+    color:#fff;padding:14px 16px 18px;border-radius:0 0 22px 22px}
+  .brandrow{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;letter-spacing:.5px}
+  .logo .mark{width:34px;height:34px;border-radius:11px;background:#fff;color:var(--green-dark);
+    display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900}
+  .concept{font-size:10.5px;font-weight:700;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.35);
+    padding:5px 10px;border-radius:999px;letter-spacing:.6px}
+  .route{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);border-radius:16px;
+    padding:12px 14px;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(6px)}
+  .route .cities{font-size:17px;font-weight:800}
+  .route .cities small{font-weight:600;opacity:.85;font-size:12px}
+  .route .meta{font-size:12px;opacity:.92;margin-top:3px}
+  .modify{background:#fff;color:var(--green-dark);border:0;font-weight:800;font-size:12.5px;
+    padding:9px 14px;border-radius:999px;cursor:pointer;white-space:nowrap}
+  /* day strip */
+  .days{display:flex;gap:8px;overflow-x:auto;padding:14px 16px 4px;scrollbar-width:none}
+  .days::-webkit-scrollbar{display:none}
+  .day{min-width:74px;background:var(--card);border:1.5px solid var(--line);border-radius:14px;
+    padding:9px 4px;text-align:center;cursor:pointer;flex-shrink:0;transition:.15s}
+  .day .dw{font-size:11px;color:var(--mut);font-weight:700}
+  .day .dn{font-size:17px;font-weight:800;margin:2px 0}
+  .day .dp{font-size:11px;color:var(--mut);font-weight:600}
+  .day.sel{border-color:var(--green);background:#eaf6ee;box-shadow:0 4px 14px rgba(23,128,64,.18)}
+  .day.sel .dp{color:var(--green-dark)}
+  .day .cheap{display:inline-block;font-size:9px;font-weight:800;color:#8a6410;background:var(--gold-soft);
+    border-radius:99px;padding:2px 7px;margin-top:4px}
+  /* toolbar */
+  .toolbar{display:flex;gap:8px;align-items:center;padding:12px 16px 2px;overflow-x:auto;scrollbar-width:none}
+  .toolbar::-webkit-scrollbar{display:none}
+  .chip{border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;
+    font-size:12.5px;font-weight:700;color:var(--mut);cursor:pointer;white-space:nowrap}
+  .chip.on{background:var(--green-dark);border-color:var(--green-dark);color:#fff}
+  .count{margin-left:auto;font-size:12px;color:var(--mut);font-weight:600;white-space:nowrap;padding-right:2px}
+  /* flight cards */
+  .list{padding:10px 16px;display:flex;flex-direction:column;gap:12px}
+  .fcard{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:16px;
+    cursor:pointer;transition:.15s;position:relative}
+  .fcard.sel{border-color:var(--green);box-shadow:0 8px 24px rgba(23,128,64,.16)}
+  .fcard .tag{position:absolute;top:-10px;left:14px;font-size:10px;font-weight:800;letter-spacing:.5px;
+    background:var(--gold);color:#3d2c05;padding:4px 10px;border-radius:999px}
+  .frow{display:flex;align-items:center;justify-content:space-between}
+  .time{font-size:21px;font-weight:800}
+  .code{font-size:12px;color:var(--mut);font-weight:700;margin-top:2px}
+  .mid{flex:1;margin:0 12px;text-align:center}
+  .dur{font-size:11px;color:var(--mut);font-weight:700}
+  .arc{position:relative;height:26px;margin:4px 0}
+  .arc::before{content:"";position:absolute;left:6px;right:6px;top:12px;height:2px;background:var(--line);border-radius:2px}
+  .arc .dot{position:absolute;top:8px;width:10px;height:10px;border-radius:50%;background:var(--green)}
+  .arc .dot.l{left:2px}.arc .dot.r{right:2px;background:var(--gold)}
+  .arc .plane{position:absolute;left:50%;top:2px;transform:translateX(-50%);font-size:15px}
+  .nonstop{display:inline-block;font-size:10px;font-weight:800;color:var(--green-dark);background:#e7f4ec;
+    padding:3px 9px;border-radius:999px;margin-top:5px}
+  .price{text-align:right}
+  .price .from{font-size:11px;color:var(--mut)}
+  .price .amt{font-size:20px;font-weight:800;color:var(--green-dark)}
+  .fmeta{display:flex;align-items:center;justify-content:space-between;margin-top:12px;
+    border-top:1px dashed var(--line);padding-top:12px}
+  .fno{font-size:12px;color:var(--mut);font-weight:700}
+  .selectbtn{background:var(--green);color:#fff;border:0;font-weight:800;font-size:13.5px;
+    padding:10px 22px;border-radius:999px;cursor:pointer}
+  .fcard.sel .selectbtn{background:var(--green-dark)}
+  .empty{background:var(--card);border:1.5px dashed var(--line);border-radius:18px;padding:34px 16px;
+    text-align:center;color:var(--mut);font-size:14px}
+  /* sticky bar */
+  .sticky{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;z-index:30;
+    background:rgba(255,255,255,.96);backdrop-filter:blur(10px);border-top:1px solid var(--line);
+    padding:12px 16px calc(14px + env(safe-area-inset-bottom));display:flex;align-items:center;
+    justify-content:space-between;box-shadow:0 -8px 30px rgba(0,0,0,.08)}
+  .sticky .t1{font-size:12px;color:var(--mut);font-weight:600}
+  .sticky .t2{font-size:19px;font-weight:800;color:var(--green-dark)}
+  .gobtn{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#fff;border:0;font-weight:800;
+    font-size:15px;padding:14px 30px;border-radius:999px;cursor:pointer;box-shadow:0 6px 18px rgba(23,128,64,.35)}
+  /* passenger step */
+  .paxcard{background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px;margin:14px 16px 0}
+  .paxcard h3{font-size:15px;margin-bottom:12px}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--mut);margin-bottom:6px}
+  .field input,.field select{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:13px;
+    font-size:15px;font-family:inherit;background:#fbfdfc;color:var(--ink)}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--green)}
+  .sumrow{display:flex;justify-content:space-between;font-size:13.5px;padding:7px 0;color:var(--mut)}
+  .sumrow.total{border-top:1px dashed var(--line);margin-top:6px;padding-top:12px;color:var(--ink);
+    font-weight:800;font-size:16px}
+  .sumrow.total .amt{color:var(--green-dark);font-size:20px}
+  .backbtn{background:none;border:0;color:var(--green-dark);font-weight:800;font-size:13.5px;cursor:pointer;
+    margin:14px 16px 0;padding:6px 2px}
+  /* done */
+  .donewrap{padding:40px 24px;text-align:center}
+  .checkmark{width:84px;height:84px;border-radius:50%;background:#e7f4ec;color:var(--green);
+    font-size:42px;display:flex;align-items:center;justify-content:center;margin:0 auto 18px;font-weight:900}
+  .donewrap h2{font-size:22px;margin-bottom:8px}
+  .donewrap p{color:var(--mut);font-size:14px;line-height:1.6}
+  .refbox{background:var(--card);border:1.5px dashed var(--green);border-radius:16px;padding:16px;margin:20px 0}
+  .refbox .rl{font-size:11px;color:var(--mut);font-weight:700;letter-spacing:1px}
+  .refbox .rv{font-size:26px;font-weight:800;color:var(--green-dark);letter-spacing:2px;margin-top:4px}
+  .credit{text-align:center;font-size:11.5px;color:var(--mut);padding:26px 16px 8px}
+  #toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:#10231a;
+    color:#fff;font-size:13.5px;font-weight:600;padding:12px 20px;border-radius:999px;opacity:0;
+    transition:.25s;z-index:50;pointer-events:none;max-width:90%;text-align:center}
+  #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="topbar">
+    <div class="brandrow">
+      <div class="logo"><span class="mark">✈</span> UMZA AIR</div>
+      <div class="concept">DESIGN CONCEPT</div>
+    </div>
+    <div class="route">
+      <div>
+        <div class="cities">KAN <small>→</small> ABV</div>
+        <div class="meta" id="tripmeta">Thu 08 Oct · 1 Adult · Economy · One-way</div>
+      </div>
+      <button class="modify" onclick="toast('Modify search is part of the full concept')">Modify</button>
+    </div>
+  </div>
+
+  <!-- STEP 1: RESULTS -->
+  <div id="step-results">
+    <div class="days" id="days"></div>
+    <div class="toolbar" id="toolbar">
+      <button class="chip on" data-f="all">All</button>
+      <button class="chip" data-f="morning">Morning</button>
+      <button class="chip" data-f="afternoon">Afternoon</button>
+      <button class="chip" data-f="evening">Evening</button>
+      <button class="chip on" data-s="cheap">₦ Cheapest</button>
+      <button class="chip" data-s="early">Earliest</button>
+      <span class="count" id="count"></span>
+    </div>
+    <div class="list" id="list"></div>
+    <div class="credit">Design concept by Engr Mahmod · not affiliated with Umza Air</div>
+  </div>
+
+  <!-- STEP 2: PASSENGER -->
+  <div id="step-pax" hidden>
+    <button class="backbtn" onclick="goStep('results')">← Back to flights</button>
+    <div class="paxcard">
+      <h3>Who's flying?</h3>
+      <div class="field"><label>FIRST NAME</label><input id="fn" placeholder="e.g. Mahmod" autocomplete="given-name"></div>
+      <div class="field"><label>LAST NAME</label><input id="ln" placeholder="e.g. Aminu" autocomplete="family-name"></div>
+      <div class="field"><label>PHONE (WHATSAPP)</label><input id="ph" inputmode="tel" placeholder="e.g. 0803 000 0000" autocomplete="tel"></div>
+      <div class="field"><label>EMAIL</label><input id="em" inputmode="email" placeholder="you@example.com" autocomplete="email"></div>
+    </div>
+    <div class="paxcard">
+      <h3>Fare summary</h3>
+      <div id="faresum"></div>
+    </div>
+    <div class="credit">Design concept by Engr Mahmod · not affiliated with Umza Air</div>
+  </div>
+
+  <!-- STEP 3: DONE -->
+  <div id="step-done" hidden>
+    <div class="donewrap">
+      <div class="checkmark">✓</div>
+      <h2>You're going to Abuja!</h2>
+      <p id="donesub"></p>
+      <div class="refbox">
+        <div class="rl">BOOKING REFERENCE</div>
+        <div class="rv" id="refcode">UMZ-8X4K2Q</div>
+      </div>
+      <p>A confirmation email and WhatsApp message<br>are on the way. Safe travels ✈</p>
+      <div class="credit">Design concept by Engr Mahmod · demo only, no real booking was made</div>
+    </div>
+  </div>
+
+  <div class="sticky" id="sticky" hidden>
+    <div><div class="t1" id="stickysub">UY-426 · 11:20 AM</div><div class="t2" id="stickytotal">₦134,000</div></div>
+    <button class="gobtn" onclick="goStep('pax')">Continue →</button>
+  </div>
+  <div id="toast"></div>
+</div>
+
+<script>
+const DAYS=[
+ {d:'Mon',n:5,p:134000},{d:'Tue',n:6,p:134000},{d:'Wed',n:7,p:134000},
+ {d:'Thu',n:8,p:134000,sel:true},{d:'Fri',n:9,p:136000},
+ {d:'Sat',n:10,p:144000},{d:'Sun',n:11,p:134000}
+];
+const FLIGHTS=[
+ {no:'UY-426',dep:'11:20 AM',depMin:680,arr:'12:20 PM',dur:'1h 0m',price:134000,tag:'BEST PRICE',tod:'morning'},
+ {no:'UY-428',dep:'3:45 PM',depMin:945,arr:'4:45 PM',dur:'1h 0m',price:141000,tag:'',tod:'afternoon'},
+ {no:'UY-430',dep:'7:10 PM',depMin:1150,arr:'8:10 PM',dur:'1h 0m',price:138000,tag:'',tod:'evening'}
+];
+let selDay=3, filter='all', sort='cheap', selected=null;
+const fmt=n=>'₦'+n.toLocaleString('en-NG');
+const $=id=>document.getElementById(id);
+
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');
+ clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2200);}
+
+function renderDays(){
+ const minP=Math.min(...DAYS.map(x=>x.p));
+ $('days').innerHTML=DAYS.map((x,i)=>
+  `<div class="day${i===selDay?' sel':''}" onclick="setDay(${i})">
+    <div class="dw">${x.d}</div><div class="dn">${x.n}</div>
+    <div class="dp">${fmt(x.p)}</div>
+    ${x.p===minP?'<div class="cheap">CHEAPEST</div>':''}
+   </div>`).join('');
+ const dd=DAYS[selDay];
+ $('tripmeta').textContent=`${dd.d} ${String(dd.n).padStart(2,'0')} Oct · 1 Adult · Economy · One-way`;
+}
+function setDay(i){selDay=i;selected=null;$('sticky').hidden=true;renderDays();renderList();}
+
+document.querySelectorAll('#toolbar .chip').forEach(c=>c.addEventListener('click',()=>{
+ if(c.dataset.f){filter=c.dataset.f;
+  document.querySelectorAll('#toolbar .chip[data-f]').forEach(x=>x.classList.toggle('on',x===c));}
+ else{sort=c.dataset.s;
+  document.querySelectorAll('#toolbar .chip[data-s]').forEach(x=>x.classList.toggle('on',x===c));}
+ renderList();
+}));
+
+function priceFor(f){return f.price+(DAYS[selDay].p-134000);}
+function renderList(){
+ let arr=FLIGHTS.filter(f=>filter==='all'||f.tod===filter);
+ arr=arr.slice().sort((a,b)=>sort==='cheap'?priceFor(a)-priceFor(b):a.depMin-b.depMin);
+ $('count').textContent=arr.length+' flight'+(arr.length===1?'':'s');
+ $('list').innerHTML=arr.length?arr.map(f=>{
+  const p=priceFor(f),i=FLIGHTS.indexOf(f),sel=selected===i;
+  return `<div class="fcard${sel?' sel':''}" onclick="selectFlight(${i})">
+   ${f.tag?`<div class="tag">★ ${f.tag}</div>`:''}
+   <div class="frow">
+     <div><div class="time">${f.dep}</div><div class="code">Kano (KAN)</div></div>
+     <div class="mid"><div class="dur">${f.dur}</div>
+       <div class="arc"><span class="dot l"></span><span class="plane">✈</span><span class="dot r"></span></div>
+       <span class="nonstop">Nonstop</span></div>
+     <div><div class="time">${f.arr}</div><div class="code">Abuja (ABV)</div></div>
+   </div>
+   <div class="fmeta"><span class="fno">${f.no} · Economy</span>
+     <div class="price"><div class="from">from</div><div class="amt">${fmt(p)}</div></div>
+   </div>
+   <div style="margin-top:12px;text-align:right">
+     <button class="selectbtn">${sel?'✓ Selected':'Select →'}</button>
+   </div>
+  </div>`;}).join('')
+ :'<div class="empty">No flights in this time window.<br>Try another filter.</div>';
+}
+function selectFlight(i){
+ selected=i;const f=FLIGHTS[i];
+ $('stickysub').textContent=`${f.no} · ${f.dep} → ${f.arr}`;
+ $('stickytotal').textContent=fmt(priceFor(f));
+ $('sticky').hidden=false;renderList();
+}
+function goStep(s){
+ ['results','pax','done'].forEach(x=>$('step-'+x).hidden=x!==s);
+ if(s==='pax'){
+  if(selected===null){toast('Select a flight first');return;}
+  const f=FLIGHTS[selected],p=priceFor(f);
+  $('faresum').innerHTML=
+   `<div class="sumrow"><span>${f.no} · Kano → Abuja</span><span>${fmt(p)}</span></div>
+    <div class="sumrow"><span>Taxes & charges</span><span>Included</span></div>
+    <div class="sumrow total"><span>Total</span><span class="amt">${fmt(p)}</span></div>`;
+  $('sticky').hidden=true;
+ }
+ if(s==='results'){$('sticky').hidden=selected===null;}
+ window.scrollTo({top:0});
+}
+function finishBooking(){
+ const fn=$('fn').value.trim(),ln=$('ln').value.trim(),
+       ph=$('ph').value.trim(),em=$('em').value.trim();
+ if(!fn||!ln||!ph||!em){toast('Please fill in all passenger details');return;}
+ if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){toast('That email doesn\'t look right');return;}
+ const f=FLIGHTS[selected];
+ $('donesub').innerHTML=`${fn}, your seat on <b>${f.no}</b> · Kano → Abuja<br>${DAYS[selDay].d} ${DAYS[selDay].n} Oct · ${f.dep} · ${fmt(priceFor(f))}`;
+ $('refcode').textContent='UMZ-'+Math.random().toString(36).slice(2,7).toUpperCase();
+ goStep('done');
+}
+/* sticky Continue uses its inline onclick; pax-step button created below */
+// continue button inside pax step
+const cont=document.createElement('button');
+cont.className='gobtn';cont.style.cssText='display:block;width:calc(100% - 32px);margin:16px auto 0';
+cont.textContent='Continue to payment →';cont.onclick=finishBooking;
+$('step-pax').appendChild(cont);
+renderDays();renderList();
+</script>
+</body>
+</html>
