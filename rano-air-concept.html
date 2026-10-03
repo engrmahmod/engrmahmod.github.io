@@ -29,6 +29,7 @@
   .nav{display:flex;align-items:center;justify-content:space-between;height:76px;color:#fff}
   .logo{display:flex;align-items:center;gap:12px;font-weight:800;font-size:1.35rem;letter-spacing:2px}
   .logo .mark{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));display:flex;align-items:center;justify-content:center;color:var(--maroon-deep);font-weight:900;font-family:'Playfair Display',serif;font-size:1.3rem;box-shadow:0 4px 14px rgba(227,172,47,.4)}
+  .logo .mark-img{width:44px;height:44px;border-radius:50%;object-fit:cover;transform:scale(1.12);background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.35);flex:none}
   .nav-links{display:flex;gap:32px;font-size:.95rem;font-weight:500}
   .nav-links a{opacity:.85;position:relative;transition:.2s}
   .nav-links a::after{content:"";position:absolute;left:0;bottom:-6px;width:0;height:2px;background:var(--gold);transition:.25s}
@@ -181,6 +182,7 @@
     .nav{height:66px}
     .logo{font-size:1.02rem;letter-spacing:1px;gap:8px}
     .logo .mark{width:34px;height:34px;font-size:1rem}
+    .logo .mark-img{width:36px;height:36px}
     .nav .btn{padding:9px 18px;font-size:.82rem;white-space:nowrap}
     .contact-card{padding:18px 16px;max-width:350px;margin:0 auto}
     .contact-card h3{font-size:1.05rem;margin-bottom:12px}
@@ -199,7 +201,7 @@
 
 <header id="hdr">
   <div class="wrap nav">
-    <div class="logo"><span class="mark">R</span> RANO&nbsp;AIR</div>
+    <div class="logo"><img class="mark-img" src="rano-logo.jpg" alt="Rano Air"> RANO&nbsp;AIR</div>
     <nav class="nav-links">
       <a href="#book">Book</a><a href="#destinations">Destinations</a><a href="#experience">Experience</a><a href="#contact">Contact</a>
     </nav>
@@ -336,7 +338,7 @@
     <div class="concept-note">⚠️ Independent design concept — a redesign proposal. Not affiliated with or endorsed by Rano Air Limited.</div>
     <div class="foot-grid">
       <div>
-        <div class="logo" style="margin-bottom:14px"><span class="mark">R</span> RANO&nbsp;AIR</div>
+        <div class="logo" style="margin-bottom:14px"><img class="mark-img" src="rano-logo.jpg" alt="Rano Air"> RANO&nbsp;AIR</div>
         <p style="opacity:.7;font-size:.93rem;max-width:340px">Safe, reliable, affordable scheduled, charter and cargo flights within and outside Nigeria since 2019.</p>
       </div>
       <div>
