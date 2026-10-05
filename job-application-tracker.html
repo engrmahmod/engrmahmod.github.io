@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JAT — Job Application Tracker</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><text x='50' y='68' font-size='52' text-anchor='middle' fill='white' font-family='Arial' font-weight='bold'>J</text></svg>">
+<style>
+:root{
+  --bg:#070b16; --bg2:#080c17; --card:#0c1322; --card2:#0f1729;
+  --border:#1c2742; --text:#e9edf5; --muted:#8b94a9;
+  --blue:#2563eb; --blue-lt:#60a5fa;
+  --green:#22c55e; --sky:#3b82f6; --orange:#f59e0b; --purple:#a855f7; --red:#ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:Inter,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;font-size:14px;line-height:1.5}
+.app{display:flex;min-height:100vh}
+/* ---------- sidebar ---------- */
+.sidebar{width:250px;background:var(--bg2);border-right:1px solid var(--border);padding:22px 14px;position:fixed;top:0;bottom:0;left:0;display:flex;flex-direction:column;z-index:60;transition:transform .25s ease}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 20px}
+.brand-mark{width:38px;height:38px;border-radius:10px;background:var(--blue);display:grid;place-items:center;font-weight:800;font-size:17px;color:#fff;flex:none}
+.brand small{display:block;color:var(--muted);font-size:10.5px;font-weight:400}
+.brand b{font-size:15px}
+.nav{display:flex;flex-direction:column;gap:4px}
+.nav button{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;color:var(--muted);font-size:13.5px;font-weight:500;padding:11px 12px;border-radius:10px;cursor:pointer;text-align:left}
+.nav button .ic{font-size:16px;width:20px;text-align:center}
+.nav button:hover{background:#101828;color:var(--text)}
+.nav button.active{background:var(--blue);color:#fff}
+.side-foot{margin-top:auto;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px;font-size:12px;color:var(--muted)}
+.side-foot .ic{font-size:20px}
+/* ---------- main / topbar ---------- */
+.main{margin-left:250px;flex:1;min-width:0;padding:0 30px 60px}
+.topbar{display:flex;align-items:center;gap:14px;padding:20px 0}
+.menu-btn{display:none;background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:10px;padding:9px 12px;font-size:16px;cursor:pointer}
+.search{flex:1;max-width:380px;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:10px 14px;color:var(--muted)}
+.search input{background:none;border:0;outline:0;color:var(--text);width:100%;font-size:13.5px}
+.top-right{margin-left:auto;display:flex;align-items:center;gap:14px}
+.bell{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;font-size:17px;cursor:pointer}
+.bell .dot{position:absolute;top:8px;right:10px;width:8px;height:8px;border-radius:50%;background:var(--red)}
+.user-chip{display:flex;align-items:center;gap:10px}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#2563eb,#7c3aed);display:grid;place-items:center;font-weight:700;font-size:14px;flex:none;overflow:hidden}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.user-chip small{display:block;color:var(--muted);font-size:11px}
+.user-chip b{font-size:13px}
+.date-lbl{color:var(--muted);font-size:12.5px;white-space:nowrap}
+/* ---------- generic ---------- */
+h1{font-size:22px;font-weight:700}
+.sub{color:var(--muted);font-size:13px;margin-top:2px}
+.page-head{display:flex;align-items:flex-start;gap:16px;margin:6px 0 20px}
+.btn{background:var(--blue);color:#fff;border:0;border-radius:10px;padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{background:#1d4ed8}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--border);border-radius:10px;padding:10px 16px;font-size:13px;font-weight:600;cursor:pointer}
+.btn-ghost:hover{border-color:#2c3a5e}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px}
+.cards4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:16px}
+.stat-ic{width:42px;height:42px;border-radius:11px;display:grid;place-items:center;font-size:19px;margin-bottom:12px}
+.stat-lbl{color:var(--muted);font-size:12.5px}
+.stat-num{font-size:27px;font-weight:700;margin:2px 0}
+.delta{font-size:12px;color:var(--green)}
+.grid2{display:grid;grid-template-columns:1fr 1.35fr;gap:16px;margin-bottom:16px}
+.card h3{font-size:14.5px;font-weight:600;margin-bottom:14px}
+.link{color:var(--blue-lt);font-size:12.5px;cursor:pointer;text-decoration:none}
+.link:hover{text-decoration:underline}
+/* pills */
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:4px 11px;border-radius:20px;white-space:nowrap}
+.pill.Applied{background:rgba(34,197,94,.14);color:#4ade80}
+.pill.Interview{background:rgba(59,130,246,.16);color:#60a5fa}
+.pill.Assessment{background:rgba(245,158,11,.14);color:#fbbf24}
+.pill.Offer{background:rgba(168,85,247,.16);color:#c084fc}
+.pill.Rejected{background:rgba(239,68,68,.14);color:#f87171}
+/* tables / lists */
+.rowline{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #141d33}
+.rowline:last-child{border-bottom:0}
+.cmp-logo{width:38px;height:38px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:16px;color:#fff;flex:none}
+.rowline .grow{flex:1;min-width:0}
+.rowline b{font-size:13.5px;display:block}
+.rowline small{color:var(--muted);font-size:12px}
+.ago{color:var(--muted);font-size:12px;white-space:nowrap}
+/* tabs */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tabs button{background:var(--card);border:1px solid var(--border);color:var(--muted);border-radius:20px;padding:8px 15px;font-size:12.5px;font-weight:600;cursor:pointer}
+.tabs button.active{background:var(--blue);border-color:var(--blue);color:#fff}
+/* applications table */
+.tbl-tools{display:flex;gap:12px;align-items:center;margin-bottom:12px}
+.tbl-tools .search{max-width:300px}
+select,input[type=text],input[type=date],input[type=email],input[type=url],textarea{background:#0a1120;border:1px solid var(--border);color:var(--text);border-radius:10px;padding:10px 13px;font-size:13.5px;font-family:inherit;width:100%;outline:0}
+select:focus,input:focus,textarea:focus{border-color:var(--blue)}
+table.tbl{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.tbl th{text-align:left;color:var(--muted);font-size:12px;font-weight:600;padding:13px 16px;border-bottom:1px solid var(--border);background:#0a101f}
+.tbl td{padding:13px 16px;border-bottom:1px solid #141d33;font-size:13.5px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:hover{background:#0e1628}
+.tbl .cmp{display:flex;align-items:center;gap:12px}
+/* forms */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 20px}
+.field label{display:block;font-size:12.5px;font-weight:600;margin-bottom:7px}
+.field label .req{color:var(--red)}
+.field .hint{font-size:11.5px;color:var(--muted);font-weight:400}
+.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:22px}
+/* detail */
+.back-link{color:var(--muted);font-size:13px;cursor:pointer;margin-bottom:12px;display:inline-block}
+.back-link:hover{color:var(--text)}
+.detail-head{display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.detail-head .grow{flex:1}
+.detail-tabs{display:flex;gap:22px;border-bottom:1px solid var(--border);margin-bottom:18px}
+.detail-tabs button{background:none;border:0;color:var(--muted);font-size:13.5px;font-weight:600;padding:10px 2px;cursor:pointer;border-bottom:2px solid transparent}
+.detail-tabs button.active{color:var(--blue-lt);border-bottom-color:var(--blue)}
+.kv{display:flex;gap:12px;padding:9px 0;font-size:13.5px;border-bottom:1px solid #141d33}
+.kv:last-child{border-bottom:0}
+.kv .k{color:var(--muted);width:130px;flex:none}
+.kv .ic{width:20px;text-align:center}
+/* calendar */
+.cal-head{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.cal-head h3{font-size:15px;margin:0}
+.cal-nav{background:var(--card);border:1px solid var(--border);color:var(--text);border-radius:8px;width:32px;height:32px;cursor:pointer}
+.seg{display:flex;background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.seg button{background:none;border:0;color:var(--muted);padding:9px 16px;font-size:12.5px;font-weight:600;cursor:pointer}
+.seg button.active{background:var(--blue);color:#fff}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-dow{color:var(--muted);font-size:11.5px;font-weight:600;text-align:center;padding:6px 0}
+.cal-day{background:var(--card);border:1px solid var(--border);border-radius:10px;min-height:92px;padding:8px;font-size:12px;cursor:pointer}
+.cal-day.dim{opacity:.35}
+.cal-day.today{border-color:var(--blue)}
+.cal-day .dn{color:var(--muted);font-weight:600;margin-bottom:4px}
+.ev{font-size:10.5px;font-weight:600;border-radius:6px;padding:3px 6px;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+/* analytics */
+.legend{display:flex;flex-direction:column;gap:9px;font-size:12.5px}
+.legend .li{display:flex;align-items:center;gap:9px}
+.legend .sw{width:10px;height:10px;border-radius:3px;flex:none}
+.legend .pc{margin-left:auto;color:var(--muted)}
+/* profile */
+.prof-head{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.avatar.lg{width:64px;height:64px;font-size:24px}
+.switch{position:relative;width:44px;height:24px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.sl{position:absolute;inset:0;background:#26314f;border-radius:20px;cursor:pointer;transition:.2s}
+.sl:before{content:"";position:absolute;width:18px;height:18px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+.switch input:checked+.sl{background:var(--blue)}
+.switch input:checked+.sl:before{transform:translateX(20px)}
+.pref-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #141d33;font-size:13.5px}
+.pref-row:last-child{border:0}
+/* toast */
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:#12203a;border:1px solid var(--blue);color:#fff;padding:12px 22px;border-radius:12px;font-size:13.5px;font-weight:600;opacity:0;transition:.25s;z-index:99;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* responsive */
+.scrim{display:none}
+@media(max-width:920px){
+  .sidebar{transform:translateX(-105%)}
+  body.nav-open .sidebar{transform:none}
+  body.nav-open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55}
+  .main{margin-left:0;padding:0 16px 50px}
+  .menu-btn{display:block}
+  .cards4{grid-template-columns:1fr 1fr}
+  .grid2{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .date-lbl{display:none}
+  .tbl-wrap{overflow-x:auto}
+  table.tbl{min-width:640px}
+  .cal-day{min-height:64px}
+}
+@media(max-width:560px){.cards4{grid-template-columns:1fr}.user-chip .who{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><div class="brand-mark">J</div><div><b>JAT</b><small>Job Application Tracker</small></div></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot"><div class="ic">🚀</div><div style="margin-top:8px;font-weight:600;color:var(--text)">Better applications.</div><div>Bigger opportunities.</div></div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn">☰</button>
+      <div class="search"><span>🔍</span><input id="topSearch" placeholder="Search jobs, companies, or positions..."></div>
+      <div class="top-right">
+        <span class="date-lbl" id="dateLbl"></span>
+        <div class="bell" id="bellBtn">🔔<span class="dot" id="bellDot" style="display:none"></span></div>
+        <div class="user-chip"><div class="avatar" id="topAvatar">M</div><div class="who"><b id="topName">Mahmod</b><small>Software Engineer</small></div></div>
+      </div>
+    </div>
+    <div id="view"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+"use strict";
+/* ================= state ================= */
+const LS_KEY = "jat_state_v1";
+const STATUS_COLORS = {Applied:"#22c55e",Interview:"#3b82f6",Assessment:"#f59e0b",Offer:"#a855f7",Rejected:"#ef4444"};
+const STATUS_ORDER = ["Applied","Interview","Assessment","Offer","Rejected"];
+
+function seed(){
+  return {
+    seq: 7,
+    route: {view:"dashboard"},
+    appTab: "All", appQ: "", appSort: "recent",
+    calY: 2026, calM: 9,
+    detailTab: "overview",
+    profile: {name:"Mahmod", full:"Mahmod Aminu", title:"Software Engineer",
+      email:"mahmodaminu@gmail.com", phone:"+234 801 234 5678", location:"Nigeria", resume:""},
+    prefs: {emailNotif:true, appReminders:true, interviewReminders:true, darkMode:true},
+    apps: [
+      {id:"a1",company:"Google",position:"Software Engineer",location:"Mountain View, CA, USA",jobType:"Full-time",
+       salary:"$120,000 - $180,000 / year",link:"https://careers.google.com",applied:"2026-09-29",
+       recruiter:"Sarah Johnson",recruiterMail:"sarah.johnson@google.com",status:"Interview",
+       nextStep:"Technical Interview",nextDate:"2026-10-10",
+       notes:"Good experience with the recruiter. Technical interview will be on Google Meet. Prepare for system design and coding questions.",
+       noteUpdated:"Oct 5, 2026, 10:24 AM",source:"LinkedIn",color:"#4285F4",letter:"G"},
+      {id:"a2",company:"Microsoft",position:"Software Engineer",location:"Remote",jobType:"Full-time",
+       salary:"",link:"",applied:"2026-10-02",recruiter:"",recruiterMail:"",status:"Applied",
+       nextStep:"",nextDate:"",notes:"",noteUpdated:"",source:"LinkedIn",color:"#00A4EF",letter:"M"},
+      {id:"a3",company:"Amazon",position:"Backend Developer",location:"",jobType:"",
+       salary:"",link:"",applied:"2026-10-03",recruiter:"",recruiterMail:"",status:"Assessment",
+       nextStep:"Online Assessment",nextDate:"2026-10-08",notes:"",noteUpdated:"",source:"Company Website",color:"#FF9900",letter:"a"},
+      {id:"a4",company:"Meta",position:"Software Engineer",location:"",jobType:"",
+       salary:"",link:"",applied:"2026-09-25",recruiter:"",recruiterMail:"",status:"Offer",
+       nextStep:"Offer Review",nextDate:"2026-10-05",notes:"",noteUpdated:"",source:"Referral",color:"#0668E1",letter:"∞"},
+      {id:"a5",company:"Apple",position:"iOS Developer",location:"",jobType:"",
+       salary:"",link:"",applied:"2026-09-28",recruiter:"",recruiterMail:"",status:"Applied",
+       nextStep:"",nextDate:"",notes:"",noteUpdated:"",source:"Company Website",color:"#8E8E93",letter:""},
+      {id:"a6",company:"Tesla",position:"Software Engineer",location:"",jobType:"",
+       salary:"",link:"",applied:"2026-09-20",recruiter:"",recruiterMail:"",status:"Rejected",
+       nextStep:"",nextDate:"",notes:"",noteUpdated:"",source:"Other",color:"#E31937",letter:"T"}
+    ]
+  };
+}
+let S;
+try { S = JSON.parse(localStorage.getItem(LS_KEY)) || seed(); }
+catch(e){ S = seed(); }
+if(!S.apps) S = seed();
+function save(){ try{ localStorage.setItem(LS_KEY, JSON.stringify(S)); }catch(e){} }
+
+/* ================= helpers ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+const MON_S = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtD(iso){
+  if(!iso) return "—";
+  const [y,m,d] = iso.split("-").map(Number);
+  return `${MON_S[m-1]} ${d}, ${y}`;
+}
+function relD(iso){
+  if(!iso) return "";
+  const days = Math.round((Date.now() - new Date(iso+"T12:00:00").getTime())/864e5);
+  if(days<=0) return "today";
+  if(days===1) return "1 day ago";
+  if(days<7) return days+" days ago";
+  if(days<14) return "1 week ago";
+  return Math.round(days/7)+" weeks ago";
+}
+function pill(st){ return `<span class="pill ${esc(st)}">${esc(st)}</span>`; }
+function logo(a, sz){
+  const s = sz||38;
+  return `<div class="cmp-logo" style="width:${s}px;height:${s}px;background:${esc(a.color||"#334155")};font-size:${Math.round(s*0.45)}px">${esc(a.letter||a.company[0]||"•")}</div>`;
+}
+function toast(msg){
+  const t = $("#toast"); t.textContent = msg; t.classList.add("show");
+  clearTimeout(t._h); t._h = setTimeout(()=>t.classList.remove("show"), 2200);
+}
+function donut(segs, size, thick, centerTop, centerSub){
+  const R = 54, C = 2*Math.PI*R, total = segs.reduce((a,s)=>a+s.v,0)||1;
+  let off = 25, circles = "";
+  segs.forEach(s=>{
+    const len = s.v/total*100;
+    circles += `<circle cx="60" cy="60" r="${R}" fill="none" stroke="${s.c}" stroke-width="${thick}" stroke-dasharray="${len} ${100-len}" stroke-dashoffset="${off}" stroke-linecap="butt" pathLength="100"/>`;
+    off -= len;
+  });
+  return `<svg width="${size}" height="${size}" viewBox="0 0 120 120" style="transform:rotate(0deg)">
+    ${circles}
+    <text x="60" y="58" text-anchor="middle" fill="#e9edf5" font-size="22" font-weight="700">${esc(centerTop)}</text>
+    ${centerSub?`<text x="60" y="76" text-anchor="middle" fill="#8b94a9" font-size="11">${esc(centerSub)}</text>`:""}
+  </svg>`;
+}
+function statusCounts(){
+  const c = {}; STATUS_ORDER.forEach(s=>c[s]=0);
+  S.apps.forEach(a=>{ c[a.status]=(c[a.status]||0)+1; });
+  return c;
+}
+function go(view, param){
+  S.route = {view, param: param||null};
+  document.body.classList.remove("nav-open");
+  render(); window.scrollTo(0,0);
+}
+/* ================= chrome ================= */
+const NAV=[["dashboard","◧","Dashboard"],["applications","🗂","Applications"],["calendar","📅","Calendar"],["analytics","📈","Analytics"],["profile","👤","Profile"],["settings","⚙","Settings"]];
+function greet(){const h=new Date().getHours();return h<12?"Good morning":h<18?"Good afternoon":"Good evening";}
+function upcoming(){
+  const t=new Date(); t.setHours(0,0,0,0);
+  return S.apps.filter(a=>{ if(!a.nextDate) return false;
+    const dd=(new Date(a.nextDate+"T12:00:00")-t)/864e5; return dd>=0&&dd<=7; });
+}
+function render(){
+  const v=S.route.view, key=(v==="settings")?"settings":v;
+  $("#nav").innerHTML=NAV.map(n=>`<button data-v="${n[0]}" class="${key===n[0]?"active":""}"><span class="ic">${n[1]}</span>${n[2]}</button>`).join("");
+  document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{const vv=b.dataset.v;go(vv==="settings"?"profile":vv);});
+  const d=new Date();
+  $("#dateLbl").textContent=d.toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short",year:"numeric"});
+  $("#topName").textContent=S.profile.name||"Mahmod";
+  $("#topAvatar").textContent=((S.profile.name||"M")[0]||"M").toUpperCase();
+  $("#bellDot").style.display=upcoming().length?"block":"none";
+  const V={dashboard:vDashboard,applications:vApplications,detail:()=>vDetail(S.route.param),
+           form:()=>vForm(S.route.param),calendar:vCalendar,analytics:vAnalytics,profile:vProfile,settings:vProfile};
+  $("#view").innerHTML=(V[v]||vDashboard)();
+  bindCommon();
+  if(v==="dashboard") bindDashboard();
+  else if(v==="applications") bindApplications();
+  else if(v==="detail") bindDetail();
+  else if(v==="form") bindForm();
+  else if(v==="calendar") bindCalendar();
+  else if(v==="analytics") bindAnalytics();
+  else if(v==="profile"||v==="settings") bindProfile();
+}
+function bindCommon(){
+  const mb=$("#menuBtn"); if(mb) mb.onclick=()=>document.body.classList.toggle("nav-open");
+  const sc=$("#scrim"); if(sc) sc.onclick=()=>document.body.classList.remove("nav-open");
+  const ts=$("#topSearch");
+  if(ts) ts.onkeydown=e=>{ if(e.key==="Enter"){ S.appQ=ts.value; S.appTab="All"; go("applications"); } };
+  const bell=$("#bellBtn");
+  if(bell) bell.onclick=()=>{ const u=upcoming();
+    toast(u.length?("Upcoming: "+u.map(a=>a.company+" ("+fmtD(a.nextDate)+")").join(", ")):"No upcoming interviews this week"); };
+}
+function thisWeek(list){ const t=Date.now(); return list.filter(a=>(t-new Date(a.applied+"T12:00:00").getTime())/864e5<=7); }
+
+/* ================= dashboard ================= */
+const STAT_META=[
+  ["Total Applications","🗂","#2563eb"],
+  ["Interviews","💼","#3b82f6"],
+  ["Offers","🎁","#a855f7"],
+  ["Rejected","✖","#ef4444"]
+];
+function vDashboard(){
+  const c=statusCounts(), total=S.apps.length, wk=thisWeek(S.apps);
+  const vals=[total,c.Interview||0,c.Offer||0,c.Rejected||0];
+  const wkVals=[wk.length, thisWeek(S.apps.filter(a=>a.status==="Interview")).length,
+                thisWeek(S.apps.filter(a=>a.status==="Offer")).length,
+                thisWeek(S.apps.filter(a=>a.status==="Rejected")).length];
+  const cards=STAT_META.map((m,i)=>`
+    <div class="card"><div class="stat-ic" style="background:${m[2]}22;color:${m[2]}">${m[1]}</div>
+    <div class="stat-lbl">${m[0]}</div><div class="stat-num">${vals[i]}</div>
+    <div class="delta">↑ ${wkVals[i]} this week</div></div>`).join("");
+  const segs=STATUS_ORDER.map(s=>({v:c[s]||0,c:STATUS_COLORS[s],n:s}));
+  const legend=segs.map(s=>{const p=total?((s.v/total*100).toFixed(1)):"0.0";
+    return `<div class="li"><span class="sw" style="background:${s.c}"></span>${s.n}<span class="pc">${s.v} (${p}%)</span></div>`;}).join("");
+  const recent=[...S.apps].sort((a,b)=>b.applied.localeCompare(a.applied)).slice(0,5);
+  const rows=recent.map(a=>`
+    <div class="rowline" data-id="${a.id}" style="cursor:pointer">${logo(a)}
+      <div class="grow"><b>${esc(a.company)}</b><small>${esc(a.position)}</small></div>
+      ${pill(a.status)}<span class="ago">${relD(a.applied)}</span></div>`).join("");
+  return `
+  <div class="page-head"><div><h1>${greet()}, ${esc(S.profile.name||"Mahmod")} 👋</h1>
+    <div class="sub">Here's your job application overview.</div></div></div>
+  <div class="cards4">${cards}</div>
+  <div class="grid2">
+    <div class="card"><h3>Application Status</h3>
+      <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+        ${donut(segs,150,15,total,"Total")}
+        <div class="legend" style="flex:1;min-width:150px">${legend}</div>
+      </div></div>
+    <div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <h3 style="margin:0">Recent Applications</h3>
+        <span class="link" id="viewAll">View all →</span></div>
+      <div id="recentRows">${rows||'<div class="sub">No applications yet.</div>'}</div></div>
+  </div>
+`;
+}
+function bindDashboard(){
+  const va=$("#viewAll"); if(va) va.onclick=()=>go("applications");
+  document.querySelectorAll("#recentRows .rowline").forEach(r=>r.onclick=()=>go("detail",r.dataset.id));
+}
+
+/* ================= applications ================= */
+function appRows(){
+  let list=[...S.apps];
+  if(S.appTab!=="All") list=list.filter(a=>a.status===S.appTab);
+  const q=S.appQ.trim().toLowerCase();
+  if(q) list=list.filter(a=>(a.company+" "+a.position).toLowerCase().includes(q));
+  if(S.appSort==="recent") list.sort((a,b)=>b.applied.localeCompare(a.applied));
+  else if(S.appSort==="oldest") list.sort((a,b)=>a.applied.localeCompare(b.applied));
+  else list.sort((a,b)=>a.company.localeCompare(b.company));
+  return list;
+}
+function vApplications(){
+  const c=statusCounts(), total=S.apps.length;
+  const tabs=["All",...STATUS_ORDER].map(t=>{
+    const n=t==="All"?total:(c[t]||0);
+    return `<button data-t="${t}" class="${S.appTab===t?"active":""}">${t} (${n})</button>`;}).join("");
+  return `
+  <div class="page-head"><div style="flex:1"><h1>Applications</h1>
+    <div class="sub">Track and manage all your job applications.</div></div>
+    <button class="btn" id="addApp">+ Add Application</button></div>
+  <div class="tabs" id="appTabs">${tabs}</div>
+  <div class="tbl-tools">
+    <div class="search"><span>🔍</span><input id="appQ" placeholder="Search companies or job titles..." value="${esc(S.appQ)}"></div>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12.5px">Sort by:
+      <select id="appSort" style="width:auto">
+        <option value="recent" ${S.appSort==="recent"?"selected":""}>Most Recent</option>
+        <option value="oldest" ${S.appSort==="oldest"?"selected":""}>Oldest</option>
+        <option value="company" ${S.appSort==="company"?"selected":""}>Company A–Z</option>
+      </select></div>
+  </div>
+  <div class="tbl-wrap"><table class="tbl"><thead><tr>
+    <th>Company / Position</th><th>Status</th><th>Applied</th><th>Next Step</th>
+  </tr></thead><tbody id="appRows"></tbody></table></div>
+`;
+}
+function renderAppRows(){
+  const tb=$("#appRows"); if(!tb) return;
+  const rows=appRows();
+  tb.innerHTML=rows.length?rows.map(a=>`
+    <tr data-id="${a.id}"><td><div class="cmp">${logo(a)}<div><b>${esc(a.company)}</b><br><small style="color:var(--muted)">${esc(a.position)}</small></div></div></td>
+    <td>${pill(a.status)}</td><td>${fmtD(a.applied)}</td>
+    <td>${a.nextDate?fmtD(a.nextDate):"—"}</td></tr>`).join("")
+    :`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px">No applications found.</td></tr>`;
+  tb.querySelectorAll("tr[data-id]").forEach(r=>r.onclick=()=>go("detail",r.dataset.id));
+}
+function bindApplications(){
+  const add=$("#addApp"); if(add) add.onclick=()=>go("form");
+  document.querySelectorAll("#appTabs button").forEach(b=>b.onclick=()=>{
+    S.appTab=b.dataset.t;
+    document.querySelectorAll("#appTabs button").forEach(x=>x.classList.remove("active"));
+    b.classList.add("active"); renderAppRows();
+  });
+  const q=$("#appQ"); if(q){ q.oninput=e=>{S.appQ=e.target.value;renderAppRows();}; q.onkeydown=e=>e.stopPropagation(); }
+  const s=$("#appSort"); if(s) s.onchange=e=>{S.appSort=e.target.value;renderAppRows();};
+  renderAppRows();
+}
+/* ================= detail ================= */
+function getApp(id){ return S.apps.find(a=>a.id===id); }
+function vDetail(id){
+  const a=getApp(id);
+  if(!a) return `<div class="page-head"><div><h1>Not found</h1></div></div><button class="btn-ghost" onclick="go('applications')">Back</button>`;
+  const tab=S.detailTab||"overview";
+  const tabs=["Overview","Timeline","Notes","Documents"].map(t=>
+    `<button data-dt="${t.toLowerCase()}" class="${tab===t.toLowerCase()?"active":""}">${t}</button>`).join("");
+  let body="";
+  if(tab==="overview"){
+    const kv=(ic,k,v)=>v?`<div class="kv"><span class="ic">${ic}</span><span class="k">${k}</span><span>${v}</span></div>`:"";
+    body=`
+    <div class="grid2" style="grid-template-columns:1.5fr 1fr">
+      <div class="card"><h3>Job Details</h3>
+        ${kv("🏢","Company",esc(a.company))}${kv("💼","Position",esc(a.position))}
+        ${kv("📍","Location",esc(a.location))}${kv("🕒","Job Type",esc(a.jobType))}
+        ${kv("💰","Salary Range",esc(a.salary))}
+        ${a.link?`<div class="kv"><span class="ic">🔗</span><span class="k">Application Link</span><span><a class="link" href="${esc(a.link)}" target="_blank" rel="noopener">${esc(a.link)}</a></span></div>`:""}
+        ${kv("📅","Applied On",fmtD(a.applied))}
+        ${a.recruiter?`<div class="kv"><span class="ic">👤</span><span class="k">Recruiter / Contact</span><span>${esc(a.recruiter)}${a.recruiterMail?`<br><small style="color:var(--muted)">${esc(a.recruiterMail)}</small>`:""}</span></div>`:""}
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px"><h3>Status</h3>
+          <div style="margin-bottom:12px">${pill(a.status)}</div>
+          ${a.nextStep?`<div style="font-size:13px;font-weight:600">Next Step</div><div class="sub" style="margin:4px 0">📋 ${esc(a.nextStep)}</div><div class="sub">📅 ${fmtD(a.nextDate)}</div>`:`<div class="sub">No next step scheduled.</div>`}
+        </div>
+        <div class="card"><h3>Notes</h3>
+          <div class="sub" style="white-space:pre-wrap">${esc(a.notes||"No notes yet.")}</div>
+          ${a.noteUpdated?`<div class="sub" style="margin-top:10px;font-size:11.5px">Last updated: ${esc(a.noteUpdated)}</div>`:""}
+        </div>
+      </div>
+    </div>`;
+  } else if(tab==="timeline"){
+    const evs=[{d:a.applied,t:"Application submitted",s:"Applied to "+a.company+" for "+a.position+"."}];
+    if(a.nextDate) evs.push({d:a.nextDate,t:a.nextStep||"Next step",s:"Scheduled."});
+    evs.sort((x,y)=>x.d.localeCompare(y.d));
+    body=`<div class="card"><h3>Timeline</h3>`+evs.map(e=>`
+      <div class="rowline"><div class="cmp-logo" style="background:#1a2340">•</div>
+      <div class="grow"><b>${esc(e.t)}</b><small>${esc(e.s)}</small></div>
+      <span class="ago">${fmtD(e.d)}</span></div>`).join("")+`</div>`;
+  } else if(tab==="notes"){
+    body=`<div class="card"><h3>Notes</h3>
+      <textarea id="noteTa" rows="6" placeholder="Add notes about this application...">${esc(a.notes||"")}</textarea>
+      <div class="form-actions"><button class="btn" id="saveNote">Save Notes</button></div></div>`;
+  } else {
+    const docs=(a.docs||[]).map((d,i)=>`<div class="rowline"><span class="ic">📄</span><div class="grow"><b>${esc(d)}</b></div><span class="link" data-del-doc="${i}">Remove</span></div>`).join("");
+    body=`<div class="card"><h3>Documents</h3><div id="docList">${docs||'<div class="sub">No documents yet.</div>'}</div>
+      <div style="display:flex;gap:10px;margin-top:14px"><input type="text" id="docName" placeholder="Document name, e.g. Resume.pdf"><button class="btn-ghost" id="addDoc">Add</button></div></div>`;
+  }
+  return `
+  <span class="back-link" id="backBtn">← Back</span>
+  <div class="detail-head">${logo(a,46)}
+    <div class="grow"><h1 style="font-size:19px">${esc(a.company)}</h1><div class="sub">${esc(a.position)}</div></div>
+    ${pill(a.status)}
+    <button class="btn-ghost" id="editApp">✏ Edit</button>
+    <button class="btn-ghost" id="dupApp">⧉ Duplicate</button>
+    <button class="btn-ghost" id="delApp" style="color:#f87171">🗑</button>
+  </div>
+  <div class="detail-tabs" id="dTabs">${tabs}</div>
+  <div id="dBody">${body}</div>`;
+}
+function bindDetail(){
+  const id=S.route.param, a=getApp(id); if(!a) return;
+  const bb=$("#backBtn"); if(bb) bb.onclick=()=>go("applications");
+  const ed=$("#editApp"); if(ed) ed.onclick=()=>go("form",id);
+  const du=$("#dupApp"); if(du) du.onclick=()=>{
+    const c=JSON.parse(JSON.stringify(a)); c.id="a"+(S.seq++);
+    c.company=c.company+" (copy)"; S.apps.unshift(c); save(); toast("Duplicated"); go("detail",c.id); };
+  const del=$("#delApp"); if(del) del.onclick=()=>{
+    if(confirm("Delete this application?")){ S.apps=S.apps.filter(x=>x.id!==id); save(); toast("Deleted"); go("applications"); } };
+  document.querySelectorAll("#dTabs button").forEach(b=>b.onclick=()=>{S.detailTab=b.dataset.dt;save();render();});
+  const sn=$("#saveNote"); if(sn) sn.onclick=()=>{ a.notes=$("#noteTa").value;
+    a.noteUpdated=new Date().toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
+    save(); toast("Notes saved"); render(); };
+  const ad=$("#addDoc"); if(ad) ad.onclick=()=>{ const v=$("#docName").value.trim(); if(!v) return;
+    a.docs=a.docs||[]; a.docs.push(v); save(); toast("Document added"); render(); };
+  document.querySelectorAll("[data-del-doc]").forEach(x=>x.onclick=()=>{ a.docs.splice(+x.dataset.delDoc,1); save(); render(); });
+}
+
+/* ================= add / edit form ================= */
+function vForm(id){
+  const a=id?getApp(id):null;
+  const F=(k,v)=>a?esc(a[k]||""):esc(v||"");
+  const opt=(list,val)=>list.map(o=>`<option ${String(val)===o?"selected":""}>${o}</option>`).join("");
+  return `
+  <span class="back-link" id="backBtn">← Back</span>
+  <div class="page-head"><div><h1>${a?"Edit Application":"Add New Application"}</h1>
+    <div class="sub">${a?"Update the details of this job application.":"Fill in the details below to track a new job application."}</div></div></div>
+  <div class="card"><div class="form-grid">
+    <div class="field"><label>Company <span class="req">*</span></label><input type="text" id="f_company" placeholder="e.g. Google" value="${F("company")}"></div>
+    <div class="field"><label>Location <span class="req">*</span></label><input type="text" id="f_location" placeholder="e.g. Remote / New York, NY" value="${F("location")}"></div>
+    <div class="field"><label>Position <span class="req">*</span></label><input type="text" id="f_position" placeholder="e.g. Software Engineer" value="${F("position")}"></div>
+    <div class="field"><label>Status <span class="req">*</span></label><select id="f_status">${opt(STATUS_ORDER,a?a.status:"Applied")}</select></div>
+    <div class="field"><label>Job Type</label><select id="f_jobType">${opt(["","Full-time","Part-time","Contract","Internship"],a?a.jobType:"")}</select></div>
+    <div class="field"><label>Applied Date <span class="req">*</span></label><input type="date" id="f_applied" value="${a?a.applied:""}"></div>
+    <div class="field"><label>Application Link <span class="hint">(Optional)</span></label><input type="url" id="f_link" placeholder="https://..." value="${F("link")}"></div>
+    <div class="field"><label>Recruiter / Contact <span class="hint">(Optional)</span></label><input type="text" id="f_recruiter" placeholder="e.g. name@company.com" value="${F("recruiter")}"></div>
+    <div class="field"><label>Salary Range <span class="hint">(Optional)</span></label><input type="text" id="f_salary" placeholder="e.g. $120,000 - $180,000 / year" value="${F("salary")}"></div>
+    <div class="field"><label>Next Step <span class="hint">(Optional)</span></label><input type="text" id="f_nextStep" placeholder="e.g. Technical Interview" value="${F("nextStep")}"></div>
+    <div class="field"><label>Next Step Date <span class="hint">(Optional)</span></label><input type="date" id="f_nextDate" value="${a?(a.nextDate||""):""}"></div>
+    <div class="field"><label>Source <span class="hint">(Optional)</span></label><select id="f_source">${opt(["LinkedIn","Company Website","Referral","Other"],a?(a.source||"LinkedIn"):"LinkedIn")}</select></div>
+    <div class="field" style="grid-column:1/-1"><label>Notes <span class="hint">(Optional)</span></label><textarea id="f_notes" rows="4" placeholder="Add any notes about this application...">${F("notes")}</textarea></div>
+  </div>
+  <div class="form-actions"><button class="btn-ghost" id="cancelF">Cancel</button>
+    <button class="btn" id="saveF">${a?"Save Changes":"Save Application"}</button></div></div>`;
+}
+function bindForm(){
+  const id=S.route.param;
+  const bb=$("#backBtn"); if(bb) bb.onclick=()=>go(id?"detail":"applications",id||undefined);
+  const c=$("#cancelF"); if(c) c.onclick=()=>go(id?"detail":"applications",id||undefined);
+  const sv=$("#saveF"); if(!sv) return;
+  sv.onclick=()=>{
+    const g=x=>$("#"+x).value.trim();
+    const company=g("f_company"),position=g("f_position"),location=g("f_location"),
+          status=g("f_status"),applied=g("f_applied");
+    if(!company||!position||!location||!applied){ toast("Please fill Company, Position, Location and Applied Date"); return; }
+    const data={company,position,location,status,applied,jobType:g("f_jobType"),link:g("f_link"),
+      recruiter:g("f_recruiter"),salary:g("f_salary"),nextStep:g("f_nextStep"),nextDate:g("f_nextDate"),
+      source:g("f_source"),notes:g("f_notes")};
+    if(id){ Object.assign(getApp(id),data); save(); toast("Application updated"); go("detail",id); }
+    else{
+      const colors=["#2563eb","#7c3aed","#059669","#d97706","#dc2626","#0891b2"];
+      const na=Object.assign({id:"a"+(S.seq++),recruiterMail:"",noteUpdated:"",docs:[],
+        color:colors[S.seq%colors.length],letter:company[0].toUpperCase()},data);
+      S.apps.unshift(na); save(); toast("Application saved"); go("detail",na.id);
+    }
+  };
+}
+
+/* ================= calendar ================= */
+function vCalendar(){
+  const y=S.calY,m=S.calM;
+  const first=new Date(y,m,1).getDay(), dim=new Date(y,m+1,0).getDate(), dimP=new Date(y,m,0).getDate();
+  const evBy={};
+  S.apps.forEach(a=>{ if(!a.nextDate) return;
+    const [yy,mm,dd]=a.nextDate.split("-").map(Number);
+    if(yy===y&&mm===m+1){ (evBy[dd]=evBy[dd]||[]).push(a); } });
+  let cells="";
+  ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].forEach(d=>cells+=`<div class="cal-dow">${d}</div>`);
+  for(let i=first-1;i>=0;i--) cells+=`<div class="cal-day dim"><div class="dn">${dimP-i}</div></div>`;
+  const today=new Date();
+  for(let d=1;d<=dim;d++){
+    const evs=(evBy[d]||[]).map(a=>{
+      const col=STATUS_COLORS[a.status]||"#60a5fa";
+      return `<div class="ev" data-id="${a.id}" style="background:${col}22;color:${col};border:1px solid ${col}55">${esc(a.nextStep||a.status)} · ${esc(a.company)}</div>`;}).join("");
+    const isT=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;
+    cells+=`<div class="cal-day${isT?" today":""}"><div class="dn">${d}</div>${evs}</div>`;
+  }
+  const tail=(first+dim)%7; if(tail) for(let d=1;d<=7-tail;d++) cells+=`<div class="cal-day dim"><div class="dn">${d}</div></div>`;
+  return `
+  <div class="page-head"><div style="flex:1"><h1>Calendar</h1>
+    <div class="sub">Keep track of interviews, follow-ups and important dates.</div></div></div>
+  <div class="card">
+    <div class="cal-head">
+      <button class="cal-nav" id="calPrev">‹</button><h3>${MONTHS[m]} ${y}</h3><button class="cal-nav" id="calNext">›</button>
+      <div style="margin-left:auto" class="seg"><button class="active">Month</button><button id="segW">Week</button><button id="segD">Day</button></div>
+    </div>
+    <div class="cal-grid">${cells}</div>
+  </div>`;
+}
+function bindCalendar(){
+  const pv=$("#calPrev"),nx=$("#calNext");
+  if(pv) pv.onclick=()=>{S.calM--;if(S.calM<0){S.calM=11;S.calY--;}save();render();};
+  if(nx) nx.onclick=()=>{S.calM++;if(S.calM>11){S.calM=0;S.calY++;}save();render();};
+  const sw=$("#segW"),sd=$("#segD");
+  if(sw) sw.onclick=()=>toast("Week view coming soon");
+  if(sd) sd.onclick=()=>toast("Day view coming soon");
+  document.querySelectorAll(".ev").forEach(e=>e.onclick=ev=>{ev.stopPropagation();go("detail",e.target.dataset.id);});
+}
+
+/* ================= analytics ================= */
+function vAnalytics(){
+  const c=statusCounts(), total=S.apps.length||1;
+  const ir=(c.Interview/total*100), or_=(c.Offer/total*100), sr=(c.Offer/total*100);
+  const cards=[
+    ["Total Applications",total,"↑ 33%"],["Interview Rate",ir.toFixed(1)+"%","↑ 12%"],
+    ["Offer Rate",or_.toFixed(1)+"%","↑ 8%"],["Success Rate",sr.toFixed(1)+"%","↑ 10%"]
+  ].map(k=>`<div class="card"><div class="stat-lbl">${k[0]}</div><div class="stat-num">${k[1]}</div><div class="delta">${k[2]}</div></div>`).join("");
+  // line chart: cumulative apps over last 30 days
+  const days=[]; const now=new Date(); now.setHours(0,0,0,0);
+  for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);days.push(d);}
+  const cum=days.map(d=>S.apps.filter(a=>new Date(a.applied+"T12:00:00")<=d).length);
+  const mx=Math.max(...cum,1), W2=600,H2=220,pad2=30;
+  const px=i=>pad2+i*(W2-2*pad2)/29, py=v=>H2-pad2-(v/mx)*(H2-2*pad2);
+  const pts=cum.map((v,i)=>`${px(i).toFixed(1)},${py(v).toFixed(1)}`).join(" ");
+  const line=`<svg width="100%" viewBox="0 0 ${W2} ${H2}" preserveAspectRatio="none" style="height:220px">
+    <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b82f6" stop-opacity=".35"/><stop offset="1" stop-color="#3b82f6" stop-opacity="0"/>
+    </linearGradient></defs>
+    <polygon points="${pad2},${H2-pad2} ${pts} ${W2-pad2},${H2-pad2}" fill="url(#ag)"/>
+    <polyline points="${pts}" fill="none" stroke="#60a5fa" stroke-width="2.5"/>
+    ${cum.map((v,i)=>`<circle cx="${px(i)}" cy="${py(v)}" r="3.5" fill="#0c1322" stroke="#60a5fa" stroke-width="2"/>`).join("")}
+    <text x="${pad2}" y="${H2-8}" fill="#8b94a9" font-size="10">${MON_S[days[0].getMonth()]} ${days[0].getDate()}</text>
+    <text x="${W2-pad2-46}" y="${H2-8}" fill="#8b94a9" font-size="10">${MON_S[days[29].getMonth()]} ${days[29].getDate()}</text>
+  </svg>`;
+  // source donut
+  const src={}; S.apps.forEach(a=>{src[a.source||"Other"]=(src[a.source||"Other"]||0)+1;});
+  const srcC={"LinkedIn":"#3b82f6","Company Website":"#22c55e","Referral":"#f59e0b","Other":"#a855f7"};
+  const segs=Object.keys(src).map(k=>({v:src[k],c:srcC[k]||"#64748b",n:k}));
+  const leg=segs.map(s=>`<div class="li"><span class="sw" style="background:${s.c}"></span>${esc(s.n)}<span class="pc">${s.v} (${(s.v/total*100).toFixed(1)}%)</span></div>`).join("");
+  return `
+  <div class="page-head"><div style="flex:1"><h1>Analytics</h1>
+    <div class="sub">Track your progress and get insights.</div></div>
+    <select style="width:auto"><option>Last 30 days</option><option>Last 90 days</option><option>All time</option></select></div>
+  <div class="cards4">${cards}</div>
+  <div class="grid2">
+    <div class="card"><h3>Application Progress</h3>${line}</div>
+    <div class="card"><h3>Applications by Source</h3>
+      <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap">
+        ${donut(segs,150,15,S.apps.length,"")}
+        <div class="legend" style="flex:1;min-width:150px">${leg||'<div class="sub">No data yet.</div>'}</div>
+      </div></div>
+  </div>`;
+}
+function bindAnalytics(){}
+
+/* ================= profile ================= */
+function vProfile(){
+  const p=S.profile, pr=S.prefs;
+  const tg=(k,lbl)=>`<div class="pref-row"><span>${lbl}</span>
+    <label class="switch"><input type="checkbox" data-pref="${k}" ${pr[k]?"checked":""}><span class="sl"></span></label></div>`;
+  return `
+  <div class="page-head"><div><h1>Profile & Settings</h1>
+    <div class="sub">Manage your account and preferences.</div></div></div>
+  <div class="grid2" style="grid-template-columns:1.4fr 1fr">
+    <div class="card">
+      <div class="prof-head"><div class="avatar lg">${esc((p.name||"M")[0].toUpperCase())}</div>
+        <div class="grow" style="flex:1"><h1 style="font-size:18px">${esc(p.full||p.name)}</h1><div class="sub">${esc(p.title)}</div></div>
+        <button class="btn-ghost" id="editProf">Edit Profile</button></div>
+      <div id="profView">
+        <h3>Personal Information</h3>
+        <div class="kv"><span class="k">Email</span><span>${esc(p.email)}</span></div>
+        <div class="kv"><span class="k">Phone</span><span>${esc(p.phone)}</span></div>
+        <div class="kv"><span class="k">Location</span><span>${esc(p.location)}</span></div>
+        <div class="kv"><span class="k">Resume</span><span>${p.resume?esc(p.resume):'<span style="color:var(--muted)">No resume uploaded</span>'} <span class="link" id="resumeBtn" style="margin-left:8px">View / Upload</span></span></div>
+        <input type="file" id="resumeFile" style="display:none">
+      </div>
+      <div id="profEdit" style="display:none">
+        <h3>Edit Profile</h3>
+        <div class="form-grid">
+          <div class="field"><label>Full Name</label><input type="text" id="p_full" value="${esc(p.full)}"></div>
+          <div class="field"><label>Display Name</label><input type="text" id="p_name" value="${esc(p.name)}"></div>
+          <div class="field"><label>Title</label><input type="text" id="p_title" value="${esc(p.title)}"></div>
+          <div class="field"><label>Email</label><input type="email" id="p_email" value="${esc(p.email)}"></div>
+          <div class="field"><label>Phone</label><input type="text" id="p_phone" value="${esc(p.phone)}"></div>
+          <div class="field"><label>Location</label><input type="text" id="p_location" value="${esc(p.location)}"></div>
+        </div>
+        <div class="form-actions"><button class="btn" id="saveProf">Save</button></div>
+      </div>
+    </div>
+    <div class="card"><h3>Preferences</h3>
+      ${tg("emailNotif","Email notifications")}${tg("appReminders","Application reminders")}
+      ${tg("interviewReminders","Interview reminders")}${tg("darkMode","Dark mode")}
+    </div>
+  </div>`;
+}
+function bindProfile(){
+  document.querySelectorAll("[data-pref]").forEach(t=>t.onchange=()=>{
+    S.prefs[t.dataset.pref]=t.checked; save(); toast("Preference saved"); });
+  const ep=$("#editProf");
+  if(ep) ep.onclick=()=>{ const v=$("#profView"),e=$("#profEdit");
+    const open=e.style.display==="none"; e.style.display=open?"block":"none"; v.style.display=open?"none":"block";
+    ep.textContent=open?"Cancel":"Edit Profile"; };
+  const sp=$("#saveProf");
+  if(sp) sp.onclick=()=>{ const g=x=>$("#"+x).value.trim();
+    S.profile.full=g("p_full");S.profile.name=g("p_name");S.profile.title=g("p_title");
+    S.profile.email=g("p_email");S.profile.phone=g("p_phone");S.profile.location=g("p_location");
+    save(); toast("Profile saved"); render(); };
+  const rb=$("#resumeBtn"),rf=$("#resumeFile");
+  if(rb&&rf){ rb.onclick=()=>rf.click();
+    rf.onchange=()=>{ if(rf.files[0]){ S.profile.resume=rf.files[0].name; save(); toast("Resume attached"); render(); } }; }
+}
+
+/* ================= init ================= */
+render();
+</script>
+</body>
+</html>
