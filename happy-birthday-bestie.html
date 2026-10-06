@@ -109,7 +109,7 @@ function balloons(){ const em=['🎈','🎈','🎈','🎉','⭐','💖'];
     document.body.appendChild(b); setTimeout(()=>b.remove(),9500); }, i*280);
 }
 /* typed message */
-const MSG = "If my life was a program, you'd be the most important function in it \u2014 no bugs, no errors, just pure happiness every time you run. You debug my bad days and compile all my worries away without even trying.\n\nMay your new year be like clean code \u2014 smooth, beautiful, and full of amazing features. No deprecated dreams, only upgrades! \uD83D\uDE80\n\nKeep shining. The world is better with you in it \u2014 tested and confirmed \u2705";
+const MSG = "If my life was a program, you'd be the most important function in it \u2014 no bugs, no errors, just pure happiness every time you run. You debug my bad days and compile all my worries away without even trying.\n\nMay your new year be like clean code \u2014 smooth, beautiful, and full of amazing features. No deprecated dreams, only upgrades! \uD83D\uDE80\n\nKeep shining. The world is better with you in it \u2705";
 function typeMsg(el, text, done){ el.classList.add('show'); let i=0;
   (function t(){ if(i<=text.length){ el.innerHTML=text.slice(0,i).replace(/\n/g,'<br>'); i+=2; setTimeout(t,18); }
     else if(done) done(); })();
