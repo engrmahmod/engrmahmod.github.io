@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Peller &amp; Jarvis — A Little One Is On The Way 👶🏽</title>
+<meta name="description" content="Join fans celebrating Peller & Jarvis as they expect their first child! Vote on the baby's gender, pick a name, and leave your wishes.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;800&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FFFBF3; --gold:#C9A227; --gold-soft:#F5EAD0; --rose:#F9E8EC;
+  --baby-blue:#E4F1FB; --ink:#26263a; --muted:#77778c; --card:#ffffff;
+  --shadow:0 18px 50px rgba(120,90,20,.12);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Nunito',system-ui,-apple-system,'Segoe UI',sans-serif;background:var(--cream);color:var(--ink);overflow-x:hidden}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:60}
+.wrap{max-width:640px;margin:0 auto;padding:0 22px}
+
+/* ---------- HERO ---------- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden;
+  background:radial-gradient(1200px 600px at 50% -10%,#fff6df 0%,var(--cream) 55%,#fdeef0 100%)}
+.balloon{position:absolute;font-size:44px;opacity:.85;animation:floatUp linear infinite;filter:saturate(1.2)}
+@keyframes floatUp{0%{transform:translateY(110vh) rotate(-8deg)}100%{transform:translateY(-20vh) rotate(8deg)}}
+.badge{display:inline-block;background:#fff;border:1.5px solid var(--gold);color:#8a6d1a;font-weight:800;font-size:15px;letter-spacing:2.5px;
+  padding:10px 22px;border-radius:999px;margin-bottom:26px;box-shadow:var(--shadow)}
+.baby{font-size:96px;animation:beat 1.6s ease-in-out infinite;filter:drop-shadow(0 10px 20px rgba(0,0,0,.15))}
+@keyframes beat{0%,100%{transform:scale(1)}12%{transform:scale(1.12)}24%{transform:scale(1)}}
+.hero h1{font-family:'Playfair Display',Georgia,serif;font-size:52px;font-weight:800;line-height:1.12;margin:18px 0 6px;
+  background:linear-gradient(100deg,#8a6d1a,#d4af37 40%,#b07818 70%,#8a6d1a);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .amp{font-size:30px;color:var(--muted);font-weight:600}
+.hero p.lead{font-size:21px;color:var(--muted);margin-top:14px;max-width:440px}
+.hero p.lead b{color:var(--ink)}
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-size:15px;color:var(--muted);letter-spacing:2px;animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,10px)}}
+
+/* ---------- SECTIONS ---------- */
+section{padding:64px 0}
+.sec-head{text-align:center;margin-bottom:30px}
+.sec-head .kicker{font-size:14px;font-weight:800;letter-spacing:3px;color:var(--gold);text-transform:uppercase}
+.sec-head h2{font-family:'Playfair Display',Georgia,serif;font-size:36px;margin-top:8px}
+.sec-head p{color:var(--muted);font-size:17px;margin-top:8px}
+.card{background:var(--card);border-radius:26px;box-shadow:var(--shadow);padding:30px 26px}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* ---------- QUOTE ---------- */
+.quote-card{background:linear-gradient(135deg,#fffdf6,#fdf3e3);border:1.5px solid var(--gold-soft);text-align:center;position:relative}
+.quote-card .qmark{font-family:'Playfair Display',Georgia,serif;font-size:70px;color:var(--gold);line-height:.6;display:block;margin-bottom:10px}
+.quote-card p{font-family:'Playfair Display',Georgia,serif;font-size:23px;font-style:italic;line-height:1.55}
+.quote-card .who{margin-top:16px;font-weight:800;font-size:15px;letter-spacing:2px;color:#8a6d1a}
+
+/* ---------- TIMELINE ---------- */
+.timeline{position:relative;margin-top:6px;padding-left:34px}
+.timeline::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:3px;border-radius:3px;
+  background:linear-gradient(var(--gold),#f0c6d4)}
+.t-item{position:relative;padding:0 0 28px}
+.t-item:last-child{padding-bottom:0}
+.t-item::before{content:"";position:absolute;left:-31px;top:4px;width:15px;height:15px;border-radius:50%;
+  background:#fff;border:4px solid var(--gold);box-shadow:0 0 0 4px #f7ecd4}
+.t-item .date{font-size:14px;font-weight:800;letter-spacing:1.5px;color:#a5852f}
+.t-item h3{font-size:21px;margin:4px 0}
+.t-item p{color:var(--muted);font-size:16px}
+
+/* ---------- GENDER VOTE ---------- */
+.gender-btns{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:8px}
+.gbtn{border:2.5px solid #e8e2d2;background:#fffdf8;border-radius:20px;padding:22px 10px;font-size:19px;font-weight:800;cursor:pointer;
+  font-family:inherit;color:var(--ink);transition:transform .15s ease,border-color .2s,box-shadow .2s}
+.gbtn small{display:block;font-weight:600;color:var(--muted);font-size:14px;margin-top:4px}
+.gbtn .em{font-size:44px;display:block;margin-bottom:6px}
+.gbtn.boy.sel{border-color:#5aa9e6;box-shadow:0 10px 30px rgba(90,169,230,.25);background:var(--baby-blue)}
+.gbtn.girl.sel{border-color:#e58aa5;box-shadow:0 10px 30px rgba(229,138,165,.25);background:var(--rose)}
+.gbtn:active{transform:scale(.96)}
+.gres{margin-top:18px;display:none}
+.gres.show{display:block}
+.grow{margin:12px 0}
+.grow .lbl{display:flex;justify-content:space-between;font-weight:800;font-size:16px;margin-bottom:6px}
+.bar{height:16px;border-radius:99px;background:#f0ece0;overflow:hidden}
+.bar i{display:block;height:100%;width:0;border-radius:99px;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.bar.boy i{background:linear-gradient(90deg,#5aa9e6,#8ecae6)}
+.bar.girl i{background:linear-gradient(90deg,#e58aa5,#f4a7c3)}
+.gtotal{text-align:center;color:var(--muted);font-size:15px;margin-top:10px}
+
+/* ---------- NAME POLL ---------- */
+.tabs{display:flex;gap:10px;justify-content:center;margin-bottom:20px}
+.tab{border:2px solid #e8e2d2;background:#fff;border-radius:999px;padding:10px 26px;font-weight:800;font-size:16px;cursor:pointer;font-family:inherit;color:var(--muted)}
+.tab.sel{background:var(--ink);color:#fff;border-color:var(--ink)}
+.name-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ncard{background:#fffdf8;border:2px solid #eee6d2;border-radius:18px;padding:18px 14px;text-align:center;transition:border-color .2s}
+.ncard h3{font-size:21px}
+.ncard .vcount{font-size:14px;color:var(--muted);font-weight:700;margin:6px 0 10px}
+.ncard button{border:none;background:linear-gradient(100deg,#d4af37,#b8912a);color:#fff;font-weight:800;font-size:15px;
+  padding:10px 22px;border-radius:999px;cursor:pointer;font-family:inherit}
+.ncard button:active{transform:scale(.94)}
+.ncard.voted{border-color:var(--gold);background:#fffbeF}
+.ncard button:disabled{opacity:.55}
+
+/* ---------- GUESTBOOK ---------- */
+.gb-form{display:grid;gap:12px;margin-bottom:22px}
+.gb-form input,.gb-form textarea{font-family:inherit;font-size:17px;padding:15px 18px;border-radius:16px;border:2px solid #e8e2d2;background:#fffdf8;color:var(--ink);width:100%}
+.gb-form input:focus,.gb-form textarea:focus{outline:none;border-color:var(--gold)}
+.gb-form textarea{min-height:96px;resize:vertical}
+.gb-form button{border:none;background:linear-gradient(100deg,#e58aa5,#d4688a);color:#fff;font-weight:800;font-size:18px;
+  padding:16px;border-radius:16px;cursor:pointer;font-family:inherit;box-shadow:0 12px 26px rgba(212,104,138,.3)}
+.gb-form button:active{transform:scale(.97)}
+.wishes{display:grid;gap:14px}
+.wish{background:#fff;border-left:5px solid var(--gold);border-radius:0 18px 18px 0;padding:18px;box-shadow:var(--shadow);animation:pop .4s ease}
+@keyframes pop{from{transform:scale(.96);opacity:0}}
+.wish p{font-size:17px;line-height:1.55}
+.wish .who{margin-top:10px;font-weight:800;font-size:14px;color:#a5852f;letter-spacing:1px}
+.empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:16px}
+
+/* ---------- FOOTER ---------- */
+footer{background:#1d1d2e;color:#cfcfe0;text-align:center;padding:44px 22px 54px}
+footer .big{font-size:54px;margin-bottom:10px}
+footer h2{font-family:'Playfair Display',Georgia,serif;color:#fff;font-size:26px}
+footer p{color:#9a9ab2;font-size:15px;margin-top:10px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.6}
+footer .credit{margin-top:22px;font-size:14px;color:#7c7c96;letter-spacing:1px}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+
+<!-- HERO -->
+<header class="hero" id="balloonField">
+  <div class="wrap">
+    <span class="badge">OCTOBER 8, 2026 — THE ANNOUNCEMENT</span>
+    <div class="baby">👶🏽</div>
+    <h1>Peller &amp; Jarvis</h1>
+    <div class="amp">are expecting their first child</div>
+    <p class="lead">A little piece of their love is coming into this world. <b>Join fans celebrating</b> — vote, pick a name &amp; leave your wishes below 👇🏽</p>
+  </div>
+  <div class="scroll-hint">SCROLL ↓</div>
+</header>
+
+<div class="wrap">
+<!-- QUOTE -->
+<section>
+  <div class="card quote-card reveal">
+    <span class="qmark">“</span>
+    <p>Our greatest blessing. Our answered prayer.</p>
+    <div class="who">— JARVIS, ON THE ANNOUNCEMENT</div>
+  </div>
+</section>
+
+<!-- JOURNEY -->
+<section>
+  <div class="sec-head reveal">
+    <div class="kicker">Their story</div>
+    <h2>The journey so far</h2>
+  </div>
+  <div class="card reveal">
+    <div class="timeline">
+      <div class="t-item">
+        <div class="date">JULY 29, 2026</div>
+        <h3>💍 Civil wedding in Lagos</h3>
+        <p>Peller &amp; Jarvis tie the knot, and fans celebrate with them.</p>
+      </div>
+      <div class="t-item">
+        <div class="date">AUGUST 1, 2026</div>
+        <h3>🤍 The white wedding</h3>
+        <p>A lavish star-studded ceremony — the couple of the year.</p>
+      </div>
+      <div class="t-item">
+        <div class="date">OCTOBER 8, 2026</div>
+        <h3>👶🏽 Baby on the way!</h3>
+        <p>Maternity photos break the internet — a little one is coming.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GENDER -->
+<section id="gender">
+  <div class="sec-head reveal">
+    <div class="kicker">Make your guess</div>
+    <h2>Boy or Girl?</h2>
+    <p>What do you think baby Peller will be? Cast your vote!</p>
+  </div>
+  <div class="card reveal">
+    <div class="gender-btns">
+      <button class="gbtn boy" data-v="boy"><span class="em">👶🏽</span>Team Boy<small>It's a prince!</small></button>
+      <button class="gbtn girl" data-v="girl"><span class="em">👧🏽</span>Team Girl<small>It's a princess!</small></button>
+    </div>
+    <div class="gres" id="gres">
+      <div class="grow">
+        <div class="lbl"><span>💙 Boy</span><span id="pctBoy">0%</span></div>
+        <div class="bar boy"><i id="barBoy"></i></div>
+      </div>
+      <div class="grow">
+        <div class="lbl"><span>💗 Girl</span><span id="pctGirl">0%</span></div>
+        <div class="bar girl"><i id="barGirl"></i></div>
+      </div>
+      <div class="gtotal" id="gtotal"></div>
+    </div>
+  </div>
+</section>
+
+<!-- NAMES -->
+<section id="names">
+  <div class="sec-head reveal">
+    <div class="kicker">Help them choose</div>
+    <h2>Vote a baby name</h2>
+    <p>Pick your favourite — one vote per name.</p>
+  </div>
+  <div class="tabs reveal">
+    <button class="tab sel" data-t="boy">💙 Boy names</button>
+    <button class="tab" data-t="girl">💗 Girl names</button>
+  </div>
+  <div class="name-grid reveal" id="nameGrid"></div>
+</section>
+
+<!-- GUESTBOOK -->
+<section id="wishes">
+  <div class="sec-head reveal">
+    <div class="kicker">Shower them with love</div>
+    <h2>Leave your wishes 💌</h2>
+    <p>Write a message for the soon-to-be parents.</p>
+  </div>
+  <div class="card reveal">
+    <form class="gb-form" id="gbForm">
+      <input id="gbName" maxlength="30" placeholder="Your name" required>
+      <textarea id="gbMsg" maxlength="240" placeholder="Your wishes for Peller & Jarvis..." required></textarea>
+      <button type="submit">Send love 💛</button>
+    </form>
+    <div class="wishes" id="wishList"></div>
+  </div>
+</section>
+</div>
+
+<footer>
+  <div class="big">👶🏽🤍</div>
+  <h2>Peller &amp; Jarvis… and now, a little one on the way.</h2>
+  <p>Here's to sleepless nights, tiny shoes, and the most beautiful chapter yet. Congratulations!</p>
+  <div class="credit">Developed by Engr Mahmod</div>
+</footer>
+
+<script>
+/* ---------- CONFETTI ---------- */
+(function(){
+  const c=document.getElementById('confetti'),x=c.getContext('2d');
+  let W,H,P=[];
+  const COLORS=['#d4af37','#f4a7c3','#8ecae6','#fff3c4','#e58aa5'];
+  function rs(){W=c.width=innerWidth;H=c.height=innerHeight}
+  rs();addEventListener('resize',rs);
+  function burst(n,spread){
+    for(let i=0;i<n;i++)P.push({x:Math.random()*W,y:-20-Math.random()*H*.3,
+      w:6+Math.random()*7,h:8+Math.random()*8,c:COLORS[i%COLORS.length],
+      vy:1.5+Math.random()*2.5,vx:-1+Math.random()*2,r:Math.random()*Math.PI,vr:-.1+Math.random()*.2,
+      life:spread||1});
+  }
+  burst(140);
+  (function loop(){
+    x.clearRect(0,0,W,H);
+    P=P.filter(p=>p.y<H+30);
+    for(const p of P){
+      p.y+=p.vy;p.x+=p.vx+Math.sin(p.y/40);p.r+=p.vr;
+      x.save();x.translate(p.x,p.y);x.rotate(p.r);x.fillStyle=p.c;
+      x.fillRect(-p.w/2,-p.h/2,p.w,p.h);x.restore();
+    }
+    requestAnimationFrame(loop);
+  })();
+  window.celebrate=()=>burst(90);
+})();
+
+/* ---------- BALLOONS ---------- */
+(function(){
+  const f=document.getElementById('balloonField');
+  const em=['🎈','🎈','🎈','💛','🤍','🎈','💙','🎈'];
+  em.forEach((e,i)=>{
+    const s=document.createElement('span');
+    s.className='balloon';s.textContent=e;
+    s.style.left=(5+Math.random()*90)+'%';
+    s.style.animationDuration=(9+Math.random()*9)+'s';
+    s.style.animationDelay=(-Math.random()*12)+'s';
+    s.style.fontSize=(34+Math.random()*26)+'px';
+    f.appendChild(s);
+  });
+})();
+
+/* ---------- REVEAL ON SCROLL ---------- */
+(function(){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+})();
+
+/* ---------- GENDER VOTE ---------- */
+(function(){
+  const K='pj_gender',KC='pj_gender_counts';
+  let counts={boy:0,girl:0};
+  try{counts=Object.assign(counts,JSON.parse(localStorage.getItem(KC)||'{}'))}catch(e){}
+  let mine=localStorage.getItem(K);
+  const gres=document.getElementById('gres');
+  function paint(){
+    const t=counts.boy+counts.girl;
+    const pb=t?Math.round(counts.boy/t*100):0, pg=t?100-pb:0;
+    gres.classList.add('show');
+    requestAnimationFrame(()=>{
+      document.getElementById('barBoy').style.width=pb+'%';
+      document.getElementById('barGirl').style.width=pg+'%';
+    });
+    document.getElementById('pctBoy').textContent=pb+'%';
+    document.getElementById('pctGirl').textContent=pg+'%';
+    document.getElementById('gtotal').textContent=t?('🗳️ '+t.toLocaleString()+' votes'):'Be the first to vote!';
+    document.querySelectorAll('.gbtn').forEach(b=>b.classList.toggle('sel',b.dataset.v===mine));
+  }
+  document.querySelectorAll('.gbtn').forEach(b=>b.addEventListener('click',()=>{
+    const v=b.dataset.v;
+    if(mine&&mine!==v){counts[mine]--;}
+    if(mine!==v){counts[v]++;localStorage.setItem(K,v);mine=v;window.celebrate&&window.celebrate();}
+    try{localStorage.setItem(KC,JSON.stringify(counts))}catch(e){}
+    paint();
+  }));
+  if(counts.boy+counts.girl>0)paint();
+})();
+
+/* ---------- NAME POLL ---------- */
+(function(){
+  const K='pj_names';
+  const DATA={
+    boy:['Oluwaseun','Damilola','Adewale','Malik','Ibrahim'],
+    girl:['Zara','Amara','Aisha','Oluwadamilola','Nia']
+  };
+  let store={};
+  try{store=JSON.parse(localStorage.getItem(K)||'{}')}catch(e){}
+  let tab='boy';
+  const grid=document.getElementById('nameGrid');
+  function key(n){return tab+':'+n}
+  function paint(){
+    grid.innerHTML='';
+    DATA[tab].forEach(n=>{
+      const v=store[key(n)]||0, voted=!!localStorage.getItem('pj_n_'+key(n));
+      const card=document.createElement('div');
+      card.className='ncard'+(voted?' voted':'');
+      card.innerHTML='<h3>'+n+'</h3><div class="vcount">💛 '+v+' vote'+(v===1?'':'s')+'</div>';
+      const btn=document.createElement('button');
+      btn.textContent=voted?'Voted ✓':'Vote';
+      btn.disabled=voted;
+      btn.addEventListener('click',()=>{
+        store[key(n)]=(store[key(n)]||0)+1;
+        localStorage.setItem('pj_n_'+key(n),'1');
+        try{localStorage.setItem(K,JSON.stringify(store))}catch(e){}
+        window.celebrate&&window.celebrate();
+        paint();
+      });
+      card.appendChild(btn);
+      grid.appendChild(card);
+    });
+  }
+  document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{
+    tab=t.dataset.t;
+    document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('sel',x===t));
+    paint();
+  }));
+  paint();
+})();
+
+/* ---------- GUESTBOOK ---------- */
+(function(){
+  const K='pj_wishes';
+  let wishes=[];
+  try{wishes=JSON.parse(localStorage.getItem(K)||'[]')}catch(e){}
+  const box=document.getElementById('wishList');
+  function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+  function paint(){
+    box.innerHTML='';
+    if(!wishes.length){
+      box.innerHTML='<div class="empty">No wishes yet — be the first to shower them with love! 💛</div>';
+      return;
+    }
+    wishes.slice().reverse().forEach(w=>{
+      const d=document.createElement('div');
+      d.className='wish';
+      d.innerHTML='<p>'+esc(w.m)+'</p><div class="who">— '+esc(w.n).toUpperCase()+'</div>';
+      box.appendChild(d);
+    });
+  }
+  document.getElementById('gbForm').addEventListener('submit',e=>{
+    e.preventDefault();
+    const n=document.getElementById('gbName').value.trim(),
+          m=document.getElementById('gbMsg').value.trim();
+    if(!n||!m)return;
+    wishes.push({n,m,t:Date.now()});
+    try{localStorage.setItem(K,JSON.stringify(wishes.slice(-60)))}catch(err){}
+    document.getElementById('gbName').value='';
+    document.getElementById('gbMsg').value='';
+    window.celebrate&&window.celebrate();
+    paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>
