@@ -85,57 +85,8 @@
   .field input:focus {
     box-shadow: 0 4px 18px rgba(120, 80, 200, 0.18), inset 0 0 0 2px #8b3ff0;
   }
-  .field input#password.masked {
-    -webkit-text-security: disc;
-  }
-  /* TEMP-RECORDING: visible dot mirror so screen captures show dots */
-  .pw-visual {
-    width: 100%;
-    min-height: 53px;
-    padding: 15px 46px 15px 44px;
-    font-size: 14.5px;
-    line-height: 1.4;
-    color: #2d1b4e;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 18px rgba(120, 80, 200, 0.12), inset 0 0 0 1px rgba(140, 110, 200, 0.14);
-    white-space: pre-wrap;
-    overflow: hidden;
-    cursor: text;
-    transition: box-shadow 0.2s;
-  }
-  .pw-visual .pw-ph { color: #a493c9; }
-  .pw-visual .caret {
-    display: none;
-    width: 2px;
-    height: 1.15em;
-    background: #2d1b4e;
-    vertical-align: -3px;
-    animation: blink 1.05s steps(1) infinite;
-  }
-  @keyframes blink { 50% { opacity: 0; } }
-  .field:focus-within .pw-visual {
-    box-shadow: 0 4px 18px rgba(120, 80, 200, 0.18), inset 0 0 0 2px #8b3ff0;
-  }
-  .field:focus-within .pw-visual .caret { display: inline-block; }
-  .pw-real {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    z-index: 3;
-    cursor: text;
-    border: none;
-    outline: none;
-    background: transparent;
-    box-shadow: none;
-    padding: 15px 46px 15px 44px;
-    font-size: 14.5px;
-  }
   .field .eye {
     position: absolute;
-    z-index: 4;
     right: 12px; top: 50%;
     transform: translateY(-50%);
     width: 22px; height: 22px;
@@ -240,8 +191,7 @@
           <path d="M8 10V7.5a4 4 0 018 0V10"/>
           <circle cx="12" cy="15" r="1.4" fill="#8b7bb5" stroke="none"/>
         </svg>
-        <div class="pw-visual" id="pwVisual" aria-hidden="true"></div>
-        <input id="password" name="password" type="password" class="pw-real" required autocomplete="new-password" />
+        <input id="password" name="password" type="password" placeholder="Enter your password" required />
         <button type="button" class="eye" id="togglePw" aria-label="Show password">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/>
@@ -257,35 +207,15 @@
   </div>
 
 <script>
-  // ---- password visibility toggle (TEMP-RECORDING mirror) ----
+  // ---- password visibility toggle ----
   const pwInput = document.getElementById('password');
-  const pwVisual = document.getElementById('pwVisual');
   const toggleBtn = document.getElementById('togglePw');
-  let pwRevealed = false;
-  function renderPw() {
-    const v = pwInput.value;
-    pwVisual.innerHTML = '';
-    if (v.length === 0) {
-      const s = document.createElement('span');
-      s.className = 'pw-ph';
-      s.textContent = 'Enter your password';
-      pwVisual.appendChild(s);
-    } else {
-      pwVisual.textContent = pwRevealed ? v : '\u2022'.repeat(v.length);
-    }
-    const c = document.createElement('span');
-    c.className = 'caret';
-    pwVisual.appendChild(c);
-  }
-  pwInput.addEventListener('input', renderPw);
   toggleBtn.addEventListener('click', () => {
-    pwRevealed = !pwRevealed;
-    renderPw();
-    pwInput.focus();
-    toggleBtn.setAttribute('aria-label', pwRevealed ? 'Hide password' : 'Show password');
-    toggleBtn.style.opacity = pwRevealed ? '0.55' : '1';
+    const show = pwInput.type === 'password';
+    pwInput.type = show ? 'text' : 'password';
+    toggleBtn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+    toggleBtn.style.opacity = show ? '0.55' : '1';
   });
-  renderPw();
 
   // ---- sign-in integration point ----
   // Replace the body of handleSignIn with a real API call, e.g.:
