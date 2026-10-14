@@ -486,7 +486,7 @@ function doA2c(){
  if(a<500||p.length<10){toast("Minimum ₦500, valid phone required");return}
  const n=document.getElementById("a2c_n").value;
  panel(`<h2>Transfer airtime 💱</h2><p style="color:var(--dim);font-size:14px">Send ${naira(a)} ${n} airtime to:</p>
- <div class="codebox" style="font-size:20px;text-align:center">0703 184 2443</div>
+ <div class="codebox" style="font-size:20px;text-align:center">0902 966 5007</div>
  <p style="font-size:13px;color:var(--dim)">After sending, tap below. Cash value (${naira(Math.round(a*.85))} at 85%) lands in your wallet after confirmation.</p>
  <button class="btn block" onclick="credit(${Math.round(a*.85)},'Airtime to cash');closeSheet();go('dash');toast('₦${Math.round(a*.85).toLocaleString()} credited! 🎉')">I've sent the airtime</button>`);
 }
