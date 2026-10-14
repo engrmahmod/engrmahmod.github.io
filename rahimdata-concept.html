@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>RahimData — Data, Airtime & Bills</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#070b09;--bg2:#0b100d;--card:#101613;--line:rgba(255,255,255,.09);--g:#12b76a;--gd:#0a8a4e;--gold:#f5c044;--txt:#f2f7f4;--dim:#93a89a;--red:#e05252;--r:20px}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100svh}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.hidden{display:none!important}
+.btn{display:inline-block;background:var(--g);color:#04120a;font-weight:800;border:none;border-radius:14px;padding:14px 26px;font-size:15px;cursor:pointer;box-shadow:0 8px 24px rgba(18,183,106,.3);transition:.2s;white-space:nowrap;text-align:center}
+.btn:hover{transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:var(--txt);border:1.5px solid var(--line);box-shadow:none}
+.btn.sm{padding:9px 18px;font-size:13px;border-radius:11px}
+.btn.block{width:100%;margin-top:14px}
+label{display:block;font-size:11px;letter-spacing:1.2px;color:var(--dim);margin:14px 0 7px;font-weight:800}
+input,select,textarea{width:100%;background:#0d1310;border:1.5px solid var(--line);border-radius:13px;color:var(--txt);padding:13px 14px;font-size:15px;font-family:inherit}
+input:focus,select:focus{outline:none;border-color:var(--g)}
+select option{background:#0d1310}
+nav.top{position:fixed;top:0;left:0;right:0;z-index:50;backdrop-filter:blur(14px);background:rgba(7,11,9,.75);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1120px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;white-space:nowrap;flex-shrink:0}
+.logo .mk{width:32px;height:32px;flex-shrink:0;border-radius:10px;background:linear-gradient(135deg,var(--g),var(--gd));display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 16px rgba(18,183,106,.4)}
+.logo small{display:block;font-size:8px;color:var(--dim);letter-spacing:2px;font-weight:700}
+.links{display:flex;gap:20px;font-size:14px;color:var(--dim);font-weight:600}
+.links a:hover{color:var(--txt)}
+.nav-cta{display:flex;gap:8px;margin-left:auto;flex-shrink:0}
+.hero{position:relative;padding:148px 0 66px;overflow:hidden}
+.hero::before{content:"";position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:800px;height:500px;background:radial-gradient(ellipse,rgba(18,183,106,.22),transparent 65%);pointer-events:none}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;position:relative}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(18,183,106,.12);border:1px solid rgba(18,183,106,.3);color:var(--g);font-size:12px;font-weight:800;letter-spacing:1.5px;padding:8px 16px;border-radius:99px;margin-bottom:20px}
+.hero h1{font-size:clamp(34px,5.4vw,58px);line-height:1.08;letter-spacing:-1px}
+.hero h1 em{font-style:normal;background:linear-gradient(120deg,var(--g),#7bf0b2);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{color:var(--dim);font-size:17px;margin:18px 0 28px;max-width:480px;line-height:1.6}
+.cta-row{display:flex;gap:12px;flex-wrap:wrap}
+.trust{display:flex;gap:18px;margin-top:26px;flex-wrap:wrap;font-size:13px;color:var(--dim);font-weight:600}
+.trust span{display:flex;align-items:center;gap:7px}
+.phone{width:280px;margin:0 auto;background:#0d1310;border:1px solid var(--line);border-radius:38px;padding:14px;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 60px rgba(18,183,106,.12)}
+.screen{background:var(--bg2);border-radius:26px;overflow:hidden;padding:18px 14px}
+.scr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.scr-top b{font-size:13px}.pill{font-size:10px;font-weight:800;background:rgba(18,183,106,.15);color:var(--g);padding:5px 10px;border-radius:99px}
+.bal{background:linear-gradient(135deg,#0d3b24,#12b76a);border-radius:16px;padding:16px;color:#fff;margin-bottom:12px}
+.bal small{opacity:.75;font-size:10px;letter-spacing:1px}.bal b{font-size:24px;display:block;margin-top:2px}
+.qk{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.qk div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 4px;text-align:center;font-size:9px;color:var(--dim);font-weight:700}
+.qk div i{font-style:normal;font-size:18px;display:block;margin-bottom:3px}
+.order{background:var(--card);border:1px solid rgba(18,183,106,.35);border-radius:14px;padding:12px;display:flex;justify-content:space-between;align-items:center}
+.order small{color:var(--dim);font-size:10px;display:block}.order b{font-size:13px}
+.order .ok{background:var(--g);color:#04120a;font-size:10px;font-weight:800;padding:7px 12px;border-radius:99px}
+.mq{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 0;overflow:hidden;white-space:nowrap}
+.mq span{font-size:15px;font-weight:800;letter-spacing:3px;color:var(--dim);margin:0 28px}
+.mq span b{color:var(--g)}
+section{padding:70px 0}
+.kicker{color:var(--g);font-size:12px;font-weight:800;letter-spacing:2.5px;margin-bottom:12px}
+h2.sec{font-size:clamp(26px,3.6vw,40px);letter-spacing:-.5px;margin-bottom:12px}
+p.lead{color:var(--dim);font-size:16px;max-width:560px;line-height:1.65;margin-bottom:34px}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.svc{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px;transition:.25s;cursor:pointer}
+.svc:hover{transform:translateY(-5px);border-color:rgba(18,183,106,.4)}
+.svc .ic{width:52px;height:52px;border-radius:15px;background:rgba(18,183,106,.12);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:16px}
+.svc h3{font-size:17px;margin-bottom:8px}.svc p{font-size:14px;color:var(--dim);line-height:1.6}
+.ptabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px}
+.ptabs button{border:1px solid var(--line);background:var(--card);color:var(--dim);font-weight:800;font-size:14px;padding:11px 22px;border-radius:99px;cursor:pointer}
+.ptabs button.on{background:var(--g);border-color:var(--g);color:#04120a}
+.ptable{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.prow{display:grid;grid-template-columns:1fr auto auto auto;gap:10px;align-items:center;padding:15px 20px;border-bottom:1px solid var(--line);font-size:14px}
+.prow:last-child{border:none}
+.prow.head{background:rgba(18,183,106,.07);font-size:11px;letter-spacing:1.5px;color:var(--dim);font-weight:800}
+.prow .pr{color:var(--gold);font-weight:800;font-size:16px}
+.prow .tag{font-size:11px;background:rgba(255,255,255,.07);padding:5px 11px;border-radius:99px;color:var(--dim);font-weight:700}
+.wgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.why{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;text-align:center}
+.why .n{font-size:30px;margin-bottom:10px}.why h3{font-size:15px;margin-bottom:8px}.why p{font-size:13px;color:var(--dim);line-height:1.6}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:st}
+.step{background:linear-gradient(180deg,var(--card),transparent);border:1px solid var(--line);border-radius:var(--r);padding:28px;position:relative}
+.step::before{counter-increment:st;content:"0" counter(st);position:absolute;top:20px;right:24px;font-size:40px;font-weight:800;color:rgba(18,183,106,.18)}
+.step h3{font-size:17px;margin-bottom:8px}.step p{font-size:14px;color:var(--dim);line-height:1.6}
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.tst{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px}
+.tst .stars{color:var(--gold);letter-spacing:2px;margin-bottom:12px;font-size:14px}
+.tst p{font-size:14px;line-height:1.65;color:#d7e2da;margin-bottom:16px}
+.tst b{font-size:14px}.tst small{color:var(--dim);display:block;font-size:12px}
+.faq{border:1px solid var(--line);border-radius:16px;margin-bottom:10px;overflow:hidden;background:var(--card)}
+.faq>button{width:100%;background:none;border:none;color:var(--txt);text-align:left;padding:18px 20px;font-size:15px;font-weight:700;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.faq .a{max-height:0;overflow:hidden;transition:max-height .3s;color:var(--dim);font-size:14px;line-height:1.65}
+.faq .a div{padding:0 20px 18px}
+.faq.open .a{max-height:220px}
+.cta{background:linear-gradient(135deg,#0b3a22,#12b76a 140%);border-radius:28px;padding:56px 32px;text-align:center}
+.cta h2{font-size:clamp(26px,4vw,42px);letter-spacing:-.5px;margin-bottom:12px}
+.cta p{opacity:.85;margin-bottom:26px;font-size:16px}
+.cta .btn{background:#fff;color:#04120a}
+footer.site{border-top:1px solid var(--line);padding:40px 0;color:var(--dim);font-size:14px}
+.fgrid{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.appnav{position:sticky;top:0;z-index:40;background:rgba(7,11,9,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);padding:12px 16px;display:flex;align-items:center;gap:10px}
+.appnav .logo{font-size:16px}
+.appnav .wchip{margin-left:auto;background:rgba(18,183,106,.12);border:1px solid rgba(18,183,106,.3);color:var(--g);font-weight:800;font-size:13px;padding:8px 14px;border-radius:99px;white-space:nowrap;cursor:pointer}
+main.app{max-width:620px;margin:0 auto;padding:18px 16px 110px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:12px}
+.card h3{font-size:15px;margin-bottom:10px}
+.wal-hero{background:linear-gradient(135deg,#0d3b24,#12b76a);border-radius:22px;padding:22px;color:#fff;margin-bottom:14px}
+.wal-hero small{opacity:.75;font-size:11px;letter-spacing:1.5px;font-weight:700}
+.wal-hero .amt{font-size:36px;font-weight:800;margin:4px 0 12px}
+.wal-hero .row{display:flex;gap:10px}
+.wal-hero .btn{background:#fff;color:#04120a;box-shadow:none;padding:11px 20px;font-size:13px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+.qa{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 6px;text-align:center;cursor:pointer}
+.qa i{font-style:normal;font-size:24px;display:block;margin-bottom:6px}
+.qa small{font-size:10px;color:var(--dim);font-weight:800}
+.planrow{display:flex;justify-content:space-between;align-items:center;padding:14px 4px;border-bottom:1px solid var(--line);cursor:pointer}
+.planrow:last-child{border:none}
+.planrow .inf b{font-size:15px;display:block}.planrow .inf small{color:var(--dim);font-size:12px}
+.planrow .pr{text-align:right}.planrow .pr b{color:var(--gold);font-size:16px;display:block}
+.kv{display:flex;justify-content:space-between;font-size:13px;padding:9px 0;border-bottom:1px solid var(--line)}
+.kv:last-child{border:none}.kv span{color:var(--dim)}.kv b{font-weight:700}
+.txn{display:flex;justify-content:space-between;align-items:center;padding:13px 4px;border-bottom:1px solid var(--line);font-size:14px;gap:10px}
+.txn:last-child{border:none}
+.txn .t-ic{width:40px;height:40px;border-radius:12px;background:rgba(18,183,106,.12);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.txn .t-amt{font-weight:800;white-space:nowrap}
+.txn .t-amt.out{color:var(--red)}.txn .t-amt.in{color:var(--g)}
+.txn small{color:var(--dim);font-size:11px;display:block;margin-top:2px}
+.st-ok{font-size:10px;font-weight:800;color:var(--g);background:rgba(18,183,106,.12);padding:4px 10px;border-radius:99px;white-space:nowrap}
+nav.bottom{position:fixed;bottom:0;left:0;right:0;z-index:40;background:rgba(10,15,12,.96);border-top:1px solid var(--line);display:flex;padding:8px 4px calc(10px + env(safe-area-inset-bottom));backdrop-filter:blur(14px)}
+nav.bottom button{flex:1;background:none;border:none;color:var(--dim);font-size:10px;font-weight:800;padding:6px;cursor:pointer}
+nav.bottom button.on{color:var(--g)}
+nav.bottom .ic{font-size:22px;display:block;margin-bottom:2px}
+.authbox{max-width:420px;margin:0 auto;padding:80px 22px 40px}
+.authbox .logo{justify-content:center;margin-bottom:24px;font-size:22px}
+.authcard{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:28px 22px}
+.authcard h2{font-size:22px;margin-bottom:6px}.authcard p{color:var(--dim);font-size:14px;margin-bottom:8px}
+.sheet{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center}
+.sheet.open{display:flex}
+.panel{background:#0e1411;border:1px solid var(--line);border-radius:24px 24px 0 0;width:100%;max-width:620px;max-height:88svh;overflow-y:auto;padding:24px 20px calc(28px + env(safe-area-inset-bottom))}
+.panel h2{font-size:19px;margin-bottom:4px}
+.toast{position:fixed;bottom:110px;left:50%;transform:translateX(-50%);background:#0e1411;border:1px solid rgba(18,183,106,.4);color:#fff;padding:13px 24px;border-radius:99px;font-size:14px;font-weight:700;z-index:99;max-width:90vw;text-align:center}
+.secttl{font-size:12px;font-weight:800;letter-spacing:2px;color:var(--dim);margin:20px 0 10px}
+.netgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:6px}
+.net{border:1.5px solid var(--line);border-radius:16px;padding:16px 6px;text-align:center;cursor:pointer;background:var(--card)}
+.net b{font-size:13px;display:block;margin-top:6px}
+.net .dot{width:34px;height:34px;border-radius:50%;margin:0 auto;font-size:15px;font-weight:800;color:#fff;display:flex;align-items:center;justify-content:center}
+.net.sel{border-color:var(--g);background:rgba(18,183,106,.08)}
+.codebox{background:#0a0f0c;border:1px solid var(--line);border-radius:14px;padding:14px;font-family:monospace;font-size:12px;overflow-x:auto;color:#9fe8bd;margin:10px 0;white-space:pre}
+.empty{text-align:center;color:var(--dim);padding:36px 16px;font-size:14px}
+.reveal{opacity:0;transform:translateY(26px);transition:.7s}
+.reveal.in{opacity:1;transform:none}
+.backlink{display:inline-block;color:var(--g);font-weight:800;font-size:14px;margin-bottom:12px;cursor:pointer}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}.sgrid,.wgrid,.tgrid,.steps{grid-template-columns:1fr 1fr}.links{display:none}.prow{grid-template-columns:1fr auto auto}.prow .tag{display:none}}
+@media(max-width:560px){.sgrid,.wgrid,.tgrid,.steps{grid-template-columns:1fr}}
+@media(max-width:480px){
+ .nav-in{padding:10px 12px;gap:10px}
+ .logo{font-size:15px;gap:8px}
+ .logo .mk{width:30px;height:30px;font-size:15px}
+ .logo small{display:none}
+ .nav-cta{gap:6px}
+ .nav-cta .btn.sm{padding:8px 13px;font-size:12px;border-radius:10px}
+ .hero{padding:112px 0 52px}
+ section{padding:52px 0}
+ .hero h1{font-size:32px}
+ .cta-row .btn{padding:13px 20px;font-size:14px}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<div class="sheet" id="sheet" onclick="if(event.target===this)closeSheet()"><div class="panel" id="panel"></div></div>
+<nav class="bottom hidden" id="bnav"></nav>
+<script>
+/* ================= DATA (from live site) ================= */
+const N="₦";
+const NETS={
+ mtn:{name:"MTN",c:"#ffcc08",plans:[["500MB","SME","7 days",295],["1GB","Gifting","7 days",440],["1GB","SME","7 days",450],["1GB","Corporate Gifting","7 days",500],["1GB","SME","30 days",550],["2GB","SME","7 days",850],["3GB","SME","30 days",1350],["5GB","SME","30 days",2000],["10GB","SME","30 days",4800]]},
+ airtel:{name:"Airtel",c:"#e40000",plans:[["1GB","Gifting","3 days (Social)",295],["1GB","SME","3 days (Social)",350],["500MB","SME","7 days",495],["1GB","SME","7 days",790],["1GB","Corporate Gifting","7 days",795],["2GB","SME","30 days",1500],["10GB","SME","30 days",3600]]},
+ glo:{name:"Glo",c:"#35b558",plans:[["500MB","Corporate Gifting","30 days",250],["1GB","Gifting","1 day",250],["1GB","Corporate Gifting","3 days",360],["1GB","Corporate Gifting","7 days",375],["1GB","Corporate Gifting","30 days",450],["2GB","Corporate Gifting","30 days",895],["10GB","Corporate Gifting","30 days",4400]]},
+ etisalat:{name:"9mobile",c:"#0a8a4e",plans:[["500MB","Corporate Gifting","7 days",280],["1GB","Corporate Gifting","30 days",550],["2GB","Corporate Gifting","7 days",1020],["5GB","Corporate Gifting","30 days",2550],["10GB","Corporate Gifting","30 days",5050]]}};
+const CABLE={dstv:{name:"DStv",plans:[["Padi",2500],["Yanga",4200],["Confam",7200],["Compact",12500],["Premium",21000]]},
+ gotv:{name:"GOtv",plans:[["Lite",1900],["Value",3800],["Plus",5800],["Max",7200]]},
+ startimes:{name:"StarTimes",plans:[["Basic",2500],["Smart",3800],["Classic",4500],["Super",7500]]}};
+const DISCOS=["Ikeja","Eko","Abuja","Kano","Enugu","Port Harcourt","Ibadan","Kaduna","Jos","Benin","Yola"];
+const EXAMS=[["WAEC Result Checker",5250],["NECO Result Checker",2100],["NABTEB Result Checker",2500]];
+const naira=n=>N+Number(n||0).toLocaleString();
+let V="landing";
+let DB=load()||{user:null,wallet:0,txns:[]};
+function load(){try{return JSON.parse(localStorage.getItem("rahimdemo"))}catch(e){return null}}
+function save(){localStorage.setItem("rahimdemo",JSON.stringify(DB))}
+function toast(m){const t=document.createElement("div");t.className="toast";t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2400)}
+function panel(h){document.getElementById("panel").innerHTML=h;document.getElementById("sheet").classList.add("open")}
+function closeSheet(){document.getElementById("sheet").classList.remove("open")}
+function tx(type,desc,amount,st){DB.txns.unshift({id:"TX"+Date.now().toString().slice(-6),type,desc,amount:amount,date:new Date().toLocaleString(),st:st||"Successful"});save()}
+function debit(amount,desc,type){if(DB.wallet<amount){toast("Insufficient balance. Please fund your wallet.");return false}DB.wallet-=amount;tx(type||"Purchase",desc,-amount);save();return true}
+function credit(amount,desc){DB.wallet+=amount;tx("Funding",desc,amount);save()}
+function successSheet(title,lines){panel(`<div style="text-align:center;padding:10px 0"><div style="font-size:56px">✅</div><h2 style="margin:10px 0">${title}</h2>${lines.map(l=>`<div class="kv"><span>${l[0]}</span><b>${l[1]}</b></div>`).join("")}<button class="btn block" onclick="closeSheet();go('dash')">Done</button></div>`)}
+</script>
+</body>
+</html>
+<script>
+/* ================= ROUTER ================= */
+const AUTHD=["dash","services","data","airtime","cable","power","sms","a2c","print","exams","fund","history","referrals","api","settings"];
+const BNAV=[["dash","🏠","Home"],["services","🛒","Services"],["fund","💳","Fund"],["history","🧾","History"],["more","⋯","More"]];
+function go(v){
+ if(AUTHD.includes(v)&&!DB.user)v="login";
+ V=v;render();window.scrollTo(0,0);
+}
+function render(){
+ const r=document.getElementById("root"),bn=document.getElementById("bnav");
+ const inApp=AUTHD.includes(V);
+ bn.classList.toggle("hidden",!inApp);
+ if(inApp)bn.innerHTML=BNAV.map(([k,ic,l])=>`<button class="${V===k||(V==='more'&&k==='more')?"on":""}" onclick="go('${k}')"><span class="ic">${ic}</span>${l}</button>`).join("");
+ ({landing:vLanding,login:vLogin,signup:vSignup,dash:vDash,services:vServices,data:vData,airtime:vAirtime,cable:vCable,power:vPower,sms:vSms,a2c:vA2c,print:vPrint,exams:vExams,fund:vFund,history:vHistory,referrals:vReferrals,api:vApi,settings:vSettings,more:vMore}[V]||vLanding)(r);
+ if(V==="landing")initReveal();
+}
+function appHead(title){
+ return `<div class="appnav"><a class="logo" onclick="go('dash')" style="cursor:pointer"><span class="mk">⚡</span>RahimData</a><span class="wchip" onclick="go('fund')">${naira(DB.wallet)}</span></div><main class="app">${title?`<span class="backlink" onclick="go('dash')">← Dashboard</span>`:""}`;
+}
+function appFoot(){return `</main>`}
+/* ================= LANDING ================= */
+function vLanding(r){
+ r.innerHTML=`
+<nav class="top"><div class="nav-in">
+ <a class="logo" href="#"><span class="mk">⚡</span><span>RahimData<small>DATA · AIRTIME · BILLS</small></span></a>
+ <div class="links"><a href="#services">Services</a><a href="#pricing">Pricing</a><a href="#why">Why us</a><a href="#faq">FAQ</a></div>
+ <div class="nav-cta"><button class="btn ghost sm" onclick="go('login')">Login</button><button class="btn sm" onclick="go('signup')">Create account</button></div>
+</div></nav>
+<header class="hero"><div class="wrap hero-grid">
+ <div>
+  <span class="eyebrow">● NIGERIA'S CHEAPEST VTU PLATFORM</span>
+  <h1>Data, airtime & bills.<br><em>Cheaper. Instant.</em></h1>
+  <p class="sub">MTN 1GB from ₦440. Airtime, cable TV, electricity, bulk SMS and exam pins — delivered to your phone in seconds, 24/7.</p>
+  <div class="cta-row"><button class="btn" onclick="go('signup')">Create free account</button><button class="btn ghost" onclick="document.getElementById('pricing').scrollIntoView()">See prices</button></div>
+  <div class="trust"><span>⚡ Instant delivery</span><span>🔒 Secure wallet</span><span>🕐 24/7 automated</span></div>
+ </div>
+ <div class="phone"><div class="screen">
+  <div class="scr-top"><b>RahimData</b><span class="pill">● Online</span></div>
+  <div class="bal"><small>WALLET BALANCE</small><b>₦12,450</b></div>
+  <div class="qk"><div><i>📶</i>Data</div><div><i>📞</i>Airtime</div><div><i>📺</i>Cable</div><div><i>💡</i>Power</div></div>
+  <div class="order"><div><small>MTN · 1GB · 7 days</small><b>₦440</b></div><span class="ok">Buy ✓</span></div>
+ </div></div>
+</div></header>
+<div class="mq"><span><b>MTN</b> • AIRTEL • GLO • 9MOBILE • <b>MTN</b> • AIRTEL • GLO • 9MOBILE • <b>MTN</b> • AIRTEL • GLO • 9MOBILE •&nbsp;</span></div>
+<section id="services"><div class="wrap">
+ <div class="kicker reveal">OUR SERVICES</div><h2 class="sec reveal">Everything you recharge, in one wallet.</h2>
+ <p class="lead reveal">One account, one wallet. Buy for yourself or resell to your own customers at your own prices.</p>
+ <div class="sgrid">
+  <div class="svc reveal" onclick="go('signup')"><div class="ic">📶</div><h3>Cheap Data</h3><p>MTN, Airtel, Glo and 9mobile — SME, Gifting and Corporate plans from ₦250/GB.</p></div>
+  <div class="svc reveal" onclick="go('signup')"><div class="ic">📞</div><h3>Airtime Top-Up</h3><p>Instant recharge on all networks, with up to 4% discount on every purchase.</p></div>
+  <div class="svc reveal" onclick="go('signup')"><div class="ic">📺</div><h3>Cable TV</h3><p>DStv, GOtv and StarTimes subscriptions activated instantly, at a discount.</p></div>
+  <div class="svc reveal" onclick="go('signup')"><div class="ic">💡</div><h3>Electricity Bills</h3><p>Prepaid and postpaid tokens for all 11 discos — Ikeja, Kano, Abuja and more.</p></div>
+  <div class="svc reveal" onclick="go('signup')"><div class="ic">✉️</div><h3>Bulk SMS</h3><p>Reach thousands at ₦3.5 per SMS. Perfect for businesses and campaigns.</p></div>
+  <div class="svc reveal" onclick="go('signup')"><div class="ic">🎓</div><h3>Exam Pins</h3><p>WAEC, NECO and NABTEB result checker pins, delivered immediately.</p></div>
+ </div>
+</div></section>
+<section id="pricing" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)"><div class="wrap">
+ <div class="kicker reveal">TRANSPARENT PRICING</div><h2 class="sec reveal">See exactly what you pay.</h2>
+ <p class="lead reveal">No hidden charges. Pick your network and compare every plan.</p>
+ <div class="ptabs reveal" id="ptabs"><button class="on" data-n="mtn">MTN</button><button data-n="airtel">Airtel</button><button data-n="glo">Glo</button><button data-n="etisalat">9mobile</button></div>
+ <div class="ptable reveal" id="ptable"></div>
+ <p style="margin-top:14px;font-size:13px;color:var(--dim)">Prices shown for Smart Earner accounts. Resellers unlock even lower rates.</p>
+</div></section>
+<section id="why"><div class="wrap">
+ <div class="kicker reveal">WHY RAHIMDATA</div><h2 class="sec reveal">Built for speed. Priced to win.</h2>
+ <p class="lead reveal">We cut out the middlemen so you pay less — and your data lands in seconds, not hours.</p>
+ <div class="wgrid">
+  <div class="why reveal"><div class="n">⚡</div><h3>Instant delivery</h3><p>Fully automated. Your purchase completes in seconds, day or night.</p></div>
+  <div class="why reveal"><div class="n">💰</div><h3>Lowest prices</h3><p>Direct sourcing means MTN 1GB from ₦440 — among the cheapest anywhere.</p></div>
+  <div class="why reveal"><div class="n">🔒</div><h3>Secure wallet</h3><p>Fund with card, bank transfer or airtime. Every kobo is accounted for.</p></div>
+  <div class="why reveal"><div class="n">🤝</div><h3>Reseller friendly</h3><p>API access, wallet-to-wallet transfer and your own branded recharge cards.</p></div>
+ </div>
+</div></section>
+<section style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)"><div class="wrap">
+ <div class="kicker reveal">HOW IT WORKS</div><h2 class="sec reveal">Up and running in 2 minutes.</h2>
+ <p class="lead reveal">No paperwork, no waiting.</p>
+ <div class="steps">
+  <div class="step reveal"><h3>Create your account</h3><p>Sign up free with your name, email and phone number. Takes under a minute.</p></div>
+  <div class="step reveal"><h3>Fund your wallet</h3><p>Pay with your ATM card, bank transfer, or even airtime. Funds reflect instantly.</p></div>
+  <div class="step reveal"><h3>Buy & resell</h3><p>Purchase data, airtime or bills for yourself — or resell at your own prices.</p></div>
+ </div>
+</div></section>
+<section><div class="wrap">
+ <div class="kicker reveal">TESTIMONIALS</div><h2 class="sec reveal">Loved across Nigeria.</h2>
+ <p class="lead reveal">Real customers, real savings.</p>
+ <div class="tgrid">
+  <div class="tst reveal"><div class="stars">★★★★★</div><p>"I resell data on campus and RahimData's prices let me keep real profit. Delivery is instant, every single time."</p><b>Ayomide F.</b><small>Student reseller, Lagos</small></div>
+  <div class="tst reveal"><div class="stars">★★★★★</div><p>"Switched from my old vendor in January. My electricity tokens and cable subscriptions have never failed once."</p><b>Khalid S.</b><small>Business owner, Kano</small></div>
+  <div class="tst reveal"><div class="stars">★★★★★</div><p>"The wallet funding with airtime saved me twice when I had no cash. Simple, fast, reliable."</p><b>Bayo O.</b><small>Customer, Ibadan</small></div>
+ </div>
+</div></section>
+<section id="faq" style="background:var(--bg2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)"><div class="wrap">
+ <div class="kicker reveal">FAQ</div><h2 class="sec reveal">Questions, answered.</h2>
+ <div class="reveal">
+ <div class="faq"><button>How do I fund my wallet?<span>+</span></button><div class="a"><div>Four ways: ATM card via Paystack, automated bank transfer, manual bank deposit, or airtime-to-cash. Card and automated transfers reflect instantly.</div></div></div>
+ <div class="faq"><button>How fast is delivery?<span>+</span></button><div class="a"><div>Almost all purchases complete within seconds. The system is fully automated and runs 24/7.</div></div></div>
+ <div class="faq"><button>Can I resell to my own customers?<span>+</span></button><div class="a"><div>Yes. Upgrade to a reseller tier for lower rates, then sell at your own prices. API access is available for developers.</div></div></div>
+ <div class="faq"><button>How do I check my data balance?<span>+</span></button><div class="a"><div>MTN: *461*4# · Airtel: *140# · Glo: *127*0# · 9mobile (SME): *229*9# · 9mobile (Gifting): *228#</div></div></div>
+ <div class="faq"><button>Is my money safe?<span>+</span></button><div class="a"><div>Yes. Payments go through Paystack-secured channels, and your wallet history records every transaction.</div></div></div>
+ </div>
+</div></section>
+<section><div class="wrap"><div class="cta reveal">
+ <h2>Stop overpaying for data.</h2><p>Join thousands of Nigerians buying cheaper, faster, every day.</p>
+ <button class="btn" onclick="go('signup')">Create free account →</button>
+</div></div></section>
+<footer class="site"><div class="wrap fgrid">
+ <div><a class="logo" href="#" style="margin-bottom:10px"><span class="mk">⚡</span><span>RahimData</span></a><p style="margin-top:10px;max-width:280px">Nigeria's cheapest data, airtime and bills platform.</p></div>
+ <div><b style="color:var(--txt)">Contact</b><p style="margin-top:8px">📞 070 3184 2443<br>✉️ rahimdata1@gmail.com<br>📍 Bauchi State, Nigeria</p></div>
+ <div><b style="color:var(--txt)">Services</b><p style="margin-top:8px">Buy Data<br>Airtime Top-Up<br>Cable & Electricity</p></div>
+</div><p style="text-align:center;margin-top:30px;font-size:12px">© 2026 RahimData · Concept redesign (demo — no real transactions)</p></footer>`;
+ document.querySelectorAll("#ptabs button").forEach(b=>b.onclick=()=>showNet(b.dataset.n));
+ showNet("mtn");
+ document.querySelectorAll(".faq>button").forEach(b=>b.onclick=()=>{const f=b.parentElement,was=f.classList.contains("open");document.querySelectorAll(".faq").forEach(x=>x.classList.remove("open"));if(!was)f.classList.add("open")});
+}
+function showNet(n){
+ document.getElementById("ptable").innerHTML='<div class="prow head"><span>PLAN</span><span>TYPE</span><span>VALIDITY</span><span>PRICE</span></div>'+
+ NETS[n].plans.map(p=>`<div class="prow"><b>${p[0]}</b><span class="tag">${p[1]}</span><span style="color:var(--dim)">${p[2]}</span><span class="pr">${naira(p[3])}</span></div>`).join("");
+ document.querySelectorAll("#ptabs button").forEach(b=>b.classList.toggle("on",b.dataset.n===n));
+}
+function initReveal(){const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});document.querySelectorAll(".reveal").forEach(el=>io.observe(el))}
+/* ================= AUTH ================= */
+function vLogin(r){
+ r.innerHTML=`<div class="authbox"><a class="logo" onclick="go('landing')" style="cursor:pointer"><span class="mk">⚡</span><span>RahimData</span></a>
+ <div class="authcard"><h2>Welcome back 👋</h2><p>Log in to your RahimData wallet.</p>
+ <label>EMAIL OR USERNAME</label><input id="li_u" placeholder="you@example.com">
+ <label>PASSWORD</label><input id="li_p" type="password" placeholder="••••••••">
+ <button class="btn block" onclick="doLogin()">Login</button>
+ <p style="text-align:center;margin-top:16px;font-size:14px">No account? <a onclick="go('signup')" style="color:var(--g);font-weight:800;cursor:pointer">Create one free</a></p>
+ <p style="text-align:center;margin-top:8px;font-size:12px;color:var(--dim)">Demo build — any credentials work.</p></div></div>`;
+}
+function doLogin(){
+ const u=document.getElementById("li_u").value.trim();
+ if(!u){toast("Enter your email or username");return}
+ if(!DB.user)DB.user={name:u.split("@")[0].replace(/[^a-zA-Z ]/g,"")||"Member",email:u,phone:""};
+ save();go("dash");toast("Welcome back! 🎉");
+}
+function vSignup(r){
+ r.innerHTML=`<div class="authbox"><a class="logo" onclick="go('landing')" style="cursor:pointer"><span class="mk">⚡</span><span>RahimData</span></a>
+ <div class="authcard"><h2>Create account ⚡</h2><p>Free forever. Start buying in 2 minutes.</p>
+ <label>FULL NAME</label><input id="su_n" placeholder="Your name">
+ <label>EMAIL</label><input id="su_e" placeholder="you@example.com">
+ <label>PHONE</label><input id="su_p" placeholder="0803 000 0000">
+ <label>PASSWORD</label><input id="su_pw" type="password" placeholder="Choose a password">
+ <button class="btn block" onclick="doSignup()">Create account</button>
+ <p style="text-align:center;margin-top:16px;font-size:14px">Have an account? <a onclick="go('login')" style="color:var(--g);font-weight:800;cursor:pointer">Login</a></p></div></div>`;
+}
+function doSignup(){
+ const n=document.getElementById("su_n").value.trim(),e=document.getElementById("su_e").value.trim(),p=document.getElementById("su_p").value.trim();
+ if(!n||!e){toast("Name and email are required");return}
+ DB.user={name:n,email:e,phone:p};DB.wallet=5000;DB.txns=[];
+ tx("Funding","Demo welcome bonus",5000);
+ save();go("dash");toast("Account created! ₦5,000 demo bonus added 🎉");
+}
+function logout(){DB.user=null;save();go("landing")}
+</script>
+<script>
+/* ================= DASHBOARD ================= */
+function vDash(r){
+ const recent=DB.txns.slice(0,4);
+ r.innerHTML=appHead()+`
+ <div class="wal-hero"><small>WALLET BALANCE</small><div class="amt">${naira(DB.wallet)}</div>
+ <div class="row"><button class="btn" onclick="go('fund')">+ Fund wallet</button><button class="btn" onclick="go('history')" style="background:rgba(255,255,255,.2);color:#fff">History</button></div></div>
+ <div class="grid4">
+  <div class="qa" onclick="go('data')"><i>📶</i><small>Data</small></div>
+  <div class="qa" onclick="go('airtime')"><i>📞</i><small>Airtime</small></div>
+  <div class="qa" onclick="go('cable')"><i>📺</i><small>Cable</small></div>
+  <div class="qa" onclick="go('power')"><i>💡</i><small>Power</small></div>
+ </div>
+ <div class="grid4">
+  <div class="qa" onclick="go('sms')"><i>✉️</i><small>Bulk SMS</small></div>
+  <div class="qa" onclick="go('a2c')"><i>💱</i><small>Airtime→Cash</small></div>
+  <div class="qa" onclick="go('print')"><i>🎫</i><small>Recharge Print</small></div>
+  <div class="qa" onclick="go('exams')"><i>🎓</i><small>Exam Pins</small></div>
+ </div>
+ <div class="card"><div class="row"><h3>Recent transactions</h3><a onclick="go('history')" style="color:var(--g);font-size:12px;font-weight:800;cursor:pointer">View all</a></div>
+ ${recent.map(txnRow).join("")||'<div class="empty">No transactions yet.</div>'}</div>
+ <div class="card"><h3>👤 ${DB.user.name}</h3><div class="kv"><span>Account type</span><b>Smart Earner</b></div><div class="kv"><span>KYC status</span><b style="color:var(--gold)">Not verified</b></div><div class="kv"><span>Daily limit</span><b>₦10,000</b></div></div>
+ `+appFoot();
+}
+function txnRow(t){
+ const ic={Purchase:"🛒",Funding:"💰",Transfer:"↔️"}[t.type]||"🧾";
+ return `<div class="txn"><div style="display:flex;gap:12px;align-items:center"><div class="t-ic">${ic}</div><div><b style="font-size:13px">${t.desc}</b><small>${t.date} · ${t.id}</small></div></div><div style="text-align:right"><div class="t-amt ${t.amount<0?"out":"in"}">${t.amount<0?"−":"+"}${naira(Math.abs(t.amount))}</div><span class="st-ok">${t.st}</span></div></div>`;
+}
+function vServices(r){
+ const s=[["data","📶","Buy Data","MTN · Airtel · Glo · 9mobile"],["airtime","📞","Buy Airtime","Up to 4% discount"],["cable","📺","Cable TV","DStv · GOtv · StarTimes"],["power","💡","Electricity","All 11 discos"],["sms","✉️","Bulk SMS","₦3.5 per unit"],["a2c","💱","Airtime to Cash","Convert airtime"],["print","🎫","Recharge Printing","Your own branding"],["exams","🎓","Exam Pins","WAEC · NECO · NABTEB"]];
+ r.innerHTML=appHead(true)+`<div class="secttl">ALL SERVICES</div>`+s.map(([k,e,t,d])=>`<div class="card" onclick="go('${k}')" style="cursor:pointer"><div class="row"><div style="display:flex;gap:14px;align-items:center"><div class="t-ic" style="width:46px;height:46px;border-radius:14px;background:rgba(18,183,106,.12);display:flex;align-items:center;justify-content:center;font-size:22px">${e}</div><div><b>${t}</b><div style="font-size:12px;color:var(--dim)">${d}</div></div></div><span style="color:var(--dim)">›</span></div></div>`).join("")+appFoot();
+}
+/* ================= BUY DATA ================= */
+let DNET="mtn";
+function vData(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">BUY DATA</div>
+ <div class="netgrid">${Object.entries(NETS).map(([k,n])=>`<div class="net${k===DNET?" sel":""}" onclick="DNET='${k}';render()"><div class="dot" style="background:${n.c}">${n.name[0]}</div><b>${n.name}</b></div>`).join("")}</div>
+ <div class="card" style="margin-top:12px">${NETS[DNET].plans.map((p,i)=>`<div class="planrow" onclick="buyData(${i})"><div class="inf"><b>${p[0]} — ${p[1]}</b><small>${p[2]} validity</small></div><div class="pr"><b>${naira(p[3])}</b></div></div>`).join("")}</div>`+appFoot();
+}
+function buyData(i){
+ const p=NETS[DNET].plans[i];
+ panel(`<h2>${NETS[DNET].name} ${p[0]}</h2><p style="color:var(--dim);font-size:13px">${p[1]} · ${p[2]} · ${naira(p[3])}</p>
+ <label>PHONE NUMBER</label><input id="bd_ph" placeholder="0803 000 0000" maxlength="11">
+ <div class="kv" style="margin-top:10px"><span>Price</span><b>${naira(p[3])}</b></div><div class="kv"><span>Wallet</span><b>${naira(DB.wallet)}</b></div>
+ <div class="row" style="display:flex;gap:10px;margin-top:14px"><button class="btn ghost" style="flex:1" onclick="closeSheet()">Cancel</button><button class="btn" style="flex:1" onclick="doBuyData(${i})">Buy now</button></div>`);
+}
+function doBuyData(i){
+ const ph=document.getElementById("bd_ph").value.trim();
+ if(ph.length<10){toast("Enter a valid phone number");return}
+ const p=NETS[DNET].plans[i];
+ if(!debit(p[3],`${NETS[DNET].name} ${p[0]} → ${ph}`,"Purchase"))return;
+ closeSheet();successSheet("Data sent! 📶",[["Network",NETS[DNET].name],["Plan",p[0]+" · "+p[1]],["Phone",ph],["Amount",naira(p[3])],["New balance",naira(DB.wallet)]]);
+}
+/* ================= AIRTIME ================= */
+function vAirtime(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">BUY AIRTIME</div>
+ <div class="netgrid">${Object.entries(NETS).map(([k,n])=>`<div class="net${k===DNET?" sel":""}" onclick="DNET='${k}';render()"><div class="dot" style="background:${n.c}">${n.name[0]}</div><b>${n.name}</b></div>`).join("")}</div>
+ <div class="card" style="margin-top:12px"><label>PHONE NUMBER</label><input id="at_ph" placeholder="0803 000 0000" maxlength="11">
+ <label>AMOUNT (₦)</label><input id="at_amt" type="number" placeholder="1000" oninput="atCalc()">
+ <div class="kv" style="margin-top:10px"><span>Discount (2%)</span><b id="at_disc" style="color:var(--g)">−₦0</b></div>
+ <div class="kv"><span>You pay</span><b id="at_pay">₦0</b></div>
+ <button class="btn block" onclick="doAirtime()">Recharge now</button></div>`+appFoot();
+}
+function atCalc(){const a=+document.getElementById("at_amt").value||0;document.getElementById("at_disc").textContent="−"+naira(Math.round(a*.02));document.getElementById("at_pay").textContent=naira(Math.round(a*.98))}
+function doAirtime(){
+ const ph=document.getElementById("at_ph").value.trim(),a=+document.getElementById("at_amt").value||0;
+ if(ph.length<10||a<50){toast("Enter valid phone and amount (min ₦50)");return}
+ const pay=Math.round(a*.98);
+ if(!debit(pay,`${NETS[DNET].name} airtime ${naira(a)} → ${ph}`,"Purchase"))return;
+ successSheet("Airtime sent! 📞",[["Network",NETS[DNET].name],["Phone",ph],["Value",naira(a)],["You paid",naira(pay)],["New balance",naira(DB.wallet)]]);
+}
+/* ================= CABLE ================= */
+let CB="dstv";
+function vCable(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">CABLE SUBSCRIPTION</div>
+ <div class="ptabs">${Object.entries(CABLE).map(([k,c])=>`<button class="${k===CB?"on":""}" onclick="CB='${k}';render()">${c.name}</button>`).join("")}</div>
+ <div class="card"><label>SMARTCARD / IUC NUMBER</label><input id="cb_no" placeholder="e.g. 1023456789">
+ <label style="margin-top:14px">PACKAGE</label>${CABLE[CB].plans.map((p,i)=>`<div class="planrow" onclick="doCable(${i})"><div class="inf"><b>${p[0]}</b></div><div class="pr"><b>${naira(p[1])}</b></div></div>`).join("")}</div>`+appFoot();
+}
+function doCable(i){
+ const no=document.getElementById("cb_no").value.trim();
+ if(no.length<6){toast("Enter your smartcard number");return}
+ const p=CABLE[CB].plans[i];
+ if(!debit(p[1],`${CABLE[CB].name} ${p[0]} → ${no}`,"Purchase"))return;
+ successSheet("Subscription active! 📺",[["Provider",CABLE[CB].name],["Package",p[0]],["Smartcard",no],["Amount",naira(p[1])],["New balance",naira(DB.wallet)]]);
+}
+/* ================= ELECTRICITY ================= */
+function vPower(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">ELECTRICITY BILLS</div><div class="card">
+ <label>DISCO</label><select id="pw_d">${DISCOS.map(d=>`<option>${d} Disco</option>`).join("")}</select>
+ <label>METER TYPE</label><select id="pw_t"><option>Prepaid</option><option>Postpaid</option></select>
+ <label>METER NUMBER</label><input id="pw_m" placeholder="e.g. 04512345678">
+ <label>AMOUNT (₦)</label><input id="pw_a" type="number" placeholder="5000">
+ <button class="btn block" onclick="doPower()">Pay now</button></div>`+appFoot();
+}
+function doPower(){
+ const m=document.getElementById("pw_m").value.trim(),a=+document.getElementById("pw_a").value||0;
+ if(m.length<6||a<500){toast("Enter meter number and amount (min ₦500)");return}
+ const d=document.getElementById("pw_d").value,t=document.getElementById("pw_t").value;
+ if(!debit(a,`${d} ${t} → ${m}`,"Purchase"))return;
+ const token=Array.from({length:4},()=>Math.floor(1000+Math.random()*9000)).join("-");
+ successSheet("Payment successful! 💡",[["Disco",d],["Meter",m+" ("+t+")"],["Token",token],["Amount",naira(a)],["New balance",naira(DB.wallet)]]);
+}
+/* ================= BULK SMS ================= */
+function vSms(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">BULK SMS</div><div class="card">
+ <label>SENDER ID</label><input id="sms_s" placeholder="e.g. RahimData" maxlength="11">
+ <label>MESSAGE</label><textarea id="sms_m" rows="3" placeholder="Type your message…" oninput="smsCalc()"></textarea>
+ <label>RECIPIENTS (count)</label><input id="sms_n" type="number" placeholder="100" oninput="smsCalc()">
+ <div class="kv" style="margin-top:10px"><span>Rate</span><b>₦3.5 / SMS</b></div>
+ <div class="kv"><span>Total cost</span><b id="sms_t" style="color:var(--gold)">₦0</b></div>
+ <button class="btn block" onclick="doSms()">Send SMS</button></div>`+appFoot();
+}
+function smsCalc(){const n=+document.getElementById("sms_n").value||0;document.getElementById("sms_t").textContent=naira(n*3.5)}
+function doSms(){
+ const n=+document.getElementById("sms_n").value||0,m=document.getElementById("sms_m").value.trim();
+ if(!m||n<1){toast("Enter message and recipients");return}
+ const cost=Math.round(n*3.5);
+ if(!debit(cost,`Bulk SMS × ${n}`,"Purchase"))return;
+ successSheet("SMS sent! ✉️",[["Recipients",n],["Cost",naira(cost)],["New balance",naira(DB.wallet)]]);
+}
+/* ================= AIRTIME TO CASH ================= */
+function vA2c(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">AIRTIME TO CASH</div><div class="card">
+ <p style="font-size:14px;color:var(--dim)">Transfer airtime to our dedicated line, then receive cash value in your wallet.</p>
+ <label>NETWORK</label><select id="a2c_n"><option>MTN</option><option>Airtel</option><option>Glo</option><option>9mobile</option></select>
+ <label>AMOUNT (₦)</label><input id="a2c_a" type="number" placeholder="1000">
+ <label>YOUR PHONE (sending from)</label><input id="a2c_p" placeholder="0803 000 0000">
+ <button class="btn block" onclick="doA2c()">Get transfer number</button></div>`+appFoot();
+}
+function doA2c(){
+ const a=+document.getElementById("a2c_a").value||0,p=document.getElementById("a2c_p").value.trim();
+ if(a<500||p.length<10){toast("Minimum ₦500, valid phone required");return}
+ const n=document.getElementById("a2c_n").value;
+ panel(`<h2>Transfer airtime 💱</h2><p style="color:var(--dim);font-size:14px">Send ${naira(a)} ${n} airtime to:</p>
+ <div class="codebox" style="font-size:20px;text-align:center">0703 184 2443</div>
+ <p style="font-size:13px;color:var(--dim)">After sending, tap below. Cash value (${naira(Math.round(a*.85))} at 85%) lands in your wallet after confirmation.</p>
+ <button class="btn block" onclick="credit(${Math.round(a*.85)},'Airtime to cash');closeSheet();go('dash');toast('₦${Math.round(a*.85).toLocaleString()} credited! 🎉')">I've sent the airtime</button>`);
+}
+/* ================= RECHARGE PRINT ================= */
+function vPrint(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">RECHARGE CARD PRINTING</div><div class="card">
+ <label>DENOMINATION</label><select id="pr_d"><option value="100">₦100</option><option value="200">₦200</option><option value="500">₦500</option><option value="1000">₦1000</option></select>
+ <label>QUANTITY</label><input id="pr_q" type="number" placeholder="10" oninput="prCalc()">
+ <div class="kv" style="margin-top:10px"><span>Total cost</span><b id="pr_t" style="color:var(--gold)">₦0</b></div>
+ <button class="btn block" onclick="doPrint()">Generate pins</button></div>`+appFoot();
+}
+function prCalc(){const q=+document.getElementById("pr_q").value||0,d=+document.getElementById("pr_d").value;document.getElementById("pr_t").textContent=naira(q*d)}
+function doPrint(){
+ const q=+document.getElementById("pr_q").value||0,d=+document.getElementById("pr_d").value,cost=q*d;
+ if(q<1){toast("Enter quantity");return}
+ if(!debit(cost,`Recharge pins ${naira(d)} × ${q}`,"Purchase"))return;
+ const pins=Array.from({length:Math.min(q,5)},()=>Math.floor(100000000000+Math.random()*899999999999));
+ panel(`<h2>Pins generated 🎫</h2><p style="color:var(--dim);font-size:13px">${naira(d)} × ${q} pins</p><div class="codebox">${pins.join("\n")}${q>5?"\n…+"+(q-5)+" more":""}</div><button class="btn block" onclick="closeSheet();go('dash')">Done</button>`);
+}
+/* ================= EXAM PINS ================= */
+function vExams(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">EXAM PINS</div><div class="card">
+ ${EXAMS.map((e,i)=>`<div class="planrow" onclick="doExam(${i})"><div class="inf"><b>${e[0]}</b><small>Instant delivery</small></div><div class="pr"><b>${naira(e[1])}</b></div></div>`).join("")}</div>`+appFoot();
+}
+function doExam(i){
+ const e=EXAMS[i];
+ if(!debit(e[1],e[0],"Purchase"))return;
+ const pin="RD"+Math.floor(10000000+Math.random()*89999999);
+ successSheet("Pin delivered! 🎓",[["Product",e[0]],["PIN",pin],["Amount",naira(e[1])],["New balance",naira(DB.wallet)]]);
+}
+/* ================= FUND WALLET ================= */
+function vFund(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">FUND WALLET</div>
+ <div class="card"><h3>💳 Card (Paystack)</h3><label>AMOUNT (₦)</label><input id="f_card" type="number" placeholder="5000">
+ <button class="btn block" onclick="fundCard()">Pay with card</button></div>
+ <div class="card"><h3>🏦 Bank transfer</h3><p style="font-size:13px;color:var(--dim)">Transfer to your dedicated virtual account:</p>
+ <div class="codebox">Bank: PalmPay\nAccount: 7023182443\nName: RahimData/Your Name</div>
+ <button class="btn ghost block" onclick="toast('Demo: use card funding to test instantly')">I've sent the money</button></div>
+ <div class="card"><h3>🎟️ Coupon</h3><label>COUPON CODE</label><input id="f_cp" placeholder="e.g. RD-XXXX-XXXX">
+ <button class="btn ghost block" onclick="fundCoupon()">Redeem</button></div>`+appFoot();
+}
+function fundCard(){
+ const a=+document.getElementById("f_card").value||0;
+ if(a<100){toast("Minimum ₦100");return}
+ panel(`<h2>Card payment 💳</h2><p style="color:var(--dim);font-size:13px">Demo checkout — ${naira(a)}</p>
+ <label>CARD NUMBER</label><input placeholder="5123 4567 8901 2345" maxlength="19">
+ <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>EXPIRY</label><input placeholder="12/28"></div><div><label>CVV</label><input placeholder="123" maxlength="4"></div></div>
+ <button class="btn block" onclick="credit(${a},'Card funding');closeSheet();go('dash');toast('${naira(a)} added! 🎉')">Pay ${naira(a)}</button>`);
+}
+function fundCoupon(){
+ const c=document.getElementById("f_cp").value.trim();
+ if(c.length<4){toast("Enter coupon code");return}
+ credit(2000,"Coupon "+c);go("dash");toast("₦2,000 coupon redeemed! 🎉");
+}
+/* ================= HISTORY / REFERRALS / API / SETTINGS / MORE ================= */
+function vHistory(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">TRANSACTION HISTORY</div><div class="card">
+ ${DB.txns.map(txnRow).join("")||'<div class="empty">No transactions yet.</div>'}</div>`+appFoot();
+}
+function vReferrals(r){
+ const link="https://rahimdata.com/signup/?referral="+encodeURIComponent(DB.user.name.split(" ")[0]);
+ r.innerHTML=appHead(true)+`<div class="secttl">REFER & EARN</div>
+ <div class="card" style="text-align:center"><div style="font-size:44px">🎁</div><h3>Earn ₦500 per referral</h3><p style="font-size:13px;color:var(--dim)">When someone you invite upgrades to affiliate.</p>
+ <div class="codebox" style="font-size:12px">${link}</div>
+ <button class="btn block" onclick="navigator.clipboard&&navigator.clipboard.writeText('${link}');toast('Link copied! 📋')">Copy referral link</button></div>
+ <div class="card"><div class="kv"><span>Total referrals</span><b>0</b></div><div class="kv"><span>Earnings</span><b>₦0</b></div></div>`+appFoot();
+}
+function vApi(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">DEVELOPER API</div>
+ <div class="card"><h3>🔑 Authorization</h3><p style="font-size:13px;color:var(--dim)">Pass your token as a Bearer header on every request.</p>
+ <div class="codebox">Authorization: Bearer YOUR_API_TOKEN</div></div>
+ <div class="card"><h3>Buy data</h3><div class="codebox">POST /api/v1/data
+{
+  "network": 1,
+  "plan_id": 12,
+  "phone": "08030000000"
+}</div></div>
+ <div class="card"><h3>Network IDs</h3><div class="kv"><span>MTN</span><b>1</b></div><div class="kv"><span>Glo</span><b>2</b></div><div class="kv"><span>9mobile</span><b>3</b></div><div class="kv"><span>Airtel</span><b>4</b></div></div>
+ <div class="card"><h3>Webhooks</h3><p style="font-size:13px;color:var(--dim)">Get instant callbacks on every transaction. Set your webhook URL in Settings → API.</p></div>`+appFoot();
+}
+function vSettings(r){
+ r.innerHTML=appHead(true)+`<div class="secttl">SETTINGS</div>
+ <div class="card"><h3>Profile</h3><div class="kv"><span>Name</span><b>${DB.user.name}</b></div><div class="kv"><span>Email</span><b>${DB.user.email}</b></div><div class="kv"><span>Phone</span><b>${DB.user.phone||"—"}</b></div></div>
+ <div class="card"><h3>Security</h3><div class="kv"><span>KYC verification</span><b style="color:var(--gold)">Not verified</b></div><button class="btn ghost block" onclick="toast('KYC: ₦100 per BVN attempt (demo)')">Verify BVN</button></div>
+ <button class="btn ghost block" style="color:var(--red)" onclick="logout()">Log out</button>`+appFoot();
+}
+function vMore(r){
+ const items=[["referrals","🎁","Refer & Earn"],["api","🔌","Developer API"],["settings","⚙️","Settings"],["landing","🌐","View homepage"]];
+ r.innerHTML=appHead()+`<div class="secttl">MORE</div>`+items.map(([k,e,t])=>`<div class="card" onclick="go('${k}')" style="cursor:pointer"><div class="row"><div style="display:flex;gap:12px;align-items:center"><span style="font-size:22px">${e}</span><b>${t}</b></div><span style="color:var(--dim)">›</span></div></div>`).join("")+appFoot();
+}
+/* ================= INIT ================= */
+render();
+</script>
+</body>
+</html>
