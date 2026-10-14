@@ -85,6 +85,9 @@
   .field input:focus {
     box-shadow: 0 4px 18px rgba(120, 80, 200, 0.18), inset 0 0 0 2px #8b3ff0;
   }
+  .field input#password.masked {
+    -webkit-text-security: disc;
+  }
   .field .eye {
     position: absolute;
     right: 12px; top: 50%;
@@ -191,7 +194,7 @@
           <path d="M8 10V7.5a4 4 0 018 0V10"/>
           <circle cx="12" cy="15" r="1.4" fill="#8b7bb5" stroke="none"/>
         </svg>
-        <input id="password" name="password" type="password" placeholder="Enter your password" required />
+        <input id="password" name="password" type="text" class="masked" placeholder="Enter your password" required />
         <button type="button" class="eye" id="togglePw" aria-label="Show password">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
             <path d="M2.5 12S6 5.8 12 5.8 21.5 12 21.5 12 18 18.2 12 18.2 2.5 12 2.5 12z"/>
@@ -211,10 +214,9 @@
   const pwInput = document.getElementById('password');
   const toggleBtn = document.getElementById('togglePw');
   toggleBtn.addEventListener('click', () => {
-    const show = pwInput.type === 'password';
-    pwInput.type = show ? 'text' : 'password';
-    toggleBtn.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
-    toggleBtn.style.opacity = show ? '0.55' : '1';
+    const hidden = pwInput.classList.toggle('masked');
+    toggleBtn.setAttribute('aria-label', hidden ? 'Show password' : 'Hide password');
+    toggleBtn.style.opacity = hidden ? '1' : '0.55';
   });
 
   // ---- sign-in integration point ----
