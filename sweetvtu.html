@@ -653,7 +653,9 @@ const validPhone = p => /^0\d{10}$/.test((p||'').trim());
 const me = () => ME;
 
 let token = null;
+let lastActivity = Date.now(); // 3-minute inactivity logout tracker
 try { token = JSON.parse(localStorage.getItem('sv_token')); } catch(e){}
+if(token) lastActivity = Date.now();
 let ME = null, PAYSTACK_PK = '';
 let curNet = 'MTN', curPlan = null, curCabPlan = null, curAirNet = 'MTN', curCabProv = 'DStv', curDisco = 0;
 let CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
@@ -672,7 +674,7 @@ async function api(path, method='GET', body=null){
 async function refreshMe(){
   try{ const m = await api('/api/me'); if(m.ok) ME = m.user; }catch(e){}
 }
-function saveToken(t){ token = t; localStorage.setItem('sv_token', JSON.stringify(t)); }
+function saveToken(t){ token = t; lastActivity = Date.now(); localStorage.setItem('sv_token', JSON.stringify(t)); }
 
 function go(where){
   const site = $('sitemode'), app = $('appmode');
@@ -959,6 +961,15 @@ function doLogout(silent){
   try{ localStorage.removeItem('sv_token'); }catch(e){}
   if(!silent) go('site'); else go('site');
 }
+
+/* ----- 3-minute inactivity auto-logout ----- */
+['touchstart','click','keydown','scroll'].forEach(ev =>
+  window.addEventListener(ev, ()=>{ lastActivity = Date.now(); }, {passive:true}));
+setInterval(()=>{
+  if(token && Date.now() - lastActivity > 180000){
+    doLogout(true);
+  }
+}, 30000);
 
 /* ----- dashboard / history / profile ----- */
 async function renderDash(){
