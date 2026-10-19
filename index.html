@@ -81,7 +81,7 @@
 <section class="section" id="quote">
   <p class="eyebrow reveal">Talk to us</p>
   <h2 class="reveal">Request a Quote</h2>
-  <p class="section-sub reveal">Fill the form — it opens straight into our WhatsApp chat.</p>
+  <p class="section-sub reveal">Fill the form, add a photo of what you want, and send it straight to our WhatsApp or email.</p>
   <form class="quote-form reveal" id="quote-form">
     <div class="field">
       <label for="q-name">Your name</label>
@@ -97,7 +97,19 @@
       <label for="q-details">What do you need?</label>
       <textarea id="q-details" rows="4" placeholder="Tell us what you need..." required></textarea>
     </div>
-    <button class="btn btn-primary btn-block" type="submit">Send via WhatsApp</button>
+    <div class="field">
+      <label for="q-photo">Photo of what you want (optional)</label>
+      <input type="file" id="q-photo" accept="image/*">
+    </div>
+    <div class="field">
+      <label>Send via</label>
+      <div class="send-choice">
+        <label class="choice"><input type="radio" name="q-channel" value="whatsapp" checked> <span>WhatsApp</span></label>
+        <label class="choice"><input type="radio" name="q-channel" value="email"> <span>Email</span></label>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" type="submit" id="q-submit">Send via WhatsApp</button>
+    <p class="form-note" id="q-attach-hint" hidden></p>
     <p class="form-note">You'll get a reference number like <strong>UB-XXXXXX</strong> with your request.</p>
   </form>
 </section>
