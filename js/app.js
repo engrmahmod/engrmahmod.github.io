@@ -206,8 +206,14 @@ function renderSite() {
           try { canShareFiles = navigator.canShare(shareData); } catch (e) { canShareFiles = false; }
           if (canShareFiles) {
             submitBtn.textContent = 'Opening…';
+            const companyEmail = (typeof SITE_CONFIG !== 'undefined' && SITE_CONFIG.email) || 'UxbridgeLimited@gmail.com';
+            try {
+              if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(companyEmail).catch(() => {});
+              }
+            } catch (e) {}
             navigator.share(shareData).then(() => {
-              done(true, 'Opened — pick your email app to send with the photo attached. Your reference is ' + ref + '.');
+              done(true, 'Opened — pick your email app. The company email is copied: paste it in the To field. Your reference is ' + ref + '.');
               clearFields();
             }).catch((err) => {
               if (err && err.name === 'AbortError') {
