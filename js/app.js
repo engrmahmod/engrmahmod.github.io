@@ -88,6 +88,44 @@ function renderSite() {
     serviceSelect.appendChild(opt);
   });
 
+  /* ----- Shrink a photo on-device so uploads finish in seconds ----- */
+  const shrinkPhoto = (file) => new Promise((resolve) => {
+    const fail = () => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(String(fr.result).split(',')[1] || '');
+      fr.onerror = () => resolve('');
+      fr.readAsDataURL(file);
+    };
+    try {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        try {
+          const MAX = 1280;
+          let w = img.width, h = img.height;
+          if (w > MAX || h > MAX) {
+            const r = Math.min(MAX / w, MAX / h);
+            w = Math.max(1, Math.round(w * r));
+            h = Math.max(1, Math.round(h * r));
+          }
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          c.toBlob((blob) => {
+            if (!blob) { fail(); return; }
+            const fr = new FileReader();
+            fr.onload = () => resolve(String(fr.result).split(',')[1] || '');
+            fr.onerror = () => resolve('');
+            fr.readAsDataURL(blob);
+          }, 'image/jpeg', 0.82);
+        } catch (e) { fail(); }
+      };
+      img.onerror = () => { URL.revokeObjectURL(url); fail(); };
+      img.src = url;
+    } catch (e) { fail(); }
+  });
+
   /* ----- Quote form → WhatsApp or Email (customer's choice) ----- */
   const submitBtn = document.getElementById('q-submit');
   const channelRadios = document.querySelectorAll('input[name="q-channel"]');
@@ -153,17 +191,8 @@ function renderSite() {
           }).catch(() => done(false, 'Could not send. Check your connection and try again.'));
         };
         if (photoFile) {
-          if (photoFile.size > 4 * 1024 * 1024) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Send via Email';
-            hint.hidden = false;
-            hint.textContent = 'That photo is over 4MB — pick a smaller one.';
-            return;
-          }
-          const reader = new FileReader();
-          reader.onload = () => postEmail((String(reader.result).split(',')[1] || ''));
-          reader.onerror = () => postEmail(null);
-          reader.readAsDataURL(photoFile);
+          submitBtn.textContent = 'Shrinking photo…';
+          shrinkPhoto(photoFile).then((b64) => postEmail(b64 || null));
         } else {
           postEmail(null);
         }
@@ -176,17 +205,11 @@ function renderSite() {
 
     if (currentChannel() === 'email') { sendQuote(null); return; }
     if (!photoFile) { sendQuote(null); return; }
-    if (photoFile.size > 4 * 1024 * 1024) {
-      hint.hidden = false;
-      hint.textContent = 'That photo is over 4MB — pick a smaller one.';
-      return;
-    }
     submitBtn.disabled = true;
     submitBtn.textContent = 'Uploading photo…';
-    const reader = new FileReader();
-    reader.onload = async () => {
+    shrinkPhoto(photoFile).then(async (base64) => {
       try {
-        const base64 = String(reader.result).split(',')[1] || '';
+        if (!base64) throw new Error('empty photo');
         const res = await fetch(QUOTE_PROXY + '/api/quote-photo', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -197,20 +220,12 @@ function renderSite() {
         sendQuote(data.url);
       } catch (err) {
         submitBtn.disabled = false;
-        submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
+        submitBtn.textContent = 'Send via WhatsApp';
         hint.hidden = false;
         hint.textContent = 'Photo upload failed — sending without it. You can attach the photo in the chat instead.';
         sendQuote(null);
       }
-    };
-    reader.onerror = () => {
-      submitBtn.disabled = false;
-      submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
-      hint.hidden = false;
-      hint.textContent = 'Could not read that photo — sending without it.';
-      sendQuote(null);
-    };
-    reader.readAsDataURL(photoFile);
+    });
   });
 
   initReveal();
