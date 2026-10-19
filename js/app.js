@@ -184,7 +184,11 @@ function renderSite() {
           }).then((res) => res.json().catch(() => ({}))).then((data) => {
             if (data.ok) {
               done(true, 'Sent! Your reference is ' + ref + ' — we will contact you soon.');
-              document.getElementById('quote-form').reset();
+              document.getElementById('q-name').value = '';
+              document.getElementById('q-contact').value = '';
+              document.getElementById('q-service').selectedIndex = 0;
+              document.getElementById('q-details').value = '';
+              document.getElementById('q-photo').value = '';
             } else {
               done(false, 'Could not send: ' + (data.error || 'try again.'));
             }
