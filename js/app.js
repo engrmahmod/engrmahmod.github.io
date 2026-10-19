@@ -161,13 +161,17 @@ function renderSite() {
       if (photoUrl) lines.push('Photo: ' + photoUrl);
 
       if (currentChannel() === 'email') {
-        // Server sends the email with the photo as a real attachment.
+        // Email channel: open the customer's email app with the photo
+        // attached as a real file (native share). Falls back to the
+        // server sending it if share is unavailable.
         submitBtn.disabled = true;
         submitBtn.textContent = 'Sending…';
-        const payload = {
-          ref: ref, name: name, contact: contact,
-          service: document.getElementById('q-service').value,
-          details: document.getElementById('q-details').value.trim(),
+        const clearFields = () => {
+          document.getElementById('q-name').value = '';
+          document.getElementById('q-contact').value = '';
+          document.getElementById('q-service').selectedIndex = 0;
+          document.getElementById('q-details').value = '';
+          document.getElementById('q-photo').value = '';
         };
         const done = (ok, msg) => {
           submitBtn.disabled = false;
@@ -175,8 +179,13 @@ function renderSite() {
           hint.hidden = false;
           hint.textContent = msg;
         };
-        const postEmail = (photoB64) => {
-          payload.photo = photoB64 || null;
+        const sendViaServer = (photoB64) => {
+          const payload = {
+            ref: ref, name: name, contact: contact,
+            service: document.getElementById('q-service').value,
+            details: document.getElementById('q-details').value.trim(),
+            photo: photoB64 || null,
+          };
           fetch(QUOTE_PROXY + '/api/quote-email', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -184,21 +193,38 @@ function renderSite() {
           }).then((res) => res.json().catch(() => ({}))).then((data) => {
             if (data.ok) {
               done(true, 'Sent! Your reference is ' + ref + ' — we will contact you soon.');
-              document.getElementById('q-name').value = '';
-              document.getElementById('q-contact').value = '';
-              document.getElementById('q-service').selectedIndex = 0;
-              document.getElementById('q-details').value = '';
-              document.getElementById('q-photo').value = '';
+              clearFields();
             } else {
               done(false, 'Could not send: ' + (data.error || 'try again.'));
             }
           }).catch(() => done(false, 'Could not send. Check your connection and try again.'));
         };
+        const shareText = lines.join('\n');
+        if (photoFile && navigator.canShare) {
+          const shareData = { title: 'Quote Request ' + ref, text: shareText, files: [photoFile] };
+          let canShareFiles = false;
+          try { canShareFiles = navigator.canShare(shareData); } catch (e) { canShareFiles = false; }
+          if (canShareFiles) {
+            submitBtn.textContent = 'Opening…';
+            navigator.share(shareData).then(() => {
+              done(true, 'Opened — pick your email app to send with the photo attached. Your reference is ' + ref + '.');
+              clearFields();
+            }).catch((err) => {
+              if (err && err.name === 'AbortError') {
+                done(false, 'Cancelled — nothing was sent.');
+              } else {
+                submitBtn.textContent = 'Shrinking photo…';
+                shrinkPhoto(photoFile).then((b64) => sendViaServer(b64 || null));
+              }
+            });
+            return;
+          }
+        }
         if (photoFile) {
           submitBtn.textContent = 'Shrinking photo…';
-          shrinkPhoto(photoFile).then((b64) => postEmail(b64 || null));
+          shrinkPhoto(photoFile).then((b64) => sendViaServer(b64 || null));
         } else {
-          postEmail(null);
+          sendViaServer(null);
         }
         return;
       }
