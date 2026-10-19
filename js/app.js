@@ -87,13 +87,24 @@ function renderSite() {
     serviceSelect.appendChild(opt);
   });
 
-  /* ----- Quote form → WhatsApp ----- */
+  /* ----- Quote form → WhatsApp or Email (customer's choice) ----- */
+  const submitBtn = document.getElementById('q-submit');
+  const channelRadios = document.querySelectorAll('input[name="q-channel"]');
+  const currentChannel = () => {
+    const r = document.querySelector('input[name="q-channel"]:checked');
+    return r ? r.value : 'whatsapp';
+  };
+  channelRadios.forEach((r) => r.addEventListener('change', () => {
+    submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
+  }));
   document.getElementById('quote-form').addEventListener('submit', (e) => {
     e.preventDefault();
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let ref = 'UB-';
     for (let i = 0; i < 6; i++) ref += chars[Math.floor(Math.random() * chars.length)];
 
+    const photoInput = document.getElementById('q-photo');
+    const hasPhoto = photoInput.files && photoInput.files.length > 0;
     const lines = [
       'Hello UX BRIDGE IMPORT & EXPORT,',
       'Quote request ' + ref,
@@ -101,7 +112,25 @@ function renderSite() {
       'Service: ' + document.getElementById('q-service').value,
       'Details: ' + document.getElementById('q-details').value.trim(),
     ];
-    window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+    if (hasPhoto) lines.push('Photo: I have attached a photo of what I want.');
+
+    const hint = document.getElementById('q-attach-hint');
+    if (currentChannel() === 'email') {
+      const email = (SITE_CONFIG && SITE_CONFIG.email) ? SITE_CONFIG.email : 'UxbridgeLimited@gmail.com';
+      const subject = encodeURIComponent('Quote Request ' + ref + ' — UX BRIDGE');
+      const body = encodeURIComponent(lines.join('\n'));
+      window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+      hint.hidden = false;
+      hint.textContent = hasPhoto
+        ? 'Your email app just opened — attach the photo you selected before sending.'
+        : 'Your email app just opened with your request ready to send.';
+    } else {
+      window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+      hint.hidden = false;
+      hint.textContent = hasPhoto
+        ? 'WhatsApp just opened — attach the photo you selected in the chat to complete your request.'
+        : 'WhatsApp just opened with your request ready to send.';
+    }
   });
 
   initReveal();
