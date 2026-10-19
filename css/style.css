@@ -388,3 +388,5 @@ a.contact-card:hover { transform: translateY(-5px); border-color: rgba(255, 122,
   .hero-stats { gap: 10px; }
   .stat { padding: 12px 20px; min-width: 110px; }
 }
+
+/* pages rebuild nudge */
