@@ -110,27 +110,71 @@ function renderSite() {
     hint.hidden = true;
 
     const sendQuote = (photoUrl) => {
+      const name = document.getElementById('q-name').value.trim();
+      const contact = document.getElementById('q-contact').value.trim();
       const lines = [
         'Hello UX BRIDGE IMPORT & EXPORT,',
         'Quote request ' + ref,
-        'Name: ' + document.getElementById('q-name').value.trim(),
+        'Name: ' + name,
+        'Contact: ' + contact,
         'Service: ' + document.getElementById('q-service').value,
         'Details: ' + document.getElementById('q-details').value.trim(),
       ];
       if (photoUrl) lines.push('Photo: ' + photoUrl);
 
       if (currentChannel() === 'email') {
-        const email = (SITE_CONFIG && SITE_CONFIG.email) ? SITE_CONFIG.email : 'UxbridgeLimited@gmail.com';
-        const subject = encodeURIComponent('Quote Request ' + ref + ' — UX BRIDGE');
-        const body = encodeURIComponent(lines.join('\n'));
-        window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
-      } else {
-        window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+        // Server sends the email with the photo as a real attachment.
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Sending…';
+        const payload = {
+          ref: ref, name: name, contact: contact,
+          service: document.getElementById('q-service').value,
+          details: document.getElementById('q-details').value.trim(),
+        };
+        const done = (ok, msg) => {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Send via Email';
+          hint.hidden = false;
+          hint.textContent = msg;
+        };
+        const postEmail = (photoB64) => {
+          payload.photo = photoB64 || null;
+          fetch(QUOTE_PROXY + '/api/quote-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          }).then((res) => res.json().catch(() => ({}))).then((data) => {
+            if (data.ok) {
+              done(true, 'Sent! Your reference is ' + ref + ' — we will contact you soon.');
+              document.getElementById('quote-form').reset();
+            } else {
+              done(false, 'Could not send: ' + (data.error || 'try again.'));
+            }
+          }).catch(() => done(false, 'Could not send. Check your connection and try again.'));
+        };
+        if (photoFile) {
+          if (photoFile.size > 4 * 1024 * 1024) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Send via Email';
+            hint.hidden = false;
+            hint.textContent = 'That photo is over 4MB — pick a smaller one.';
+            return;
+          }
+          const reader = new FileReader();
+          reader.onload = () => postEmail((String(reader.result).split(',')[1] || ''));
+          reader.onerror = () => postEmail(null);
+          reader.readAsDataURL(photoFile);
+        } else {
+          postEmail(null);
+        }
+        return;
       }
+      window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
       submitBtn.disabled = false;
-      submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
+      submitBtn.textContent = 'Send via WhatsApp';
     };
 
+    if (currentChannel() === 'email') { sendQuote(null); return; }
     if (!photoFile) { sendQuote(null); return; }
     if (photoFile.size > 4 * 1024 * 1024) {
       hint.hidden = false;
