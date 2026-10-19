@@ -264,6 +264,15 @@ a { color: inherit; }
 .quote-form textarea { resize: vertical; }
 .form-note { text-align: center; color: var(--muted); font-size: 13px; margin-top: 16px; }
 .form-note strong { color: var(--accent2); }
+.send-choice { display: flex; gap: 12px; }
+.choice {
+  flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 14px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--bg); color: var(--text); font-size: 15px; cursor: pointer;
+  transition: border-color .2s, box-shadow .2s;
+}
+.choice input { width: auto; accent-color: var(--accent); }
+.choice:has(input:checked) { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255, 122, 26, .15); }
 
 /* Contact */
 .contact-grid {
