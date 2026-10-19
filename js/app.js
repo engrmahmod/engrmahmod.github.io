@@ -4,6 +4,7 @@
 let WA_NUMBER = '2349066666633';
 let SERVICES = [];
 let SITE_CONFIG = {};
+const QUOTE_PROXY = 'https://uxb-admin-proxy.onrender.com';
 
 /* ---------- Load data files ---------- */
 async function loadData() {
@@ -104,33 +105,68 @@ function renderSite() {
     for (let i = 0; i < 6; i++) ref += chars[Math.floor(Math.random() * chars.length)];
 
     const photoInput = document.getElementById('q-photo');
-    const hasPhoto = photoInput.files && photoInput.files.length > 0;
-    const lines = [
-      'Hello UX BRIDGE IMPORT & EXPORT,',
-      'Quote request ' + ref,
-      'Name: ' + document.getElementById('q-name').value.trim(),
-      'Service: ' + document.getElementById('q-service').value,
-      'Details: ' + document.getElementById('q-details').value.trim(),
-    ];
-    if (hasPhoto) lines.push('Photo: I have attached a photo of what I want.');
-
+    const photoFile = (photoInput.files && photoInput.files[0]) || null;
     const hint = document.getElementById('q-attach-hint');
-    if (currentChannel() === 'email') {
-      const email = (SITE_CONFIG && SITE_CONFIG.email) ? SITE_CONFIG.email : 'UxbridgeLimited@gmail.com';
-      const subject = encodeURIComponent('Quote Request ' + ref + ' — UX BRIDGE');
-      const body = encodeURIComponent(lines.join('\n'));
-      window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+    hint.hidden = true;
+
+    const sendQuote = (photoUrl) => {
+      const lines = [
+        'Hello UX BRIDGE IMPORT & EXPORT,',
+        'Quote request ' + ref,
+        'Name: ' + document.getElementById('q-name').value.trim(),
+        'Service: ' + document.getElementById('q-service').value,
+        'Details: ' + document.getElementById('q-details').value.trim(),
+      ];
+      if (photoUrl) lines.push('Photo: ' + photoUrl);
+
+      if (currentChannel() === 'email') {
+        const email = (SITE_CONFIG && SITE_CONFIG.email) ? SITE_CONFIG.email : 'UxbridgeLimited@gmail.com';
+        const subject = encodeURIComponent('Quote Request ' + ref + ' — UX BRIDGE');
+        const body = encodeURIComponent(lines.join('\n'));
+        window.location.href = 'mailto:' + email + '?subject=' + subject + '&body=' + body;
+      } else {
+        window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
+      }
+      submitBtn.disabled = false;
+      submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
+    };
+
+    if (!photoFile) { sendQuote(null); return; }
+    if (photoFile.size > 4 * 1024 * 1024) {
       hint.hidden = false;
-      hint.textContent = hasPhoto
-        ? 'Your email app just opened — attach the photo you selected before sending.'
-        : 'Your email app just opened with your request ready to send.';
-    } else {
-      window.open('https://wa.me/' + WA_NUMBER + '?text=' + encodeURIComponent(lines.join('\n')), '_blank');
-      hint.hidden = false;
-      hint.textContent = hasPhoto
-        ? 'WhatsApp just opened — attach the photo you selected in the chat to complete your request.'
-        : 'WhatsApp just opened with your request ready to send.';
+      hint.textContent = 'That photo is over 4MB — pick a smaller one.';
+      return;
     }
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Uploading photo…';
+    const reader = new FileReader();
+    reader.onload = async () => {
+      try {
+        const base64 = String(reader.result).split(',')[1] || '';
+        const res = await fetch(QUOTE_PROXY + '/api/quote-photo', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ref: ref, content: base64 }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.url) throw new Error(data.error || 'upload failed');
+        sendQuote(data.url);
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
+        hint.hidden = false;
+        hint.textContent = 'Photo upload failed — sending without it. You can attach the photo in the chat instead.';
+        sendQuote(null);
+      }
+    };
+    reader.onerror = () => {
+      submitBtn.disabled = false;
+      submitBtn.textContent = currentChannel() === 'email' ? 'Send via Email' : 'Send via WhatsApp';
+      hint.hidden = false;
+      hint.textContent = 'Could not read that photo — sending without it.';
+      sendQuote(null);
+    };
+    reader.readAsDataURL(photoFile);
   });
 
   initReveal();
