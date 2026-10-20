@@ -197,6 +197,18 @@ async function loadRepoJson(path) {
   return { sha: d.sha, data: d.data };
 }
 async function saveRepoJson(path, sha, obj, message) {
+  try {
+    return await putRepoJson(path, sha, obj, message);
+  } catch (e) {
+    // Gallery changed elsewhere while this page was open (stale SHA) — refresh and retry once
+    if (e.status === 409 || e.status === 422) {
+      const g = await loadRepoJson(path);
+      return await putRepoJson(path, g.sha, obj, message);
+    }
+    throw e;
+  }
+}
+async function putRepoJson(path, sha, obj, message) {
   if (token) {
     const d = await gh('/repos/' + OWNER + '/' + REPO + '/contents/' + path, 'PUT', {
       message: message,
