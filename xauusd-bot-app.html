@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>XAUUSD Bot</title>
+<style>
+  :root{
+    --bg:#0b0e13; --card:#151a23; --card2:#1b222e; --line:#262f3f;
+    --gold:#e8b33c; --gold2:#f5cf6b; --text:#eef2f7; --muted:#8b96a7;
+    --green:#2fbf71; --red:#e5484d; --radius:18px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;min-height:100vh;padding-bottom:40px}
+  .wrap{max-width:520px;margin:0 auto;padding:20px 16px}
+  .brand{text-align:center;padding:26px 0 8px}
+  .brand .coin{width:64px;height:64px;border-radius:50%;margin:0 auto 12px;background:radial-gradient(circle at 32% 30%,#ffe9a8,var(--gold) 55%,#a87b14);display:flex;align-items:center;justify-content:center;font-size:28px;box-shadow:0 10px 30px rgba(232,179,60,.25)}
+  .brand h1{font-size:24px;letter-spacing:.5px}
+  .brand h1 span{color:var(--gold)}
+  .brand p{color:var(--muted);font-size:13px;margin-top:5px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-top:16px}
+  .card h2{font-size:15px;margin-bottom:4px}
+  .card .sub{color:var(--muted);font-size:12.5px;line-height:1.5;margin-bottom:12px}
+  label{display:block;font-size:12px;color:var(--muted);margin:12px 0 6px;text-transform:uppercase;letter-spacing:.6px}
+  input,select{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:12px;color:var(--text);padding:13px 14px;font-size:15px;outline:none}
+  input:focus{border-color:var(--gold)}
+  .btn{width:100%;border:none;border-radius:14px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px}
+  .btn-gold{background:linear-gradient(135deg,var(--gold2),var(--gold));color:#221a02}
+  .btn-gold:active{transform:scale(.99)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+  .btn-start{background:linear-gradient(135deg,#37d67a,#1f9d55);color:#04160b}
+  .btn-stop{background:linear-gradient(135deg,#ff6b6e,#d93636);color:#fff}
+  .msg{font-size:13.5px;border-radius:12px;padding:11px 13px;margin-top:14px;display:none;line-height:1.5}
+  .msg.err{display:block;background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.4);color:#ff9c9f}
+  .msg.ok{display:block;background:rgba(47,191,113,.12);border:1px solid rgba(47,191,113,.4);color:#7fe6ac}
+  .switch-link{text-align:center;margin-top:16px;font-size:13.5px;color:var(--muted)}
+  .switch-link a{color:var(--gold);text-decoration:none;font-weight:600}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+  .stat .k{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .stat .v{font-size:22px;font-weight:800;margin-top:5px}
+  .stat .v.gold{color:var(--gold)}
+  .pill{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;padding:6px 12px;border-radius:99px;border:1px solid var(--line)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+  .dot.on{background:var(--green);box-shadow:0 0 10px var(--green)}
+  .rowflex{display:flex;justify-content:space-between;align-items:center;gap:10px}
+  input[type=range]{padding:0;accent-color:var(--gold);height:32px}
+  .riskval{font-size:26px;font-weight:800;color:var(--gold)}
+  .pos{border:1px solid var(--line);background:var(--card2);border-radius:12px;padding:12px 14px;margin-top:10px;font-size:14px}
+  .pos b.buy{color:var(--green)} .pos b.sell{color:var(--red)}
+  .log{margin-top:6px}
+  .log .ev{border-bottom:1px solid var(--line);padding:10px 2px;font-size:13px;line-height:1.5}
+  .log .ev:last-child{border-bottom:none}
+  .log .t{color:var(--muted);font-size:11px}
+  .empty{color:var(--muted);font-size:13.5px;text-align:center;padding:14px 0 4px}
+  .hidden{display:none!important}
+  .tiny{font-size:11.5px;color:var(--muted);text-align:center;margin-top:18px;line-height:1.6}
+  .gear{position:absolute;top:18px;right:18px;background:var(--card);border:1px solid var(--line);color:var(--muted);width:38px;height:38px;border-radius:12px;font-size:17px;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="wrap" style="position:relative">
+  <button class="gear" id="gearBtn" title="Server settings">&#9881;</button>
+
+  <div class="brand">
+    <div class="coin">&#129689;</div>
+    <h1>XAUUSD <span>BOT</span></h1>
+    <p>Gold auto-trader &mdash; connect your MT5, set your risk, press start.</p>
+  </div>
+
+  <!-- ============ AUTH ============ -->
+  <div id="authView">
+    <div class="card" id="loginCard">
+      <h2>Welcome back</h2>
+      <p class="sub">Log in to manage your trading bot.</p>
+      <label>Email</label>
+      <input id="loginEmail" type="email" autocomplete="email" placeholder="you@example.com">
+      <label>Password</label>
+      <input id="loginPw" type="password" autocomplete="current-password" placeholder="Your password">
+      <div class="msg" id="loginMsg"></div>
+      <button class="btn btn-gold" id="loginBtn">Log in</button>
+      <div class="switch-link">New here? <a href="#" id="toSignup">Create an account</a></div>
+    </div>
+
+    <div class="card hidden" id="signupCard">
+      <h2>Create your account</h2>
+      <p class="sub">Free. Your bot account &mdash; separate from your broker login.</p>
+      <label>Email</label>
+      <input id="suEmail" type="email" autocomplete="email" placeholder="you@example.com">
+      <label>Password</label>
+      <input id="suPw" type="password" autocomplete="new-password" placeholder="6+ characters">
+      <div class="msg" id="suMsg"></div>
+      <button class="btn btn-gold" id="signupBtn">Create account</button>
+      <div class="switch-link">Already have one? <a href="#" id="toLogin">Log in</a></div>
+    </div>
+  </div>
+
+  <!-- ============ CONNECT ============ -->
+  <div id="connectView" class="hidden">
+    <div class="card">
+      <h2>Connect your MT5 account</h2>
+      <p class="sub">Enter the same login you use in MetaTrader 5. Start with a <b>demo account</b>.
+      The bot runs in the cloud &mdash; no computer needed, your phone is the control room.</p>
+      <label>MT5 login number</label>
+      <input id="mt5Login" inputmode="numeric" placeholder="e.g. 12345678">
+      <label>MT5 password</label>
+      <input id="mt5Pw" type="password" placeholder="Your MT5 account password">
+      <label>Broker server name</label>
+      <input id="mt5Server" placeholder="e.g. Exness-MT5Trial8">
+      <p class="sub" style="margin-top:10px">Find the server name inside MT5: it is shown on the login screen, exactly as written there.</p>
+      <div class="msg" id="connectMsg"></div>
+      <button class="btn btn-gold" id="connectBtn">Connect broker</button>
+      <div class="switch-link"><a href="#" id="logout1">Log out</a></div>
+    </div>
+  </div>
+
+  <!-- ============ DASHBOARD ============ -->
+  <div id="dashView" class="hidden">
+    <div class="stats">
+      <div class="stat"><div class="k">Balance</div><div class="v gold" id="stBalance">&mdash;</div></div>
+      <div class="stat"><div class="k">Equity</div><div class="v" id="stEquity">&mdash;</div></div>
+    </div>
+
+    <div class="card">
+      <div class="rowflex">
+        <h2 style="margin:0">Trading bot</h2>
+        <span class="pill"><span class="dot" id="botDot"></span><span id="botState">Stopped</span></span>
+      </div>
+      <p class="sub" id="acctLine" style="margin-top:8px">&mdash;</p>
+      <label>Risk per trade: <span class="riskval" id="riskVal">1.0%</span></label>
+      <input type="range" id="riskRange" min="0.5" max="5" step="0.5" value="1">
+      <p class="sub">Every trade's lot size is calculated from your equity so a loss costs exactly this %. If your account is too small for a safe trade, the bot skips it.</p>
+      <label style="display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;font-size:13.5px;color:var(--text);margin-top:14px">
+        <input type="checkbox" id="minLotChk" style="width:20px;height:20px;accent-color:var(--gold)">
+        Allow minimum-lot trades (0.01) on small accounts &mdash; the bot shows the real risk % before entering
+      </label>
+      <div class="msg" id="dashMsg"></div>
+      <button class="btn btn-start" id="toggleBtn">&#9654; Start bot</button>
+    </div>
+
+    <div class="card">
+      <h2>Open positions</h2>
+      <div id="posList"><div class="empty">No open positions.</div></div>
+    </div>
+
+    <div class="card">
+      <h2>Bot activity</h2>
+      <div class="log" id="eventLog"><div class="empty">Nothing yet.</div></div>
+      <div class="switch-link"><a href="#" id="refreshBtn">Refresh</a> &nbsp;&middot;&nbsp; <a href="#" id="logout2">Log out</a></div>
+    </div>
+  </div>
+
+  <!-- ============ SERVER SETTINGS ============ -->
+  <div id="serverCard" class="card hidden">
+    <h2>Server address</h2>
+    <p class="sub">The bot server this page talks to. Already set for you &mdash; only change it if your developer tells you to.</p>
+    <input id="apiBase" placeholder="https://your-bot-server.onrender.com">
+    <button class="btn btn-ghost" id="saveApiBtn">Save</button>
+  </div>
+
+  <p class="tiny">Strategy backtested on 2 years of gold data: 46.5% win rate,<br>
+  wins pay 1.5&times; losses, 1% risk per trade. Trading involves risk &mdash;<br>
+  always test on a demo account first.</p>
+</div>
+
+<script>
+// ================== CONFIG ==================
+// When the server is hosted, put its address here (or tap the gear icon).
+let API = localStorage.getItem('xauusd_api') || 'https://xauusd-bot-server.onrender.com';
+// ============================================
+let TOKEN = localStorage.getItem('xauusd_token') || '';
+let STATE = { bot_enabled:false, risk_percent:1.0, allow_min_lot:false };
+
+const $ = id => document.getElementById(id);
+function show(id){ ['authView','connectView','dashView'].forEach(v => $(v).classList.toggle('hidden', v !== id)); }
+function msg(el, text, ok){ el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'err'); }
+function money(n){ return n == null ? '—' : '$' + Number(n).toLocaleString(undefined,{minimumFractionDigits:2, maximumFractionDigits:2}); }
+
+async function api(path, method, body){
+  const r = await fetch(API + path, {
+    method: method || 'GET',
+    headers: { 'Content-Type':'application/json', ...(TOKEN ? { 'Authorization':'Bearer ' + TOKEN } : {}) },
+    body: body ? JSON.stringify(body) : undefined
+  });
+  const data = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(data.error || 'Something went wrong. Check the server address (gear icon).');
+  return data;
+}
+
+// ---------- auth ----------
+$('toSignup').onclick = e => { e.preventDefault(); $('loginCard').classList.add('hidden'); $('signupCard').classList.remove('hidden'); };
+$('toLogin').onclick = e => { e.preventDefault(); $('signupCard').classList.add('hidden'); $('loginCard').classList.remove('hidden'); };
+
+$('signupBtn').onclick = async () => {
+  try {
+    const d = await api('/api/signup', 'POST', { email: $('suEmail').value, password: $('suPw').value });
+    TOKEN = d.token; localStorage.setItem('xauusd_token', TOKEN);
+    refresh();
+  } catch (e) { msg($('suMsg'), e.message, false); }
+};
+$('loginBtn').onclick = async () => {
+  try {
+    const d = await api('/api/login', 'POST', { email: $('loginEmail').value, password: $('loginPw').value });
+    TOKEN = d.token; localStorage.setItem('xauusd_token', TOKEN);
+    refresh();
+  } catch (e) { msg($('loginMsg'), e.message, false); }
+};
+function logout(){ TOKEN = ''; localStorage.removeItem('xauusd_token'); show('authView'); }
+$('logout1').onclick = e => { e.preventDefault(); logout(); };
+$('logout2').onclick = e => { e.preventDefault(); logout(); };
+
+// ---------- connect ----------
+$('connectBtn').onclick = async () => {
+  const btn = $('connectBtn'); btn.textContent = 'Connecting…'; btn.disabled = true;
+  try {
+    await api('/api/connect', 'POST', {
+      mt5_login: $('mt5Login').value, mt5_password: $('mt5Pw').value, mt5_server: $('mt5Server').value
+    });
+    msg($('connectMsg'), 'Connected. Taking you to your dashboard…', true);
+    setTimeout(refresh, 800);
+  } catch (e) { msg($('connectMsg'), e.message, false); }
+  btn.textContent = 'Connect broker'; btn.disabled = false;
+};
+
+// ---------- dashboard ----------
+$('riskRange').oninput = () => { $('riskVal').textContent = Number($('riskRange').value).toFixed(1) + '%'; };
+$('riskRange').onchange = async () => {
+  try { await api('/api/settings', 'POST', { risk_percent: parseFloat($('riskRange').value), bot_enabled: STATE.bot_enabled, allow_min_lot: STATE.allow_min_lot }); STATE.risk_percent = parseFloat($('riskRange').value); }
+  catch (e) { msg($('dashMsg'), e.message, false); }
+};
+$('minLotChk').onchange = async () => {
+  try { await api('/api/settings', 'POST', { risk_percent: STATE.risk_percent, bot_enabled: STATE.bot_enabled, allow_min_lot: $('minLotChk').checked }); STATE.allow_min_lot = $('minLotChk').checked; }
+  catch (e) { msg($('dashMsg'), e.message, false); }
+};
+$('toggleBtn').onclick = async () => {
+  const target = !STATE.bot_enabled;
+  try {
+    await api('/api/settings', 'POST', { risk_percent: STATE.risk_percent, bot_enabled: target, allow_min_lot: STATE.allow_min_lot });
+    STATE.bot_enabled = target; paintBot();
+    msg($('dashMsg'), target ? 'Bot started. It checks gold every hour and trades only high-confirmation setups.' : 'Bot stopped.', true);
+  } catch (e) { msg($('dashMsg'), e.message, false); }
+};
+$('refreshBtn').onclick = e => { e.preventDefault(); refresh(); };
+
+function paintBot(){
+  $('botDot').className = 'dot' + (STATE.bot_enabled ? ' on' : '');
+  $('botState').textContent = STATE.bot_enabled ? 'Running' : 'Stopped';
+  const b = $('toggleBtn');
+  b.className = 'btn ' + (STATE.bot_enabled ? 'btn-stop' : 'btn-start');
+  b.innerHTML = STATE.bot_enabled ? '&#9632; Stop bot' : '&#9654; Start bot';
+}
+
+async function refresh(){
+  if (!TOKEN) { show('authView'); return; }
+  try {
+    const s = await api('/api/status');
+    if (!s.connected) { show('connectView'); return; }
+    show('dashView');
+    STATE.bot_enabled = !!s.bot_enabled;
+    STATE.risk_percent = s.risk_percent || 1.0;
+    STATE.allow_min_lot = !!s.allow_min_lot;
+    $('minLotChk').checked = STATE.allow_min_lot;
+    $('riskRange').value = STATE.risk_percent;
+    $('riskVal').textContent = Number(STATE.risk_percent).toFixed(1) + '%';
+    $('stBalance').textContent = money(s.balance);
+    $('stEquity').textContent = money(s.equity);
+    $('acctLine').textContent = 'MT5 ' + s.mt5_login + ' · ' + s.mt5_server + (s.dry_run ? ' · DRY RUN (no real orders sent)' : '');
+    paintBot();
+    const pl = $('posList');
+    if (s.positions && s.positions.length) {
+      pl.innerHTML = s.positions.map(p => {
+        const buy = (p.type || '').includes('BUY');
+        return '<div class="pos"><b class="' + (buy ? 'buy' : 'sell') + '">' + (buy ? 'BUY' : 'SELL') + '</b> ' +
+               (p.symbol || 'XAUUSD') + ' · ' + p.volume + ' lots</div>';
+      }).join('');
+    } else pl.innerHTML = '<div class="empty">No open positions.</div>';
+    const lg = $('eventLog');
+    if (s.events && s.events.length) {
+      lg.innerHTML = s.events.map(e => '<div class="ev">' + e.event + '<div class="t">' + (e.created_at || '') + ' UTC</div></div>').join('');
+    } else lg.innerHTML = '<div class="empty">Nothing yet.</div>';
+    if (s.broker_error) msg($('dashMsg'), 'Broker sync: ' + s.broker_error, false);
+  } catch (e) {
+    if (String(e.message).includes('Not logged in')) { logout(); return; }
+    show('authView');
+    msg($('loginMsg'), e.message, false);
+  }
+}
+
+// ---------- server settings ----------
+$('gearBtn').onclick = () => { $('apiBase').value = API; $('serverCard').classList.toggle('hidden'); };
+$('saveApiBtn').onclick = () => {
+  API = $('apiBase').value.replace(/\/$/, '');
+  localStorage.setItem('xauusd_api', API);
+  $('serverCard').classList.add('hidden');
+  refresh();
+};
+
+refresh();
+setInterval(() => { if (TOKEN && !$('dashView').classList.contains('hidden')) refresh(); }, 60000);
+</script>
+</body>
+</html>
