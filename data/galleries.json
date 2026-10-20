@@ -1,7 +1,7 @@
 {
   "services": [
     {
-      "description": "Quality vehicles sourced and supplied \u2014 from sedans to SUVs. Tap to see our current stock.",
+      "description": "Quality vehicles sourced and supplied — from sedans to SUVs. Tap to see our current stock.",
       "img_dir": "vehicles",
       "name": "Vehicles",
       "photos": [
@@ -90,19 +90,19 @@
           "src": "img/vehicles/v22.jpg"
         },
         {
-          "caption": "E 450 4MATIC in white \u2014 executive class, German engineering, no noise. ",
+          "caption": "E 450 4MATIC in white — executive class, German engineering, no noise. ",
           "src": "img/vehicles/vehicles-1792415177345-21.jpg"
         },
         {
-          "caption": "GLC 300 \u2014 the SUV that handles everything quietly. Sharp, clean, ready.",
+          "caption": "GLC 300 — the SUV that handles everything quietly. Sharp, clean, ready.",
           "src": "img/vehicles/vehicles-1792415181837-22.jpg"
         },
         {
-          "caption": "Fresh off the boat \u2014 AMG face, straight from the auction lot. This one won't sit long.",
+          "caption": "Fresh off the boat — AMG face, straight from the auction lot. This one won't sit long.",
           "src": "img/vehicles/vehicles-1792415184430-23.jpg"
         },
         {
-          "caption": "GLC on multi-spokes \u2014 stance, presence, road manners. Pure cruise spec.",
+          "caption": "GLC on multi-spokes — stance, presence, road manners. Pure cruise spec.",
           "src": "img/vehicles/vehicles-1792415187593-24.jpg"
         }
       ],
@@ -110,7 +110,7 @@
       "tagline": "Cars for sale in Nigeria"
     },
     {
-      "description": "Heavy-duty trucks and tippers \u2014 HOWO and Sinotruk units available for serious work.",
+      "description": "Heavy-duty trucks and tippers — HOWO and Sinotruk units available for serious work.",
       "img_dir": "trucks",
       "name": "Trucks",
       "photos": [
@@ -276,7 +276,7 @@
           "src": "img/cargo/cg11.jpg"
         },
         {
-          "caption": "Cargo hold \u2014 truck beds and parts",
+          "caption": "Cargo hold — truck beds and parts",
           "src": "img/cargo/cg12.jpg"
         },
         {
@@ -393,7 +393,7 @@
       "tagline": "Clearance without stories"
     },
     {
-      "description": "Bridge and civil construction works \u2014 concrete, steel reinforcement, marine works and site operations, delivered to spec.",
+      "description": "Bridge and civil construction works — concrete, steel reinforcement, marine works and site operations, delivered to spec.",
       "img_dir": "construction",
       "name": "Construction",
       "photos": [
@@ -434,7 +434,7 @@
       "tagline": "Bridges & civil works"
     },
     {
-      "description": "Dam construction and hydraulic structures \u2014 embankments, spillways, reinforcement and dam fixtures, built to last.",
+      "description": "Dam construction and hydraulic structures — embankments, spillways, reinforcement and dam fixtures, built to last.",
       "img_dir": "construction",
       "name": "Dam Works",
       "photos": [
@@ -467,7 +467,7 @@
       "tagline": "Dams & hydraulic structures"
     },
     {
-      "description": "Solar installations for offices and homes \u2014 panels, inverters and battery storage, installed and working.",
+      "description": "Solar installations for offices and homes — panels, inverters and battery storage, installed and working.",
       "img_dir": "solar",
       "name": "Solar",
       "photos": [
@@ -508,7 +508,7 @@
       "tagline": "Solar for office & home"
     },
     {
-      "description": "Solar-powered dam and water treatment works \u2014 clean energy driving water infrastructure.",
+      "description": "Solar-powered dam and water treatment works — clean energy driving water infrastructure.",
       "img_dir": "solar-dam",
       "name": "Solar Powered Dam",
       "photos": [
@@ -545,7 +545,7 @@
       "tagline": "Solar-driven water works"
     },
     {
-      "description": "Property sourcing and advisory \u2014 we help you find, verify and secure real estate opportunities.",
+      "description": "Property sourcing and advisory — we help you find, verify and secure real estate opportunities.",
       "img_dir": "real-estate",
       "name": "Real Estate",
       "photos": [],
@@ -553,7 +553,7 @@
       "tagline": "Property, made simple"
     },
     {
-      "description": "Recruitment and staffing support for your projects and business \u2014 the right people in the right roles.",
+      "description": "Recruitment and staffing support for your projects and business — the right people in the right roles.",
       "img_dir": "staffing",
       "name": "Staffing",
       "photos": [],
@@ -561,165 +561,165 @@
       "tagline": "Right people, right roles"
     },
     {
-      "description": "Smart home gadgets sourced and supplied \u2014 security cameras, smart lighting, automation and more, delivered and set up.",
+      "description": "Smart home gadgets sourced and supplied — security cameras, smart lighting, automation and more, delivered and set up.",
       "img_dir": "smart-homes-gadgets",
       "name": "Smart Homes Gadgets",
       "photos": [
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457166098-0.jpg",
-          "caption": ""
+          "caption": "Multi-lens panoramic security camera — three heads, full IR night vision. Nothing escapes this one."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457171099-1.jpg",
-          "caption": ""
+          "caption": "IMOU dual-lens PTZ camera — pan, tilt and zoom from your phone. Your home, watched from anywhere."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457173970-2.jpg",
-          "caption": ""
+          "caption": "Tiandy dome PTZ camera — smooth 360° rotation, crisp detail. A quiet guardian for home or shop."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457177489-3.jpg",
-          "caption": ""
+          "caption": "Tiandy bullet camera — weatherproof build, sharp outdoor view. Mount it and forget it."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457180369-4.jpg",
-          "caption": ""
+          "caption": "IMOU dual-lens PTZ, front view — two lenses, zero blind spots. Night vision built in."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457182755-5.jpg",
-          "caption": ""
+          "caption": "Nightvision compact camera — small body, big watchful eye. Fits anywhere, misses nothing."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457186453-6.jpg",
-          "caption": ""
+          "caption": "Nightvision dome camera — clean white finish, wide indoor coverage. Discreet and dependable."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457189010-7.jpg",
-          "caption": ""
+          "caption": "Nightvision PTZ with dual antennas — strong signal, smooth rotation. Watch every corner from your phone."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457191004-8.jpg",
-          "caption": ""
+          "caption": "Tiandy dual-lens camera — fixed view plus rotating zoom in one body. Two eyes, zero blind spots."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457194449-9.jpg",
-          "caption": ""
+          "caption": "Tiandy solar PTZ camera — sun-powered and wire-free. Security that never sleeps, even off-grid."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457197212-10.jpg",
-          "caption": ""
+          "caption": "Dual-lens PTZ security camera in black — fixed wide view plus rotating zoom, heavy IR for night. One camera doing the work of two."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457201172-11.jpg",
-          "caption": ""
+          "caption": "Dual-lens PTZ, front angle — crisp lens, ring of night LEDs, app-controlled rotation. Built to watch day and night."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457228067-12.jpg",
-          "caption": ""
+          "caption": "Black Box traffic recorder — Full HD 1080 dashcam with WiFi. Your silent witness on every trip."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457232433-13.jpg",
-          "caption": ""
+          "caption": "EZVIZ indoor smart camera — compact dome, smooth pan and tilt. Keep an eye on home from your phone."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457237013-14.jpg",
-          "caption": ""
+          "caption": "2K Smart DashCam with 4G — remote playback, GPS tracking, two-way talk. Your car, connected and recorded."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457241490-15.jpg",
-          "caption": ""
+          "caption": "Nightvision mini indoor camera — palm-sized, sharp lens, sits anywhere. Small body, serious watch."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457246293-16.jpg",
-          "caption": ""
+          "caption": "Netra S8 security camera, boxed — 3MP HD, watch home and family from anywhere. Sealed and ready."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457250136-17.jpg",
-          "caption": ""
+          "caption": "EZVIZ H1c smart home camera — 1080P, two-way talk, human detection, works with Alexa and Google Home."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457254940-18.jpg",
-          "caption": ""
+          "caption": "Tiandy indoor PTZ camera — smooth pan and tilt in a clean white body. Your living room, always in view."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457258453-19.jpg",
-          "caption": ""
+          "caption": "EZVIZ smart cube camera — compact black finish on a tilt stand. Big security in a small square."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457262937-20.jpg",
-          "caption": ""
+          "caption": "Tiandy home care camera with box — unit plus sealed pack. Buy it, mount it, done."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457266129-21.jpg",
-          "caption": ""
+          "caption": "Tiandy home care camera, boxed set — clean white PTZ for indoor watch. Ready to install."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457269647-22.jpg",
-          "caption": ""
+          "caption": "IMOU Ranger 2 Dual — dual-lens WiFi indoor smart camera. Two views at once, all on WiFi."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457273505-23.jpg",
-          "caption": ""
+          "caption": "Panda smart camera kit — remote viewing, push alerts, family sharing. Home security in a box."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457277637-24.jpg",
-          "caption": ""
+          "caption": "IMOU Ranger 2 Dual on its box — dual lenses, indoor smart cam. Sealed and ready to go."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457612093-25.jpg",
-          "caption": ""
+          "caption": "PiPolux flexible LED wall lights — modern 3-light design, soft eye-friendly glow. Style that lights the room."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457616569-26.jpg",
-          "caption": ""
+          "caption": "PiPolux modern pendant light set — four matte-black drops, warm glow. Dining rooms will never look the same."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457619086-27.jpg",
-          "caption": ""
+          "caption": "PiPolux recessed step lights — smart light for every corner. Stairs and hallways, always-on elegance."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457622010-28.jpg",
-          "caption": ""
+          "caption": "Hexagon LED ceiling panels — bold geometric light for modern ceilings. Your roof, reimagined."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457624330-29.jpg",
-          "caption": ""
+          "caption": "PiPolux gold wall sconce — fluted glass, brass finish, soft warm light. Luxury on your wall."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457626312-30.jpg",
-          "caption": ""
+          "caption": "Hexagon LED ceiling grid — showroom-grade install. Turns any ceiling into a statement."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457628689-31.jpg",
-          "caption": ""
+          "caption": "PiPolux industrial pendant — black dome, caged bulb, warm glow. Factory style, home comfort."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457630924-32.jpg",
-          "caption": ""
+          "caption": "Smart door lock in action — touch keypad plus fingerprint unlock. Keys optional from today."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457632851-33.jpg",
-          "caption": ""
+          "caption": "PiPolux solar wall lights — six models, all in stock. Sun by day, security by night."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457635409-34.jpg",
-          "caption": ""
+          "caption": "Smart lock full kit — panels, mortise body, fittings, everything. One box, total door security."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457652846-35.jpg",
-          "caption": ""
+          "caption": "Smart door lock with display — face panel, touch keypad, glowing fingerprint ring. Your door just got an upgrade."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457655567-36.jpg",
-          "caption": ""
+          "caption": "Smart lock close-up — welcome display, fingerprint, keypad, card and app unlock. Five ways in, zero keys needed."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457657180-37.jpg",
-          "caption": ""
+          "caption": "Fingerprint handle lock on wood — keypad plus one-touch handle unlock. Sleek black on timber."
         },
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457702443-38.jpg",
-          "caption": ""
+          "caption": "Z20 fingerprint lock set — boxed with panels, handles and fittings. Everything needed, nothing missing."
         }
       ],
       "slug": "smart-homes-gadgets",
