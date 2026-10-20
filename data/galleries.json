@@ -1,116 +1,116 @@
 {
   "services": [
     {
-      "description": "Quality vehicles sourced and supplied — from sedans to SUVs. Tap to see our current stock.",
+      "description": "Quality vehicles sourced and supplied \u2014 from sedans to SUVs. Tap to see our current stock.",
       "img_dir": "vehicles",
       "name": "Vehicles",
       "photos": [
         {
-          "src": "img/vehicles/v1.jpg",
-          "caption": "Toyota Corolla fleet"
+          "caption": "Toyota Corolla fleet",
+          "src": "img/vehicles/v1.jpg"
         },
         {
-          "src": "img/vehicles/v2.jpg",
-          "caption": "Sedans ready for delivery"
+          "caption": "Sedans ready for delivery",
+          "src": "img/vehicles/v2.jpg"
         },
         {
-          "src": "img/vehicles/v3.jpg",
-          "caption": "Vehicle warehouse"
+          "caption": "Vehicle warehouse",
+          "src": "img/vehicles/v3.jpg"
         },
         {
-          "src": "img/vehicles/v4.jpg",
-          "caption": "Stock lineup"
+          "caption": "Stock lineup",
+          "src": "img/vehicles/v4.jpg"
         },
         {
-          "src": "img/vehicles/v5.jpg",
-          "caption": "Fresh arrivals"
+          "caption": "Fresh arrivals",
+          "src": "img/vehicles/v5.jpg"
         },
         {
-          "src": "img/vehicles/v6.jpg",
-          "caption": "Sedans in storage"
+          "caption": "Sedans in storage",
+          "src": "img/vehicles/v6.jpg"
         },
         {
-          "src": "img/vehicles/v7.jpg",
-          "caption": "Range Rover in container"
+          "caption": "Range Rover in container",
+          "src": "img/vehicles/v7.jpg"
         },
         {
-          "src": "img/vehicles/v8.jpg",
-          "caption": "Toyota Hilux pickup"
+          "caption": "Toyota Hilux pickup",
+          "src": "img/vehicles/v8.jpg"
         },
         {
-          "src": "img/vehicles/v9.jpg",
-          "caption": "Toyota Hilux front view"
+          "caption": "Toyota Hilux front view",
+          "src": "img/vehicles/v9.jpg"
         },
         {
-          "src": "img/vehicles/v11.jpg",
-          "caption": "UCC dealership partnership"
+          "caption": "UCC dealership partnership",
+          "src": "img/vehicles/v11.jpg"
         },
         {
-          "src": "img/vehicles/v12.jpg",
-          "caption": "Car showroom visit"
+          "caption": "Car showroom visit",
+          "src": "img/vehicles/v12.jpg"
         },
         {
-          "src": "img/vehicles/v13.jpg",
-          "caption": "Cadillac Escalade"
+          "caption": "Cadillac Escalade",
+          "src": "img/vehicles/v13.jpg"
         },
         {
-          "src": "img/vehicles/v14.jpg",
-          "caption": "Cadillac Escalade rear view"
+          "caption": "Cadillac Escalade rear view",
+          "src": "img/vehicles/v14.jpg"
         },
         {
-          "src": "img/vehicles/v15.jpg",
-          "caption": "Honda Crider stock"
+          "caption": "Honda Crider stock",
+          "src": "img/vehicles/v15.jpg"
         },
         {
-          "src": "img/vehicles/v16.jpg",
-          "caption": "Toyota Hilux GR"
+          "caption": "Toyota Hilux GR",
+          "src": "img/vehicles/v16.jpg"
         },
         {
-          "src": "img/vehicles/v17.jpg",
-          "caption": "Range Rover secured in container"
+          "caption": "Range Rover secured in container",
+          "src": "img/vehicles/v17.jpg"
         },
         {
-          "src": "img/vehicles/v18.jpg",
-          "caption": "UX BRIDGES showroom"
+          "caption": "UX BRIDGES showroom",
+          "src": "img/vehicles/v18.jpg"
         },
         {
-          "src": "img/vehicles/v19.jpg",
-          "caption": "Sedans and SUVs on ground"
+          "caption": "Sedans and SUVs on ground",
+          "src": "img/vehicles/v19.jpg"
         },
         {
-          "src": "img/vehicles/v20.jpg",
-          "caption": "Toyota Corolla warehouse stock"
+          "caption": "Toyota Corolla warehouse stock",
+          "src": "img/vehicles/v20.jpg"
         },
         {
-          "src": "img/vehicles/v21.jpg",
-          "caption": "Toyota Hilux GR Launch Edition"
+          "caption": "Toyota Hilux GR Launch Edition",
+          "src": "img/vehicles/v21.jpg"
         },
         {
-          "src": "img/vehicles/v22.jpg",
-          "caption": "Toyota stock inspection"
+          "caption": "Toyota stock inspection",
+          "src": "img/vehicles/v22.jpg"
         },
         {
-          "src": "img/vehicles/vehicles-1792415177345-21.jpg",
-          "caption": "E 450 4MATIC in white — executive class, German engineering, no noise. "
+          "caption": "E 450 4MATIC in white \u2014 executive class, German engineering, no noise. ",
+          "src": "img/vehicles/vehicles-1792415177345-21.jpg"
         },
         {
-          "src": "img/vehicles/vehicles-1792415181837-22.jpg",
-          "caption": "GLC 300 — the SUV that handles everything quietly. Sharp, clean, ready."
+          "caption": "GLC 300 \u2014 the SUV that handles everything quietly. Sharp, clean, ready.",
+          "src": "img/vehicles/vehicles-1792415181837-22.jpg"
         },
         {
-          "src": "img/vehicles/vehicles-1792415184430-23.jpg",
-          "caption": "Fresh off the boat — AMG face, straight from the auction lot. This one won't sit long."
+          "caption": "Fresh off the boat \u2014 AMG face, straight from the auction lot. This one won't sit long.",
+          "src": "img/vehicles/vehicles-1792415184430-23.jpg"
         },
         {
-          "src": "img/vehicles/vehicles-1792415187593-24.jpg",
-          "caption": "GLC on multi-spokes — stance, presence, road manners. Pure cruise spec."
+          "caption": "GLC on multi-spokes \u2014 stance, presence, road manners. Pure cruise spec.",
+          "src": "img/vehicles/vehicles-1792415187593-24.jpg"
         }
       ],
       "slug": "vehicles",
       "tagline": "Cars for sale in Nigeria"
     },
     {
-      "description": "Heavy-duty trucks and tippers — HOWO and Sinotruk units available for serious work.",
+      "description": "Heavy-duty trucks and tippers \u2014 HOWO and Sinotruk units available for serious work.",
       "img_dir": "trucks",
       "name": "Trucks",
       "photos": [
@@ -276,7 +276,7 @@
           "src": "img/cargo/cg11.jpg"
         },
         {
-          "caption": "Cargo hold — truck beds and parts",
+          "caption": "Cargo hold \u2014 truck beds and parts",
           "src": "img/cargo/cg12.jpg"
         },
         {
@@ -393,7 +393,7 @@
       "tagline": "Clearance without stories"
     },
     {
-      "description": "Bridge and civil construction works — concrete, steel reinforcement, marine works and site operations, delivered to spec.",
+      "description": "Bridge and civil construction works \u2014 concrete, steel reinforcement, marine works and site operations, delivered to spec.",
       "img_dir": "construction",
       "name": "Construction",
       "photos": [
@@ -434,7 +434,7 @@
       "tagline": "Bridges & civil works"
     },
     {
-      "description": "Dam construction and hydraulic structures — embankments, spillways, reinforcement and dam fixtures, built to last.",
+      "description": "Dam construction and hydraulic structures \u2014 embankments, spillways, reinforcement and dam fixtures, built to last.",
       "img_dir": "construction",
       "name": "Dam Works",
       "photos": [
@@ -467,7 +467,7 @@
       "tagline": "Dams & hydraulic structures"
     },
     {
-      "description": "Solar installations for offices and homes — panels, inverters and battery storage, installed and working.",
+      "description": "Solar installations for offices and homes \u2014 panels, inverters and battery storage, installed and working.",
       "img_dir": "solar",
       "name": "Solar",
       "photos": [
@@ -508,7 +508,7 @@
       "tagline": "Solar for office & home"
     },
     {
-      "description": "Solar-powered dam and water treatment works — clean energy driving water infrastructure.",
+      "description": "Solar-powered dam and water treatment works \u2014 clean energy driving water infrastructure.",
       "img_dir": "solar-dam",
       "name": "Solar Powered Dam",
       "photos": [
@@ -545,7 +545,7 @@
       "tagline": "Solar-driven water works"
     },
     {
-      "description": "Property sourcing and advisory — we help you find, verify and secure real estate opportunities.",
+      "description": "Property sourcing and advisory \u2014 we help you find, verify and secure real estate opportunities.",
       "img_dir": "real-estate",
       "name": "Real Estate",
       "photos": [],
@@ -553,7 +553,7 @@
       "tagline": "Property, made simple"
     },
     {
-      "description": "Recruitment and staffing support for your projects and business — the right people in the right roles.",
+      "description": "Recruitment and staffing support for your projects and business \u2014 the right people in the right roles.",
       "img_dir": "staffing",
       "name": "Staffing",
       "photos": [],
@@ -561,11 +561,9 @@
       "tagline": "Right people, right roles"
     },
     {
-      "slug": "smart-homes-gadgets",
-      "name": "Smart Homes Gadgets",
-      "tagline": "Smart devices for modern living",
-      "description": "Smart home gadgets sourced and supplied — security cameras, smart lighting, automation and more, delivered and set up.",
+      "description": "Smart home gadgets sourced and supplied \u2014 security cameras, smart lighting, automation and more, delivered and set up.",
       "img_dir": "smart-homes-gadgets",
+      "name": "Smart Homes Gadgets",
       "photos": [
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457166098-0.jpg",
@@ -666,8 +664,66 @@
         {
           "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457277637-24.jpg",
           "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457612093-25.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457616569-26.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457619086-27.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457622010-28.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457624330-29.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457626312-30.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457628689-31.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457630924-32.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457632851-33.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457635409-34.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457652846-35.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457655567-36.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457657180-37.jpg",
+          "caption": ""
+        },
+        {
+          "src": "img/smart-homes-gadgets/smart-homes-gadgets-1792457702443-38.jpg",
+          "caption": ""
         }
-      ]
+      ],
+      "slug": "smart-homes-gadgets",
+      "tagline": "Smart devices for modern living"
     }
   ]
 }
