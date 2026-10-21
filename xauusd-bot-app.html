@@ -65,7 +65,7 @@
   <div class="brand">
     <div class="coin">&#129689;</div>
     <h1>XAUUSD <span>BOT</span></h1>
-    <p>Gold auto-trader &mdash; connect your MT5, set your risk, press start.</p>
+    <p>Gold auto-trader &mdash; connect your cTrader, set your risk, press start.</p>
   </div>
 
   <!-- ============ AUTH ============ -->
@@ -98,18 +98,15 @@
   <!-- ============ CONNECT ============ -->
   <div id="connectView" class="hidden">
     <div class="card">
-      <h2>Connect your MT5 account</h2>
-      <p class="sub">Enter the same login you use in MetaTrader 5. Start with a <b>demo account</b>.
+      <h2>Connect your cTrader account</h2>
+      <p class="sub">Tap the button and you will go to <b>cTrader's own website</b> to log in and approve
+      the connection &mdash; your broker password is never typed into this app. Start with a <b>demo account</b>.
       The bot runs in the cloud &mdash; no computer needed, your phone is the control room.</p>
-      <label>MT5 login number</label>
-      <input id="mt5Login" inputmode="numeric" placeholder="e.g. 12345678">
-      <label>MT5 password</label>
-      <input id="mt5Pw" type="password" placeholder="Your MT5 account password">
-      <label>Broker server name</label>
-      <input id="mt5Server" placeholder="e.g. Exness-MT5Trial8">
-      <p class="sub" style="margin-top:10px">Find the server name inside MT5: it is shown on the login screen, exactly as written there.</p>
+      <p class="sub">The connection is <b>completely free</b> &mdash; no subscription, nothing to fund.</p>
+      <p class="sub">No cTrader demo yet? Open a free one at a broker like IC Markets or Pepperstone,
+      and choose the <b>cTrader</b> platform for the account.</p>
       <div class="msg" id="connectMsg"></div>
-      <button class="btn btn-gold" id="connectBtn">Connect broker</button>
+      <button class="btn btn-gold" id="connectBtn">Connect with cTrader</button>
       <div class="switch-link"><a href="#" id="logout1">Log out</a></div>
     </div>
   </div>
@@ -209,18 +206,29 @@ function logout(){ TOKEN = ''; localStorage.removeItem('xauusd_token'); show('au
 $('logout1').onclick = e => { e.preventDefault(); logout(); };
 $('logout2').onclick = e => { e.preventDefault(); logout(); };
 
-// ---------- connect ----------
+// ---------- connect (cTrader OAuth) ----------
 $('connectBtn').onclick = async () => {
-  const btn = $('connectBtn'); btn.textContent = 'Connecting…'; btn.disabled = true;
+  const btn = $('connectBtn'); btn.textContent = 'Opening cTrader…'; btn.disabled = true;
   try {
-    await api('/api/connect', 'POST', {
-      mt5_login: $('mt5Login').value, mt5_password: $('mt5Pw').value, mt5_server: $('mt5Server').value
-    });
-    msg($('connectMsg'), 'Connected. Taking you to your dashboard…', true);
-    setTimeout(refresh, 800);
-  } catch (e) { msg($('connectMsg'), e.message, false); }
-  btn.textContent = 'Connect broker'; btn.disabled = false;
+    const d = await api('/api/ctrader/auth-url');
+    location.href = d.url;   // off to cTrader to log in + approve
+  } catch (e) { msg($('connectMsg'), e.message, false); btn.textContent = 'Connect with cTrader'; btn.disabled = false; }
 };
+
+// ---------- return from cTrader ----------
+async function handleReturn(){
+  const q = new URLSearchParams(location.search);
+  if (!q.has('connected') && !q.has('linked') && !q.has('error')) return;
+  history.replaceState({}, '', location.pathname);
+  if (q.get('error')) {
+    if (TOKEN) { show('connectView'); msg($('connectMsg'), q.get('error'), false); }
+    return;
+  }
+  if (q.get('linked') && TOKEN) {
+    try { await api('/api/ctrader/claim', 'POST', { ctid: q.get('linked') }); }
+    catch (e) { show('connectView'); msg($('connectMsg'), e.message, false); }
+  }
+}
 
 // ---------- dashboard ----------
 $('riskRange').oninput = () => { $('riskVal').textContent = Number($('riskRange').value).toFixed(1) + '%'; };
@@ -264,7 +272,7 @@ async function refresh(){
     $('riskVal').textContent = Number(STATE.risk_percent).toFixed(1) + '%';
     $('stBalance').textContent = money(s.balance);
     $('stEquity').textContent = money(s.equity);
-    $('acctLine').textContent = 'MT5 ' + s.mt5_login + ' · ' + s.mt5_server + (s.dry_run ? ' · DRY RUN (no real orders sent)' : '');
+    $('acctLine').textContent = (s.bridge === 'ctrader' ? 'cTrader ' : 'MT5 ') + s.mt5_login + ' · ' + s.mt5_server + (s.dry_run ? ' · DRY RUN (no real orders sent)' : '');
     paintBot();
     const pl = $('posList');
     if (s.positions && s.positions.length) {
@@ -295,7 +303,7 @@ $('saveApiBtn').onclick = () => {
   refresh();
 };
 
-refresh();
+handleReturn().then(() => refresh());
 setInterval(() => { if (TOKEN && !$('dashView').classList.contains('hidden')) refresh(); }, 60000);
 </script>
 </body>
