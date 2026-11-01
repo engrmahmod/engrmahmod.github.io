@@ -244,6 +244,7 @@ footer b{color:var(--txt)}
   <div class="abtns">
     <button class="btn sm" onclick="adjustWallet()">💰 Adjust Wallet</button>
     <button class="btn sm ghost" onclick="setTempPassword()">🔑 Set Temp Password</button>
+    <button class="btn sm ghost" onclick="setUserPin()">🔢 Set Transaction PIN</button>
     <button class="btn sm danger" onclick="deleteUser()">🗑️ Delete User</button>
     <button class="btn sm ghost" onclick="closeUser()">Close</button>
   </div>
@@ -427,6 +428,17 @@ async function setTempPassword(){
     const j = await aapi('/api/admin/user-password','POST',{user_id: CUR_USER.id, new_password: pw});
     if(!j.ok) return alert(j.error||'Failed.');
     alert('Password set. Tell the user: '+pw);
+  }catch(e){ alert(e.message); }
+}
+async function setUserPin(){
+  if(!CUR_USER) return;
+  const pin = prompt('New 4-digit transaction PIN for '+CUR_USER.name+' (this also clears any PIN lockout):', '');
+  if(pin===null) return;
+  if(!/^\d{4}$/.test(pin)) return alert('PIN must be exactly 4 digits.');
+  try{
+    const j = await aapi('/api/admin/user-pin','POST',{user_id: CUR_USER.id, new_pin: pin});
+    if(!j.ok) return alert(j.error||'Failed.');
+    alert('Transaction PIN set for '+CUR_USER.name+'.');
   }catch(e){ alert(e.message); }
 }
 async function deleteUser(){
