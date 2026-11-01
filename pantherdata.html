@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script>try{if(localStorage.getItem('sv_token'))document.documentElement.classList.add('sv-logged');}catch(e){}</script>
 <title>Panther Data — Buy Cheap Data, Airtime, Cable TV & Electricity in Nigeria</title>
 <meta name="description" content="Panther Data: buy cheap MTN, Airtel, Glo & 9mobile data, airtime, DStv/GOtv/Startimes subscriptions and electricity bills in Nigeria — instantly, at unbeatable prices.">
 <link rel="canonical" href="https://engrmahmod.github.io/pantherdata.html">
@@ -31,6 +32,8 @@
 
   /* ================= WEBSITE (light) ================= */
   #sitemode{background:#f2f6fd;color:#0f1e3d;min-height:100vh}
+  /* Logged-in refresh: never paint the homepage before the app loads. */
+  html.sv-logged #sitemode{display:none}
   #sitemode .wrap{max-width:760px;margin:0 auto;padding:0 22px}
   #sitemode nav{position:sticky;top:0;z-index:100;background:rgba(242,246,253,.93);backdrop-filter:blur(10px);border-bottom:1px solid #e4eaf5}
   #sitemode nav .wrap{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;position:relative}
