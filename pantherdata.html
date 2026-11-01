@@ -986,14 +986,20 @@ setInterval(()=>{
 
 /* ----- dashboard / history / profile ----- */
 async function renderDash(){
-  await refreshMe();
+  // Fetch profile and history in parallel, then render everything in one
+  // pass — so balance, spending, transaction count and the list appear
+  // together, instead of balance first and the rest seconds later.
+  const [m, j] = await Promise.all([
+    api('/api/me').catch(e=>{ if(/Session expired/.test(e.message||'')) ME=null; return {ok:false}; }),
+    api('/api/history').catch(()=>({ok:false}))
+  ]);
+  if(m.ok) ME = m.user;
   if(!ME){ go('site'); return; }
   $('dash-name').textContent = ME.name.split(' ')[0];
   $('dash-ava').textContent = (ME.name.trim()[0]||'M').toUpperCase();
   $('dash-bal').textContent = naira(ME.wallet);
-  try{
-    const j = await api('/api/history');
-    window.HIST_TXS = j.ok?j.transactions:[];
+  if(j.ok){
+    window.HIST_TXS = j.transactions||[];
     let spent = 0;
     window.HIST_TXS.forEach(t=>{ if(t.direction!=='in') spent += Number(t.amount)||0; });
     $('dash-spent').textContent = naira(spent);
@@ -1001,7 +1007,7 @@ async function renderDash(){
     const mine = window.HIST_TXS.slice(0,5);
     $('dash-tx').innerHTML = mine.length ? mine.map((t,k)=>txHTML(t,k)).join('')
       : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
-  }catch(e){ $('dash-tx').innerHTML='<div class="empty">Could not load transactions.</div>'; }
+  }else{ $('dash-tx').innerHTML='<div class="empty">Could not load transactions.</div>'; }
 }
 async function renderHistory(){
   try{
