@@ -203,6 +203,47 @@
   #appmode .modal-bg{position:fixed;inset:0;background:rgba(10,20,40,.5);backdrop-filter:blur(4px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px}
   #appmode .modal-bg.show{display:flex}
   #appmode .modal{background:#fff;border:1px solid #e6edf7;border-radius:24px;padding:30px 24px;max-width:380px;width:100%;text-align:center;animation:fade .25s;color:#0f1e3d;box-shadow:0 30px 80px rgba(20,40,90,.25)}
+  /* ================= RECEIPT (new design) ================= */
+  #rcptmodal .modal{background:transparent;border:none;box-shadow:none;padding:0;max-width:420px}
+  .rc-card{background:#fff;border-radius:26px;overflow:hidden;box-shadow:0 24px 60px rgba(15,30,61,.35);text-align:center;color:#0f1e3d}
+  .rc-head{background:linear-gradient(135deg,#0f1e3d 0%,#1f6feb 62%,#8b3dff 100%);color:#fff;padding:28px 24px 22px;text-align:center}
+  .rc-logo{font-weight:900;font-size:1.5rem;letter-spacing:1px}
+  .rc-logo span{color:#ffc542}
+  .rc-slogan{font-size:.66rem;letter-spacing:3px;font-weight:700;opacity:.85;margin-top:4px}
+  .rc-dots{display:flex;justify-content:center;gap:7px;margin-top:16px}
+  .rc-dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.75)}
+  .rc-dots i:nth-child(3n){background:#ffc542}
+  .rc-dots i:nth-child(3n+1){background:#2fd67c}
+  .rc-body{padding:24px 24px 8px;text-align:center}
+  .rc-badge{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-size:.8rem;padding:7px 16px;border-radius:999px}
+  .rc-amount{font-size:2.8rem;font-weight:900;letter-spacing:-1px;margin:12px 0 2px;color:#0f1e3d}
+  .rc-service{font-size:1rem;font-weight:700}
+  .rc-plan{color:#5b6b8c;font-size:.88rem;margin-top:2px}
+  .rc-perf{position:relative;margin:24px -24px 0;border-top:2px dashed #dbe4f2}
+  .rc-rows{padding:18px 24px 4px;text-align:left}
+  .rc-row{display:flex;justify-content:space-between;gap:14px;padding:11px 0;border-bottom:1px solid #eef2f9;font-size:.92rem}
+  .rc-row:last-child{border-bottom:none}
+  .rc-row .k{color:#5b6b8c}
+  .rc-row .v{font-weight:700;text-align:right;word-break:break-all}
+  .rc-row .v.green{color:#15803d}
+  .rc-foot{padding:16px 24px 24px;text-align:center}
+  .rc-thanks{font-weight:800;font-size:.95rem}
+  .rc-motto{color:#5b6b8c;font-size:.82rem;margin-top:4px}
+  .rc-refnote{color:#8a9ab5;font-size:.74rem;margin-top:12px}
+  .rc-actions{display:flex;gap:10px;margin-top:16px}
+  .rc-actions button{flex:1;border:none;cursor:pointer;font-weight:800;font-size:.92rem;padding:14px;border-radius:14px}
+  .rc-print{background:#1f6feb;color:#fff}
+  .rc-share{background:#0f1e3d;color:#fff}
+  .rc-close{margin-top:10px;width:100%;border:1px solid #e2e9f4;background:#fff;color:#0f1e3d;font-weight:700;padding:13px;border-radius:14px;cursor:pointer}
+  @media print{
+    body *{visibility:hidden}
+    #rcptmodal,#rcptmodal *{visibility:visible}
+    #rcptmodal{position:absolute;inset:0;background:#fff;padding:0}
+    #rcptmodal .modal{max-width:100%;box-shadow:none}
+    .rc-card{box-shadow:none}
+    .rc-actions,.rc-close{display:none !important}
+  }
+
   #appmode .modal .m-ic{font-size:3rem;margin-bottom:12px}
   #appmode .modal h3{margin-bottom:8px;color:#0f1e3d}
   #appmode .modal p{color:#5b6b8c;font-size:.92rem;margin-bottom:20px}
@@ -629,15 +670,13 @@
     <div class="m-ic" id="m-ic">✅</div><h3 id="m-title">Success</h3><p id="m-msg"></p>
     <button class="btn" onclick="closeModal()">Done</button>
   </div></div>
-  <div class="modal-bg" id="rcptmodal"><div class="modal" style="text-align:left">
-    <div style="text-align:center"><h3>Transaction Receipt</h3>
-    <div style="color:var(--muted);font-size:.8rem;letter-spacing:.2em;margin-bottom:10px">Panther Data</div></div>
+  <div class="modal-bg" id="rcptmodal"><div class="modal">
     <div id="rcpt-body"></div>
-    <div style="display:flex;gap:10px;margin-top:14px">
-      <button class="btn" onclick="downloadReceipt()" style="flex:1">⬇ Download</button>
-      <button class="btn" onclick="shareReceipt()" style="flex:1">📤 Share</button>
+    <div class="rc-actions">
+      <button class="rc-print" onclick="printReceipt()">⎙ Print / Save PDF</button>
+      <button class="rc-share" onclick="shareReceipt()">↗ Share</button>
     </div>
-    <button class="btn" onclick="closeReceipt()" style="margin-top:10px;background:var(--card);border:1px solid var(--line)">Close</button>
+    <button class="rc-close" onclick="closeReceipt()">Close</button>
   </div></div>
   <div class="modal-bg" id="pinmodal"><div class="modal">
     <div class="m-ic">🔐</div><h3>Transaction PIN</h3>
@@ -732,20 +771,47 @@ function modal(ok, title, msg){
   $('modal').classList.add('show');
 }
 function closeModal(){ $('modal').classList.remove('show'); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function maskPhone(p){ return p.slice(0,4)+' \u2022\u2022\u2022 \u2022'+p.slice(-4); }
+function calcBalAfter(i){
+  try{
+    if(!ME || !window.HIST_TXS) return null;
+    let bal = Number(ME.wallet)||0;
+    for(let k=0;k<i;k++){ const x=window.HIST_TXS[k]; const a=Number(x.amount)||0; if(x.direction==='in') bal-=a; else bal+=a; }
+    return bal;
+  }catch(e){ return null; }
+}
 function openReceipt(i){
   const t=(window.HIST_TXS||[])[i]; if(!t) return;
   window.CUR_RCPT=t;
-  const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
   const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
-  const stCol = t.status==='successful' ? '#16a34a' : (t.status==='pending' ? '#f59e0b' : '#dc2626');
-  const row=(k,v)=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px dashed #e2e9f4;font-size:.9rem"><span style="color:#7b8aa5">${k}</span><b style="text-align:right;word-break:break-all;color:#0f1e3d">${v||'—'}</b></div>`;
+  const st = t.status||'successful';
+  const stTxt = st.toUpperCase();
+  const stCol = st==='successful' ? '#15803d' : (st==='pending' ? '#f59e0b' : '#dc2626');
+  const stIc = st==='successful' ? '\u2713' : (st==='pending' ? '\u25f7' : '\u2715');
+  const desc = t.description||t.desc||'';
+  const pm = desc.match(/0\d{10}/);
+  const phone = pm ? pm[0] : '';
+  const plan = phone ? desc.replace(phone,'').replace(/\s{2,}/g,' ').replace(/^[\s\-\u2013\u2014]+|[\s\-\u2013\u2014]+$/g,'') : desc;
+  const balAfter = calcBalAfter(i);
+  const row=(k,v,cls)=>`<div class="rc-row"><span class="k">${k}</span><span class="v ${cls||''}">${v||'\u2014'}</span></div>`;
   $('rcpt-body').innerHTML =
-    `<div style="text-align:center;margin-bottom:8px"><div style="font-size:2rem">${icons[t.type]||''}</div>
-     <div style="font-size:1.5rem;font-weight:800;color:${t.direction==='in'?'#16a34a':'#b45309'}">${t.direction==='in'?'+':'−'}${naira(t.amount)}</div>
-     <div style="margin-top:4px"><span style="background:${stCol}22;color:${stCol};padding:3px 12px;border-radius:20px;font-size:.8rem;font-weight:700">${(t.status||'successful').toUpperCase()}</span></div></div>` +
-    row('Description', t.description||t.desc) + row('Type', names[t.type]||t.type) +
-    row('Date', t.created||t.date) + row('Reference', t.reference) +
-    row('Direction', t.direction==='in'?'Credit':'Debit');
+    `<div class="rc-card"><div class="rc-head"><div class="rc-logo">PANTHER<span>DATA</span></div>`+
+    `<div class="rc-slogan">NIGERIA'S SWEETEST DATA</div>`+
+    `<div class="rc-dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>`+
+    `<div class="rc-body"><div class="rc-badge" style="background:${stCol}22;color:${stCol}"><b>${stIc}</b> ${stTxt}</div>`+
+    `<div class="rc-amount">${t.direction==='in'?'+':'\u2212'}${naira(t.amount)}</div>`+
+    `<div class="rc-service">${names[t.type]||t.type||'Transaction'}</div>`+
+    `<div class="rc-plan">${esc(plan)}</div><div class="rc-perf"></div></div>`+
+    `<div class="rc-rows">`+
+    (phone ? row('Phone number', maskPhone(phone)) : '')+
+    row('Date &amp; time', fmtDT(t.created||t.date))+
+    row('Reference', esc(t.reference))+
+    row('Status', stTxt, st==='successful'?'green':'')+
+    (balAfter!==null ? row('Wallet balance after', naira(balAfter)) : '')+
+    `</div><div class="rc-foot"><div class="rc-thanks">Thank you for using Panther Data</div>`+
+    `<div class="rc-motto">Low Prices. Fast Service.</div>`+
+    `<div class="rc-refnote">Keep this receipt for your records. Questions? Reach us on WhatsApp via the app.</div></div></div>`;
   $('rcptmodal').classList.add('show');
 }
 function closeReceipt(){ $('rcptmodal').classList.remove('show'); }
@@ -757,91 +823,15 @@ function fmtDT(iso){
     return d.getDate()+' '+M[d.getMonth()]+' '+d.getFullYear()+', '+h+':'+String(d.getMinutes()).padStart(2,'0')+' '+ap;
   }catch(e){ return iso; }
 }
-function wrapLines(x, text, maxW){
-  const words=String(text==null?'—':text).split(' ');
-  const lines=[]; let line='';
-  const pushWord=(w)=>{
-    while(x.measureText(w).width>maxW && w.length>1){
-      let k=1; while(k<w.length && x.measureText(w.slice(0,k+1)).width<=maxW) k++;
-      lines.push(w.slice(0,k)); w=w.slice(k);
-    }
-    return w;
-  };
-  for(let w0 of words){
-    let w=pushWord(w0);
-    const t=line?line+' '+w:w;
-    if(x.measureText(t).width>maxW && line){ lines.push(line); line=w; }
-    else line=t;
-  }
-  if(line) lines.push(line);
-  return lines.length?lines:['—'];
-}
-function receiptCanvas(){
-  const t=window.CUR_RCPT||{}; const W=600;
-  const names={data:'Data purchase',airtime:'Airtime top-up',cable:'Cable TV',power:'Electricity bill',fund:'Wallet funding'};
-  const rows=[
-    ['Type', names[t.type]||t.type||'—'],
-    ['Description', t.description||t.desc||'—'],
-    ['Date', fmtDT(t.created||t.date)],
-    ['Reference', t.reference||'—'],
-    ['Direction', t.direction==='in'?'Credit':'Debit']
-  ];
-  // measure pass
-  const mc=document.createElement('canvas').getContext('2d');
-  mc.font='400 24px sans-serif';
-  const maxW=W-100;
-  const wrapped=rows.map(([k,v])=>({k, lines:wrapLines(mc,v,maxW)}));
-  const H=330 + wrapped.reduce((a,r)=>a+r.lines.length*36,0) + 130;
-  const c=document.createElement('canvas'); c.width=W; c.height=H;
-  const x=c.getContext('2d');
-  x.fillStyle='#ffffff'; x.fillRect(0,0,W,H);
-  x.textAlign='center'; x.fillStyle='#7c3aed';
-  x.font='800 40px sans-serif'; x.fillText('Panther Data', W/2, 80);
-  x.fillStyle='#666'; x.font='400 22px sans-serif'; x.fillText('Transaction Receipt', W/2, 118);
-  x.strokeStyle='#ccc'; x.setLineDash([8,6]); x.beginPath(); x.moveTo(40,150); x.lineTo(W-40,150); x.stroke(); x.setLineDash([]);
-  // amount: draw sign and figure separately so the ₦ never overlaps
-  x.font='800 52px sans-serif';
-  const signStr=t.direction==='in'?'+':'−', amtStr='₦'+Number(t.amount||0).toLocaleString();
-  const col=t.direction==='in' ? '#16a34a' : '#b45309';
-  const tw=x.measureText(signStr).width+x.measureText(amtStr).width;
-  x.textAlign='left'; x.fillStyle=col;
-  let ax=W/2-tw/2;
-  x.fillText(signStr, ax, 225); ax+=x.measureText(signStr).width;
-  x.fillText(amtStr, ax, 225);
-  x.textAlign='center'; x.fillStyle='#16a34a'; x.font='700 24px sans-serif';
-  x.fillText((t.status||'successful').toUpperCase(), W/2, 265);
-  x.font='400 24px sans-serif';
-  let y=330;
-  for(const r of wrapped){
-    x.textAlign='left'; x.fillStyle='#888'; x.fillText(r.k, 40, y+8);
-    x.textAlign='right'; x.fillStyle='#111';
-    r.lines.forEach((ln,i)=>x.fillText(ln, W-40, y+8+i*36));
-    y+=r.lines.length*36+22;
-  }
-  x.strokeStyle='#ccc'; x.setLineDash([8,6]); x.beginPath(); x.moveTo(40,y+6); x.lineTo(W-40,y+6); x.stroke(); x.setLineDash([]);
-  x.textAlign='center'; x.fillStyle='#888'; x.font='400 20px sans-serif';
-  x.fillText('Thank you for using Panther Data', W/2, y+52);
-  return c;
-}
-function downloadReceipt(){
-  const c=receiptCanvas();
-  const a=document.createElement('a');
-  a.download='pantherdata-receipt-'+((window.CUR_RCPT||{}).reference||'txn')+'.png';
-  a.href=c.toDataURL('image/png'); a.click();
-}
+function printReceipt(){ window.print(); }
 async function shareReceipt(){
-  const c=receiptCanvas();
-  const done=(blob)=>{
-    const f=new File([blob],'pantherdata-receipt.png',{type:'image/png'});
-    if(navigator.canShare && navigator.canShare({files:[f]})){
-      navigator.share({files:[f], title:'Panther Data Receipt'}).catch(()=>{});
-    } else if(navigator.share){
-      const t=window.CUR_RCPT||{};
-      navigator.share({title:'Panther Data Receipt',
-        text:`Panther Data receipt: ₦${Number(t.amount||0).toLocaleString()} — ${t.description||''} — Ref ${t.reference||''}`}).catch(()=>{});
-    } else { downloadReceipt(); }
-  };
-  if(c.toBlob) c.toBlob(done,'image/png'); else done(c.toDataURL('image/png'));
+  const t=window.CUR_RCPT||{};
+  const text=`Panther Data receipt: ${t.description||''} \u2014 ${t.direction==='in'?'+':'\u2212'}${naira(t.amount)} \u2014 Ref ${t.reference||''} \u2014 ${(t.status||'successful').toUpperCase()}`;
+  try{
+    if(navigator.share){ await navigator.share({title:'Panther Data Receipt', text}); return; }
+    await navigator.clipboard.writeText(text);
+    alert('Receipt details copied.');
+  }catch(e){}
 }
 function txHTML(t,i){
   const icons={data:'📶',airtime:'📞',cable:'📺',power:'💡',fund:'💳'};
