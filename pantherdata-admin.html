@@ -210,6 +210,15 @@ footer b{color:var(--txt)}
       <div class="tres" id="price-res"></div>
       <div id="price-list" style="margin-top:10px"></div>
     </div>
+    <div class="card"><h3>Fatizara prices</h3>
+      <p style="color:var(--muted); font-size:.88rem">Your own selling prices for Fatizara data and cable plans. Cost is what Fatizara charges; sell is what customers pay. Leave sell empty to sell at cost.</p>
+      <div class="prow" style="margin-top:0">
+        <button class="btn sm" onclick="seedFzPrices()">⚙️ Seed Fatizara Plans</button>
+        <button class="btn sm ghost" onclick="fzCostCheck()">🔍 Check Below-Cost Plans</button>
+      </div>
+      <div class="tres" id="fz-price-res"></div>
+      <div id="fz-price-list" style="margin-top:10px"></div>
+    </div>
   </section>
   <!-- BACKUP -->
   <section class="view" id="v-backup">
@@ -248,6 +257,7 @@ const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let ABASE = '', AKEY = '';
 let USERS = [], TXS = [], SETCACHE = [], CONNSTAT = {};
+let VTPRICES = [], FZPLANS = [];
 let CUR_USER = null;
 try {
   const saved = JSON.parse(localStorage.getItem('sv_admin')||'null');
@@ -294,7 +304,7 @@ function doAdminLogout(){
   $('a-panel').style.display='none'; $('a-login').style.display='flex';
 }
 async function renderAll(){
-  await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadPrices()]);
+  await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadPrices(), loadFzPrices()]);
 }
 /* ---------- overview ---------- */
 function statCard(ic, n, l){
@@ -536,11 +546,73 @@ async function loadPrices(){
   try{
     const j = await aapi('/api/admin/prices');
     const rows = j.ok?j.prices:[];
+    VTPRICES = rows;
     $('price-list').innerHTML = rows.length ?
-      '<table class="tbl"><thead><tr><th>Plan</th><th>Sell</th><th>Cost</th></tr></thead><tbody>'+
-      rows.map(p=>'<tr><td>'+esc(p.label||p.variation_code)+'</td><td><b>'+naira(p.sell_price)+'</b></td><td>'+(p.cost_price!=null?naira(p.cost_price):'—')+'</td></tr>').join('')+'</tbody></table>'
+      '<table class="tbl"><thead><tr><th>Plan</th><th>Sell</th><th>Cost</th><th></th></tr></thead><tbody>'+
+      rows.map((p,i)=>'<tr><td>'+esc(p.label||p.variation_code)+'</td><td><input type="number" min="0" step="any" id="vp-sell-'+i+'" value="'+esc(p.sell_price??'')+'" style="width:90px"></td><td>'+(p.cost_price!=null?naira(p.cost_price):'—')+'</td><td><button class="btn sm" onclick="saveVtPrice('+i+')">Save</button></td></tr>').join('')+'</tbody></table>'
       : '<span style="color:var(--muted)">No prices set yet — tap “Match My Price List”.</span>';
   }catch(e){}
+}
+async function saveVtPrice(i){
+  const p = VTPRICES[i]; if(!p) return;
+  const v = parseFloat($('vp-sell-'+i).value);
+  if(isNaN(v)){ alert('Enter a valid price.'); return; }
+  try{
+    const j = await aapi('/api/admin/price','POST',{variation_code:p.variation_code, sell_price:v, label:p.label||''});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    loadPrices();
+  }catch(e){ alert('✗ '+e.message); }
+}
+async function loadFzPrices(){
+  try{
+    const j = await aapi('/api/admin/fatizara-plans');
+    const rows = j.ok?j.plans:[];
+    FZPLANS = rows;
+    const groups = {};
+    rows.forEach(p=>{ (groups[p.service+'|'+p.network] = groups[p.service+'|'+p.network]||[]).push(p); });
+    let html = '';
+    for(const k of Object.keys(groups)){
+      const parts = k.split('|');
+      html += '<h4 style="margin:12px 0 4px">'+esc(parts[0].toUpperCase())+' — '+esc(parts[1].toUpperCase())+'</h4>';
+      html += '<table class="tbl"><thead><tr><th>Plan</th><th>Sell</th><th>Cost</th><th></th></tr></thead><tbody>';
+      html += groups[k].map(p=>{
+        const idx = rows.indexOf(p);
+        return '<tr><td>'+esc(p.name)+'</td><td><input type="number" min="0" step="any" id="fz-sell-'+idx+'" value="'+esc(p.sell??'')+'" placeholder="'+esc(p.cost)+'" style="width:90px"></td><td>'+naira(p.cost)+'</td><td><button class="btn sm" onclick="saveFzPrice('+idx+')">Save</button></td></tr>';
+      }).join('');
+      html += '</tbody></table>';
+    }
+    $('fz-price-list').innerHTML = html || '<span style="color:var(--muted)">No Fatizara plans yet — tap “Seed Fatizara Plans”.</span>';
+  }catch(e){}
+}
+async function saveFzPrice(idx){
+  const p = FZPLANS[idx]; if(!p) return;
+  const raw = $('fz-sell-'+idx).value;
+  const sell = raw==='' ? null : parseFloat(raw);
+  if(sell!==null && isNaN(sell)){ alert('Enter a valid price.'); return; }
+  try{
+    const j = await aapi('/api/admin/fatizara-plan','POST',{plan_id:p.plan_id, service:p.service, network:p.network, name:p.name, cost:p.cost, sell:sell});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    loadFzPrices();
+  }catch(e){ alert('✗ '+e.message); }
+}
+async function seedFzPrices(){
+  const res = $('fz-price-res'); res.className='tres'; res.textContent='Seeding…';
+  try{
+    const j = await aapi('/api/admin/fatizara-seed-plans','POST',{});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    res.className='tres ok'; res.textContent='✓ Seeded '+j.plans+' plans and '+j.discos+' discos.';
+    loadFzPrices();
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
+}
+async function fzCostCheck(){
+  const res = $('fz-price-res'); res.className='tres'; res.textContent='Checking…';
+  try{
+    const j = await aapi('/api/admin/fatizara-cost-check');
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    const losing = j.losing||[];
+    res.className = 'tres '+(losing.length?'bad':'ok');
+    res.textContent = losing.length ? '⚠️ '+losing.length+' plans selling BELOW cost: ' + losing.slice(0,8).map(l=>l.plan+' (−'+naira(l.loss)+')').join(', ') : '✓ No below-cost plans. All good.';
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
 }
 async function seedPrices(){
   const res = $('price-res'); res.className='tres'; res.textContent='Matching…';
