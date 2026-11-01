@@ -738,7 +738,13 @@ async function api(path, method='GET', body=null){
   return j;
 }
 async function refreshMe(){
-  try{ const m = await api('/api/me'); if(m.ok) ME = m.user; }catch(e){}
+  try{
+    const m = await api('/api/me');
+    if(m.ok){
+      ME = m.user;
+      try{ const prev=JSON.parse(localStorage.getItem('sv_dash')||'null')||{}; localStorage.setItem('sv_dash', JSON.stringify({...prev, name:ME.name, wallet:ME.wallet})); }catch(e){}
+    }
+  }catch(e){}
 }
 function saveToken(t){ token = t; lastActivity = Date.now(); localStorage.setItem('sv_token', JSON.stringify(t)); }
 
@@ -1132,6 +1138,17 @@ setInterval(()=>{
 
 /* ----- dashboard / history / profile ----- */
 async function renderDash(){
+  // Show last-saved amounts instantly so the dashboard never sits empty,
+  // then replace them with live values when the server answers.
+  try{
+    const c=JSON.parse(localStorage.getItem('sv_dash')||'null');
+    if(c){
+      if(c.name){ $('dash-name').textContent = c.name.split(' ')[0]; $('dash-ava').textContent = (c.name.trim()[0]||'M').toUpperCase(); }
+      if(c.wallet!==undefined) $('dash-bal').textContent = naira(c.wallet);
+      if(c.spent!==undefined) $('dash-spent').textContent = naira(c.spent);
+      if(c.count!==undefined) $('dash-count').textContent = c.count;
+    }
+  }catch(e){}
   // Fetch profile and history in parallel, then render everything in one
   // pass — so balance, spending, transaction count and the list appear
   // together, instead of balance first and the rest seconds later.
@@ -1144,16 +1161,21 @@ async function renderDash(){
   $('dash-name').textContent = ME.name.split(' ')[0];
   $('dash-ava').textContent = (ME.name.trim()[0]||'M').toUpperCase();
   $('dash-bal').textContent = naira(ME.wallet);
+  let spent=0, count=0;
   if(j.ok){
     window.HIST_TXS = j.transactions||[];
-    let spent = 0;
     window.HIST_TXS.forEach(t=>{ if(t.direction!=='in') spent += Number(t.amount)||0; });
+    count = window.HIST_TXS.length;
     $('dash-spent').textContent = naira(spent);
-    $('dash-count').textContent = window.HIST_TXS.length;
+    $('dash-count').textContent = count;
     const mine = window.HIST_TXS.slice(0,5);
     $('dash-tx').innerHTML = mine.length ? mine.map((t,k)=>txHTML(t,k)).join('')
       : '<div class="empty">No transactions yet.<br>Fund your wallet to get started.</div>';
   }else{ $('dash-tx').innerHTML='<div class="empty">Could not load transactions.</div>'; }
+  try{
+    const prev=JSON.parse(localStorage.getItem('sv_dash')||'null')||{};
+    localStorage.setItem('sv_dash', JSON.stringify({name:ME.name, wallet:ME.wallet, spent: j.ok?spent:prev.spent, count: j.ok?count:prev.count}));
+  }catch(e){}
 }
 async function renderHistory(){
   try{
