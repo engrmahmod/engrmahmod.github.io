@@ -219,6 +219,15 @@ footer b{color:var(--txt)}
       <div class="tres" id="fz-price-res"></div>
       <div id="fz-price-list" style="margin-top:10px"></div>
     </div>
+    <div class="card"><h3>Bilal prices</h3>
+      <p style="color:var(--muted); font-size:.88rem">Your own selling prices for Bilal data and cable plans. Cost is what Bilal charges; sell is what customers pay. Leave sell empty to sell at cost. Seeding pulls Bilal's live plan catalog at your account's price.</p>
+      <div class="prow" style="margin-top:0">
+        <button class="btn sm" onclick="seedBlPrices()">⚙️ Seed Bilal Plans</button>
+        <button class="btn sm ghost" onclick="blCostCheck()">🔍 Check Below-Cost Plans</button>
+      </div>
+      <div class="tres" id="bl-price-res"></div>
+      <div id="bl-price-list" style="margin-top:10px"></div>
+    </div>
   </section>
   <!-- BACKUP -->
   <section class="view" id="v-backup">
@@ -258,7 +267,7 @@ const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let ABASE = '', AKEY = '';
 let USERS = [], TXS = [], SETCACHE = [], CONNSTAT = {};
-let VTPRICES = [], FZPLANS = [];
+let VTPRICES = [], FZPLANS = [], BLPLANS = [];
 let CUR_USER = null;
 try {
   const saved = JSON.parse(localStorage.getItem('sv_admin')||'null');
@@ -305,7 +314,7 @@ function doAdminLogout(){
   $('a-panel').style.display='none'; $('a-login').style.display='flex';
 }
 async function renderAll(){
-  await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadPrices(), loadFzPrices()]);
+  await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadPrices(), loadFzPrices(), loadBlPrices()]);
 }
 /* ---------- overview ---------- */
 function statCard(ic, n, l){
@@ -620,6 +629,57 @@ async function fzCostCheck(){
   const res = $('fz-price-res'); res.className='tres'; res.textContent='Checking…';
   try{
     const j = await aapi('/api/admin/fatizara-cost-check');
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    const losing = j.losing||[];
+    res.className = 'tres '+(losing.length?'bad':'ok');
+    res.textContent = losing.length ? '⚠️ '+losing.length+' plans selling BELOW cost: ' + losing.slice(0,8).map(l=>l.plan+' (−'+naira(l.loss)+')').join(', ') : '✓ No below-cost plans. All good.';
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
+}
+async function loadBlPrices(){
+  try{
+    const j = await aapi('/api/admin/bilal-plans');
+    const rows = j.ok?j.plans:[];
+    BLPLANS = rows;
+    const groups = {};
+    rows.forEach(p=>{ (groups[p.service+'|'+p.network] = groups[p.service+'|'+p.network]||[]).push(p); });
+    let html = '';
+    for(const k of Object.keys(groups)){
+      const parts = k.split('|');
+      html += '<h4 style="margin:12px 0 4px">'+esc(parts[0].toUpperCase())+' — '+esc(parts[1].toUpperCase())+'</h4>';
+      html += '<table class="tbl"><thead><tr><th>Plan</th><th>Sell</th><th>Cost</th><th></th></tr></thead><tbody>';
+      html += groups[k].map(p=>{
+        const idx = rows.indexOf(p);
+        return '<tr><td>'+esc(p.name)+'</td><td><input type="number" min="0" step="any" id="bl-sell-'+idx+'" value="'+esc(p.sell??'')+'" placeholder="'+esc(p.cost)+'" style="width:90px"></td><td>'+naira(p.cost)+'</td><td><button class="btn sm" onclick="saveBlPrice('+idx+')">Save</button></td></tr>';
+      }).join('');
+      html += '</tbody></table>';
+    }
+    $('bl-price-list').innerHTML = html || '<span style="color:var(--muted)">No Bilal plans yet — tap “Seed Bilal Plans”.</span>';
+  }catch(e){}
+}
+async function saveBlPrice(idx){
+  const p = BLPLANS[idx]; if(!p) return;
+  const raw = $('bl-sell-'+idx).value;
+  const sell = raw==='' ? null : parseFloat(raw);
+  if(sell!==null && isNaN(sell)){ alert('Enter a valid price.'); return; }
+  try{
+    const j = await aapi('/api/admin/bilal-plan','POST',{plan_id:p.plan_id, service:p.service, network:p.network, name:p.name, cost:p.cost, sell:sell});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    loadBlPrices();
+  }catch(e){ alert('✗ '+e.message); }
+}
+async function seedBlPrices(){
+  const res = $('bl-price-res'); res.className='tres'; res.textContent='Seeding…';
+  try{
+    const j = await aapi('/api/admin/bilal-seed-plans','POST',{});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    res.className='tres ok'; res.textContent='✓ Seeded '+j.plans+' plans and '+j.discos+' discos.'+(j.catalog_synced?' Live catalog pulled.':' Add Bilal credentials, then re-run to pull live plans.');
+    loadBlPrices();
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
+}
+async function blCostCheck(){
+  const res = $('bl-price-res'); res.className='tres'; res.textContent='Checking…';
+  try{
+    const j = await aapi('/api/admin/bilal-cost-check');
     if(!j.ok) throw new Error(j.error||'Failed.');
     const losing = j.losing||[];
     res.className = 'tres '+(losing.length?'bad':'ok');
