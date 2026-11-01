@@ -238,10 +238,10 @@
   .rc-share{background:#0f1e3d;color:#fff}
   .rc-close{margin-top:8px;width:100%;border:1px solid #e2e9f4;background:#fff;color:#0f1e3d;font-weight:700;padding:11px;border-radius:14px;cursor:pointer}
   @media print{
-    /* rc-print-fix: print only the receipt, once, on one page, with its colors */
-    #sitemode, #bottomnav{display:none !important}
-    #appmode > :not(#rcptmodal){display:none !important}
+    /* rc-print-fix2: print only the receipt, once, on one page, with its colors */
+    #sitemode, #bottomnav, .view, #modal, #pinmodal{display:none !important}
     #appmode #rcptmodal{position:static;display:block;background:#fff;padding:0}
+    #appmode .ashell{max-width:none;margin:0;min-height:0}
     #rcptmodal .modal{max-width:560px;margin:0 auto;box-shadow:none}
     #rcptmodal *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
     .rc-card{box-shadow:none}
@@ -727,15 +727,38 @@ let curNet = 'MTN', curPlan = null, curCabPlan = null, curAirNet = 'MTN', curCab
 let CAB_CACHE = {}, DISCOS = [], cabVerifiedFor = '', powVerifiedFor = '';
 
 async function api(path, method='GET', body=null){
-  const r = await fetch(API_BASE + path, {
-    method,
-    headers: Object.assign({'Content-Type':'application/json'},
-      token ? {'Authorization':'Bearer '+token} : {}),
-    body: body ? JSON.stringify(body) : null
-  });
-  const j = await r.json().catch(()=>({ok:false, error:'Server did not respond.'}));
-  if(r.status === 401 && !['/api/login','/api/signup'].includes(path)){ doLogout(true); throw new Error('Session expired. Signed out.'); }
-  return j;
+  // Retry transport failures (server asleep, network blip, unreadable reply)
+  // on their own, so the user never has to tap retry. Purchases, funding
+  // and PIN changes are never retried, so a lost reply can never double-charge.
+  const noRetry=['/api/buy/','/api/fund-','/api/change-pin'].some(p=>path.startsWith(p));
+  const delays=[3000,10000,20000];
+  for(let a=0;;a++){
+    let r=null, j=null, failed=false;
+    try{
+      const ctl=new AbortController();
+      const to=setTimeout(()=>ctl.abort(),25000);
+      try{
+        r = await fetch(API_BASE + path, {
+          method,
+          headers: Object.assign({'Content-Type':'application/json'},
+            token ? {'Authorization':'Bearer '+token} : {}),
+          body: body ? JSON.stringify(body) : null,
+          signal: ctl.signal
+        });
+      }finally{ clearTimeout(to); }
+      j = await r.json().catch(()=>null);
+      if(j===null) failed=true;
+    }catch(e){
+      if(!noRetry && a<delays.length){ await new Promise(rs=>setTimeout(rs,delays[a])); continue; }
+      throw e;
+    }
+    if(failed){
+      if(!noRetry && a<delays.length){ await new Promise(rs=>setTimeout(rs,delays[a])); continue; }
+      return {ok:false, error:'Server did not respond.'};
+    }
+    if(r.status === 401 && !['/api/login','/api/signup'].includes(path)){ doLogout(true); throw new Error('Session expired. Signed out.'); }
+    return j;
+  }
 }
 async function refreshMe(){
   try{
