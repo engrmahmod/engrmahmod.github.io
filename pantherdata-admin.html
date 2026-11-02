@@ -144,6 +144,41 @@ table.tbl{width:100%; border-collapse:collapse; font-size:.85rem; min-width:560p
 .seg{display:flex; gap:6px; background:var(--card2); border:1px solid var(--line); border-radius:12px; padding:4px; width:fit-content}
 .seg button{border:none; background:transparent; padding:9px 18px; border-radius:9px; font-weight:700; color:var(--muted); cursor:pointer}
 .seg button.on{background:linear-gradient(120deg,#7c3aed,#a855f7); color:#fff}
+/* ---------- overview modern cards ---------- */
+.card-head{display:flex; align-items:center; gap:12px; margin-bottom:14px}
+.card-head .ci{width:42px; height:42px; border-radius:13px; background:#f1eafe; display:flex; align-items:center; justify-content:center; font-size:1.25rem; flex-shrink:0}
+.card-head h3{margin:0; font-size:1.05rem}
+.card-head .hpill{margin-left:auto; font-size:.68rem; background:#dcfce7; color:var(--green); border:1px solid #bbf7d0; padding:4px 10px; border-radius:20px; font-weight:700; white-space:nowrap}
+.profit-hero{background:linear-gradient(120deg,#3b0764,#7c3aed 55%,#a855f7); border-radius:16px; padding:20px; color:#fff; display:flex; justify-content:space-between; gap:12px}
+.ph-label{color:#ddd6fe; font-size:.8rem}
+.ph-big{font-size:2rem; font-weight:800; line-height:1.2}
+.ph-sub{color:#ddd6fe; font-size:.82rem; margin-top:4px}
+.ph-pill{align-self:flex-start; background:rgba(255,255,255,.2); padding:5px 11px; border-radius:20px; font-size:.7rem; font-weight:700; white-space:nowrap}
+.mini-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px}
+.mini{background:var(--card2); border:1px solid var(--line); border-radius:14px; padding:12px; min-width:0}
+.mini span{display:block; color:var(--muted); font-size:.72rem; margin-bottom:4px}
+.mini b{font-size:1.05rem}
+.bar-row{display:flex; align-items:center; gap:10px; margin-top:10px; font-size:.85rem}
+.bar-row span{width:84px; color:var(--muted); flex-shrink:0}
+.bar{flex:1; height:9px; background:#f1f5f9; border-radius:9px; overflow:hidden}
+.bar i{display:block; height:100%; background:linear-gradient(90deg,#7c3aed,#a855f7); border-radius:9px}
+.bar i.amber{background:#f59e0b}
+.wallet-hero{background:linear-gradient(120deg,#3b0764,#7c3aed 55%,#a855f7); color:#fff; padding:22px}
+.wh-top{display:flex; gap:14px; align-items:flex-start}
+.wh-ic{width:46px; height:46px; border-radius:14px; background:rgba(255,255,255,.2); display:flex; align-items:center; justify-content:center; font-size:1.4rem; flex-shrink:0}
+.wh-label{color:#ddd6fe; font-size:.82rem}
+.wh-big{font-size:2.1rem; font-weight:800; line-height:1.15}
+.wh-pill{margin-left:auto; background:#22c55e; color:#fff; padding:5px 11px; border-radius:20px; font-size:.7rem; font-weight:700; white-space:nowrap}
+.wh-note{color:#ddd6fe; font-size:.85rem; line-height:1.5; margin-top:16px}
+.mode-row{display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px dashed var(--line)}
+.mode-row:last-child{border-bottom:none}
+.mode-row .mi{width:40px; height:40px; border-radius:12px; background:#f1eafe; display:flex; align-items:center; justify-content:center; font-size:1.2rem; flex-shrink:0}
+.mode-row .mt{flex:1; min-width:0}
+.mode-row .mt b{display:block}
+.mode-row .mt span{color:var(--muted); font-size:.78rem}
+.mpill{font-size:.68rem; padding:4px 11px; border-radius:20px; font-weight:700; white-space:nowrap}
+.mpill.live{background:#dcfce7; color:var(--green); border:1px solid #bbf7d0}
+.mpill.test{background:#fef3c7; color:var(--amber); border:1px solid #fde68a}
 footer{text-align:center; color:var(--muted); font-size:.8rem; padding:26px 0 40px}
 footer b{color:var(--txt)}
 #lock-screen{position:fixed; inset:0; background:#f8fafc; z-index:200; display:none; align-items:center; justify-content:center; padding:20px}
@@ -220,10 +255,9 @@ footer b{color:var(--txt)}
   <section class="view on" id="v-over">
     <h2 class="vt">Overview<small>Your business at a glance. Revenue counts successful purchases only — admin wallet adjustments are excluded.</small></h2>
     <div class="stats" id="stat-grid"></div>
-    <div class="card"><h3>📈 Profit analytics</h3><div id="profit-rows"><span class="note">Loading…</span></div>
-      <p class="note" style="margin-top:10px">Estimated profit only: data and cable sales matched to a current plan price, plus airtime at 2% (provider charges ₦98 per ₦100). Electricity has no plan cost on file, so it is counted as unmatched, not as profit.</p></div>
-    <div class="card"><h3>💰 Provider wallet balance</h3><div id="bl-bal"><span class="note">Loading…</span></div></div>
-    <div class="card"><h3>🔌 Provider modes</h3><div id="mode-rows"><span class="note">Loading…</span></div></div>
+    <div class="card"><div id="profit-rows"><span class="note">Loading…</span></div></div>
+    <div class="card" style="padding:0; overflow:hidden"><div id="bl-bal"><span class="note" style="display:block; padding:20px">Loading…</span></div></div>
+    <div class="card"><div id="mode-rows"><span class="note">Loading…</span></div></div>
   </section>
   <!-- USERS -->
   <section class="view" id="v-users">
@@ -490,26 +524,34 @@ async function loadOverview(){
     const statEls = $('stat-grid').children;
     if(failN>0 && statEls[3]) statEls[3].classList.add('warn');
     const pr = profitAnalytics();
+    const totSales = pr.matched + pr.unmatchedN;
+    const matchedPct = totSales ? Math.round(pr.matched/totSales*100) : 0;
     $('profit-rows').innerHTML =
-      '<div class="rowline"><span class="k">Estimated profit (matched sales)</span><b>'+naira(Math.round(pr.profit))+'</b></div>'+
-      '<div class="rowline"><span class="k">Matched sales</span><b>'+pr.matched+' transactions</b></div>'+
-      '<div class="rowline"><span class="k">Unmatched sales (no plan cost on file)</span><b>'+naira(pr.unmatchedAmt)+' · '+pr.unmatchedN+' transactions</b></div>'+
-      '<div class="rowline"><span class="k">Average plan margin</span><b>'+pr.avgMargin.toFixed(1)+'%</b></div>'+
-      '<div class="rowline"><span class="k">Plans selling below cost</span><b class="'+(pr.below?'below':'')+'">'+pr.below+'</b></div>';
+      '<div class="card-head"><div class="ci">📈</div><h3>Profit analytics</h3><span class="hpill">Estimated</span></div>'+
+      '<div class="profit-hero"><div><div class="ph-label">Estimated profit</div><div class="ph-big">'+naira(Math.round(pr.profit))+'</div><div class="ph-sub">'+pr.matched+' matched sales · '+naira(pr.unmatchedAmt)+' unmatched</div></div><span class="ph-pill">All time</span></div>'+
+      '<div class="mini-grid">'+
+      '<div class="mini"><span>Average margin</span><b>'+pr.avgMargin.toFixed(1)+'%</b></div>'+
+      '<div class="mini"><span>Matched sales</span><b>'+pr.matched+'</b></div>'+
+      '<div class="mini"><span>Below cost</span><b class="'+(pr.below?'below':'')+'">'+pr.below+'</b></div></div>'+
+      '<div class="bar-row"><span>Matched</span><div class="bar"><i style="width:'+matchedPct+'%"></i></div><b>'+matchedPct+'%</b></div>'+
+      '<div class="bar-row"><span>Unmatched</span><div class="bar"><i class="amber" style="width:'+(100-matchedPct)+'%"></i></div><b>'+(100-matchedPct)+'%</b></div>'+
+      '<p class="note" style="margin-top:12px">Estimated only: data and cable sales matched to a current plan price, plus airtime at 2% (provider charges ₦98 per ₦100). Electricity has no plan cost on file, so it counts as unmatched, not as profit.</p>';
     const mo = SETCACHE.find(x=>x.key==='MONNIFY_SANDBOX');
     const blUser = SETCACHE.find(x=>x.key==='BILAL_USERNAME');
+    const monLive = mo&&mo.value==='0';
     $('mode-rows').innerHTML =
-      '<div class="rowline"><span class="k">Buying provider</span><b>🟢 Bilal</b></div>'+
-      '<div class="rowline"><span class="k">Bilal account</span><b>'+(blUser && blUser.value ? esc(blUser.value) : 'Not set')+'</b></div>'+
-      '<div class="rowline"><span class="k">Monnify funding</span><b>'+(mo&&mo.value==='0'?'🟢 LIVE':'🟡 SANDBOX')+'</b></div>';
+      '<div class="card-head"><div class="ci">🔌</div><h3>Provider modes</h3></div>'+
+      '<div class="mode-row"><div class="mi">🟣</div><div class="mt"><b>Bilal</b><span>Buying provider · all purchases</span></div><span class="mpill live">● LIVE</span></div>'+
+      '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>Bilal account</b><span>'+(blUser && blUser.value ? esc(blUser.value) : 'Not set')+'</span></div></div>'+
+      '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>Monnify funding</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
     renderUsers(); renderTxs(); renderWalletHistory();
   }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
     const b = await aapi('/api/admin/bilal-balance');
     $('bl-bal').innerHTML = b.ok
-      ? '<div class="rowline"><span class="k">Available</span><b style="font-size:1.4rem">'+naira(b.balance)+'</b></div><p class="note">Balance from your provider account. If it looks low, fund it from the provider dashboard.</p>'
-      : '<span class="note">Unavailable: '+esc(b.error||'check your provider credentials in Connections.')+'</span>';
-  }catch(e){ $('bl-bal').innerHTML = '<span class="note">Unavailable</span>'; }
+      ? '<div class="wallet-hero"><div class="wh-top"><div class="wh-ic">💰</div><div><div class="wh-label">Bilal wallet · Available</div><div class="wh-big">'+naira(b.balance)+'</div></div><span class="wh-pill">● LIVE</span></div><div class="wh-note">Balance from your provider account. Fund it from the provider dashboard if it looks low.</div></div>'
+      : '<div style="padding:20px"><span class="note">Unavailable: '+esc(b.error||'check your provider credentials in Connections.')+'</span></div>';
+  }catch(e){ $('bl-bal').innerHTML = '<div style="padding:20px"><span class="note">Unavailable</span></div>'; }
 }
 /* ---------- users ---------- */
 async function loadUsers(){
