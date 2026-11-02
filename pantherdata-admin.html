@@ -95,6 +95,45 @@ h2.vt small{display:block; color:var(--muted); font-size:.82rem; font-weight:400
 .kv .k{color:var(--muted)}
 .kv .v{word-break:break-all}
 .abtns{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px}
+/* ---------- user detail popup (reference design) ---------- */
+#umodal .modal{padding:20px; border-radius:24px}
+.uhead{position:relative; overflow:hidden; border-radius:20px; padding:20px; color:#fff; background:radial-gradient(120% 160% at 85% 0%, #c084fc66, transparent 55%), linear-gradient(120deg, #1e0a4a, #6d28d9 50%, #9333ea)}
+.uhead-close{position:absolute; top:14px; right:14px; width:36px; height:36px; border-radius:50%; border:1.5px solid #ffffff77; background:transparent; color:#fff; font-size:1.1rem; cursor:pointer; line-height:1}
+.uhead-top{display:flex; gap:14px; align-items:center; min-width:0; padding-right:40px}
+.uavatar{width:84px; height:84px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg, #a855f7, #7c3aed); border:3px solid #ffffff44; display:flex; align-items:center; justify-content:center}
+.uhead-name{font-size:1.5rem; font-weight:800; line-height:1.2; word-break:break-word}
+.uhead-user{color:#ffffffcc; font-size:.85rem; margin-top:2px}
+.u-pill{display:inline-flex; align-items:center; gap:5px; margin-top:8px; background:#16a34a; color:#fff; font-size:.8rem; font-weight:700; padding:5px 12px; border-radius:20px; white-space:nowrap}
+.u-pill.no{background:#dc2626}
+.uhead-meta{margin-top:16px; display:grid; gap:9px; font-size:.92rem}
+.uhead-row{display:flex; gap:10px; align-items:center; min-width:0; word-break:break-word}
+.uhead-row svg{flex-shrink:0}
+.umini{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:16px}
+.umini-card{background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px; box-shadow:0 4px 16px #0f1e3d08; min-width:0}
+.umini-top{display:flex; gap:10px; align-items:center; min-width:0}
+.umini-ic{width:46px; height:46px; border-radius:50%; flex-shrink:0; background:linear-gradient(135deg, #7c3aed, #a855f7); display:flex; align-items:center; justify-content:center}
+.umini-label{font-size:.85rem; color:#1e293b; line-height:1.3}
+.umini-val{font-size:1.45rem; font-weight:800; color:#0f172a; line-height:1.2}
+.umini-btn{width:100%; margin-top:11px; padding:9px 6px; border-radius:12px; font-size:.85rem; font-weight:700; cursor:pointer; white-space:nowrap}
+.umini-btn.outline{border:1.5px solid #c4b5fd; background:#fff; color:#5b21b6}
+.umini-btn.fill{border:none; background:#f1eafe; color:#5b21b6}
+.ubank{margin-top:18px}
+.ubank-head,.uqa-head{display:flex; gap:8px; align-items:center; font-size:1.05rem; font-weight:800; color:#0f172a}
+.ubank-box{margin-top:10px; background:#f1f5f9; border-radius:14px; padding:14px; display:flex; justify-content:space-between; align-items:center; gap:10px; font-size:.95rem; color:#0f172a}
+.ubank-box .ubank-val{min-width:0; word-break:break-word}
+.ubank-pill{flex-shrink:0; font-size:.8rem; font-weight:700; padding:5px 10px; border-radius:12px; white-space:nowrap}
+.ubank-pill.no{background:#fee2e2; color:#dc2626}
+.ubank-pill.ok{background:#dcfce7; color:#15803d}
+.uqa{margin-top:18px}
+.uqa-grid{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px}
+.uqa-btn{display:flex; gap:10px; align-items:center; padding:14px 12px; border:none; border-radius:14px; font-size:.9rem; font-weight:700; cursor:pointer; text-align:left; color:#1e293b; min-width:0}
+.uqa-btn .ic{font-size:1.4rem; flex-shrink:0}
+.uqa-btn .arr{margin-left:auto; font-size:1.2rem; opacity:.7; flex-shrink:0}
+.uqa-wallet{background:linear-gradient(135deg, #7c3aed, #a855f7); color:#fff}
+.uqa-pass{background:#f1eafe}
+.uqa-pin{background:#e0f2fe}
+.uqa-del{background:#fee2e2}
+.uclose{width:100%; margin-top:16px; padding:13px; border-radius:14px; border:1.5px solid #8b3dff; background:#fff; color:#5b21b6; font-size:1rem; font-weight:700; cursor:pointer; display:flex; justify-content:center; gap:8px; align-items:center}
 /* ---------- api connections ---------- */
 .prov{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:20px; margin-bottom:18px; box-shadow:0 4px 16px #0f1e3d08}
 .prov .ph{display:flex; align-items:center; gap:12px; margin-bottom:6px}
@@ -230,6 +269,13 @@ footer b{color:var(--txt)}
   .mini-grid{gap:8px}
   .bar-row span{width:72px}
   .filters .grow{min-width:0}
+  #umodal .modal{padding:16px}
+  .uhead{padding:16px}
+  .uavatar{width:68px; height:68px}
+  .uhead-name{font-size:1.25rem}
+  .umini-label{font-size:.8rem}
+  .umini-val{font-size:1.3rem}
+  .umini-card{padding:11px}
 }
 </style>
 </head>
@@ -403,18 +449,46 @@ footer b{color:var(--txt)}
 
 <!-- USER MODAL -->
 <div class="mbg" id="umodal"><div class="modal">
-  <h3 id="um-name">User</h3>
-  <div style="color:var(--muted); font-size:.85rem" id="um-sub"></div>
-  <div class="kv" id="um-kv"></div>
-  <h3 style="font-size:.95rem; margin-top:6px">Recent transactions</h3>
-  <div id="um-tx" style="max-height:220px; overflow-y:auto; font-size:.85rem"></div>
-  <div class="abtns">
-    <button class="btn sm" onclick="goWalletFromModal()">💰 Adjust Wallet</button>
-    <button class="btn sm ghost" onclick="setTempPassword()">🔑 Set Temp Password</button>
-    <button class="btn sm ghost" onclick="setUserPin()">🔢 Set Transaction PIN</button>
-    <button class="btn sm danger" onclick="deleteUser()">🗑️ Delete User</button>
-    <button class="btn sm ghost" onclick="closeUser()">Close</button>
+  <div class="uhead">
+    <button class="uhead-close" onclick="closeUser()">✕</button>
+    <div class="uhead-top">
+      <div class="uavatar"><svg viewBox="0 0 24 24" width="44" height="44" fill="#fff"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7z"/></svg></div>
+      <div style="min-width:0">
+        <div class="uhead-name" id="um-name">User</div>
+        <div class="uhead-user" id="um-user"></div>
+        <span class="u-pill" id="um-pill"></span>
+      </div>
+    </div>
+    <div class="uhead-meta">
+      <div class="uhead-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span id="um-email"></span></div>
+      <div class="uhead-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg><span id="um-phone"></span></div>
+      <div class="uhead-row"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/></svg><span id="um-joined"></span></div>
+    </div>
   </div>
+  <div class="umini">
+    <div class="umini-card">
+      <div class="umini-top"><div class="umini-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="6" width="18" height="14" rx="3"/><path d="M16 12h2"/></svg></div><div style="min-width:0"><div class="umini-label">Wallet Balance</div><div class="umini-val" id="um-wallet"></div></div></div>
+      <button class="umini-btn outline" onclick="goWalletFromModal()">Adjust Wallet ›</button>
+    </div>
+    <div class="umini-card">
+      <div class="umini-top"><div class="umini-ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 12a8 8 0 0 1 14-5M20 12a8 8 0 0 1-14 5"/><path d="M18 3v3h-3M6 21v-3h3"/></svg></div><div style="min-width:0"><div class="umini-label">Total Transactions</div><div class="umini-val" id="um-txcount"></div></div></div>
+      <button class="umini-btn fill" onclick="viewHistoryFromModal()">View History ›</button>
+    </div>
+  </div>
+  <div class="ubank">
+    <div class="ubank-head"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><path d="M3 9l9-5 9 5M4 9v9M9 9v9M14 9v9M19 9v9M2 20h20"/></svg>Bank Account</div>
+    <div class="ubank-box"><span class="ubank-val" id="um-bank"></span><span class="ubank-pill" id="um-bankpill"></span></div>
+  </div>
+  <div class="uqa">
+    <div class="uqa-head"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Quick Actions</div>
+    <div class="uqa-grid">
+      <button class="uqa-btn uqa-wallet" onclick="goWalletFromModal()"><span class="ic">🪙</span><span>Adjust Wallet</span><span class="arr">›</span></button>
+      <button class="uqa-btn uqa-pass" onclick="setTempPassword()"><span class="ic">🔑</span><span>Set Temp Password</span><span class="arr">›</span></button>
+      <button class="uqa-btn uqa-pin" onclick="setUserPin()"><span class="ic">🔒</span><span>Set Transaction PIN</span><span class="arr">›</span></button>
+      <button class="uqa-btn uqa-del" onclick="deleteUser()"><span class="ic">🗑️</span><span>Delete User</span><span class="arr">›</span></button>
+    </div>
+  </div>
+  <button class="uclose" onclick="closeUser()">✕ Close</button>
 </div></div>
 
 <!-- TRANSACTION DETAIL MODAL -->
@@ -641,16 +715,21 @@ async function openUser(id){
     if(!j.ok) return alert(j.error||'Could not load user.');
     const u = j.user; CUR_USER = u;
     $('um-name').textContent = u.name;
-    $('um-sub').textContent = '@'+(u.username||'—')+' · '+u.phone+' · joined '+(u.created||'').slice(0,10);
-    const kv = (k,v)=>'<div class="k">'+k+'</div><div class="v">'+v+'</div>';
-    $('um-kv').innerHTML =
-      kv('Email', esc(u.email||'—')+(u.email_verified?' <span class="vbadge">✓</span>':' <span class="vbadge no">unverified</span>'))+
-      kv('Wallet', '<b>'+naira(u.wallet)+'</b>')+
-      kv('Transactions', u.tx_count)+
-      kv('Bank account', u.monnify_acct ? esc(u.monnify_acct)+' · '+esc(u.monnify_bank||'')+'<br>'+esc(u.monnify_acct_name||'') : '—');
-    $('um-tx').innerHTML = (u.recent||[]).length ? u.recent.map(t=>
-      '<div class="rowline"><span class="k">'+esc((t.created||'').slice(0,16))+'</span><span>'+esc(t.description||t.type||'')+'</span><b style="color:'+(t.direction==='in'?'var(--green)':'var(--red)')+'">'+(t.direction==='in'?'+':'−')+naira(t.amount)+'</b></div>'
-    ).join('') : '<span class="note">No transactions yet.</span>';
+    $('um-user').textContent = '@'+(u.username||'—');
+    $('um-pill').className = 'u-pill' + (u.email_verified ? '' : ' no');
+    $('um-pill').textContent = u.email_verified ? '✓ Active User' : 'Unverified';
+    $('um-email').textContent = u.email || '—';
+    $('um-phone').textContent = u.phone || '—';
+    $('um-joined').textContent = 'Joined: ' + (u.created||'').slice(0,10);
+    $('um-wallet').textContent = naira(u.wallet);
+    $('um-txcount').textContent = u.tx_count;
+    if(u.monnify_acct){
+      $('um-bank').innerHTML = esc(u.monnify_acct) + ' · ' + esc(u.monnify_bank||'') + (u.monnify_acct_name ? '<br>' + esc(u.monnify_acct_name) : '');
+      $('um-bankpill').className = 'ubank-pill ok'; $('um-bankpill').textContent = '✓ Set';
+    } else {
+      $('um-bank').textContent = '—';
+      $('um-bankpill').className = 'ubank-pill no'; $('um-bankpill').textContent = '⚠ Not Set';
+    }
     $('umodal').classList.add('show');
   }catch(e){ alert(e.message); }
 }
@@ -658,6 +737,16 @@ function closeUser(){ $('umodal').classList.remove('show'); CUR_USER=null; }
 function goWalletFromModal(){
   if(!CUR_USER) return;
   const id = CUR_USER.id; closeUser(); pickWalletUser(id, true);
+}
+function viewHistoryFromModal(){
+  if(!CUR_USER) return;
+  const u = CUR_USER; closeUser();
+  setTxStatus('all');
+  if($('tx-type')) $('tx-type').value = 'all';
+  if($('tx-from')) $('tx-from').value = '';
+  if($('tx-to')) $('tx-to').value = '';
+  if($('tx-search')) $('tx-search').value = u.name;
+  nav('v-txs'); renderTxs();
 }
 async function setTempPassword(){
   if(!CUR_USER) return;
