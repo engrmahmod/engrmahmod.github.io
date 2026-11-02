@@ -51,9 +51,6 @@ nav.side button .ic{font-size:1.15rem; width:28px; text-align:center}
 nav.side button.on{background:#f1eafe; color:var(--acc)}
 nav.side button:hover{color:var(--acc)}
 main{flex:1; padding:22px 20px 80px; min-width:0}
-.tabs-mobile{display:none; gap:8px; overflow-x:auto; padding:12px 14px; background:#fff; border-bottom:1px solid var(--line); position:sticky; top:64px; z-index:40}
-.tabs-mobile button{flex-shrink:0; padding:9px 16px; border-radius:20px; border:1px solid #e2e9f4; background:var(--card); color:var(--muted); font-weight:700; font-size:.85rem; cursor:pointer}
-.tabs-mobile button.on{background:linear-gradient(120deg,#7c3aed,#a855f7); color:#fff; border:none}
 .view{display:none}
 .view.on{display:block; animation:fade .25s}
 @keyframes fade{from{opacity:0; transform:translateY(8px)} to{opacity:1}}
@@ -183,9 +180,13 @@ footer{text-align:center; color:var(--muted); font-size:.8rem; padding:26px 0 40
 footer b{color:var(--txt)}
 #lock-screen{position:fixed; inset:0; background:#f8fafc; z-index:200; display:none; align-items:center; justify-content:center; padding:20px}
 #lock-screen.show{display:flex}
+#menu-btn{display:none}
+#side-backdrop{display:none; position:fixed; inset:0; background:#0f1e3d66; z-index:80}
 @media(max-width:860px){
-  nav.side{display:none}
-  .tabs-mobile{display:flex}
+  #menu-btn{display:inline-block}
+  nav.side{display:block; position:fixed; top:0; left:0; height:100vh; height:100dvh; width:280px; max-width:85vw; z-index:90; transform:translateX(-105%); transition:transform .25s; box-shadow:0 20px 60px #0f1e3d33}
+  nav.side.open{transform:none}
+  #side-backdrop.show{display:block}
   main{padding:16px 14px 80px}
   .stats{grid-template-columns:1fr 1fr}
 }
@@ -218,23 +219,14 @@ footer b{color:var(--txt)}
 <!-- ============ PANEL ============ -->
 <div id="a-panel">
 <header class="top">
+  <button class="btn sm ghost" id="menu-btn" onclick="toggleSide()">☰ Menu</button>
   <div class="t">PANTHER<span>DATA</span></div>
   <span class="abadge">ADMIN</span>
   <span class="live" id="mode-badge">BILAL</span>
   <div class="sp"></div>
   <button class="btn sm ghost" onclick="doAdminLogout()">Logout</button>
 </header>
-<div class="tabs-mobile" id="mtabs">
-  <button data-t="v-over" class="on" onclick="nav('v-over')">📊 Overview</button>
-  <button data-t="v-users" onclick="nav('v-users')">👥 Users</button>
-  <button data-t="v-wallet" onclick="nav('v-wallet')">💰 Wallet</button>
-  <button data-t="v-txs" onclick="nav('v-txs')">🧾 Transactions</button>
-  <button data-t="v-conn" onclick="nav('v-conn')">🔌 Connections</button>
-  <button data-t="v-prices" onclick="nav('v-prices')">💲 Prices</button>
-  <button data-t="v-notif" onclick="nav('v-notif')">📣 Notifications</button>
-  <button data-t="v-sec" onclick="nav('v-sec')">🔒 Security</button>
-  <button data-t="v-backup" onclick="nav('v-backup')">💾 Backup</button>
-</div>
+<div id="side-backdrop" onclick="closeSide()"></div>
 <div class="wrap">
 <nav class="side" id="dtabs">
   <div class="navlabel">MAIN</div>
@@ -421,16 +413,28 @@ async function aapi(path, method='GET', body=null){
   if(r.status===403) throw new Error('Wrong admin key.');
   return j;
 }
-function nav(id){
+function toggleSide(){ $('dtabs').classList.toggle('open'); $('side-backdrop').classList.toggle('show'); }
+function closeSide(){ $('dtabs').classList.remove('open'); $('side-backdrop').classList.remove('show'); }
+function nav(id, fromHash){
+  if(!$(id)) return;
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   $(id).classList.add('on');
-  document.querySelectorAll('#dtabs button, #mtabs button').forEach(b=>b.classList.remove('on'));
+  document.querySelectorAll('#dtabs button').forEach(b=>b.classList.remove('on'));
   document.querySelectorAll('[data-t="'+id+'"]').forEach(b=>b.classList.add('on'));
   window.scrollTo(0,0);
+  closeSide();
+  /* Each page gets its own link (#v-users, #v-wallet, …) so the phone
+     back button moves between pages instead of leaving the admin. */
+  if(!fromHash && window.location.hash !== '#'+id) window.location.hash = id;
   if(id==='v-sec') loadLogs();
   if(id==='v-notif') loadAnns();
   if(id==='v-wallet') renderWalletHistory();
 }
+window.addEventListener('hashchange', ()=>{
+  const id = window.location.hash.replace('#','');
+  const cur = document.querySelector('.view.on');
+  if(id && $(id) && (!cur || cur.id !== id)) nav(id, true);
+});
 async function doAdminLogin(){
   const base = $('ap-base').value.trim().replace(/\/+$/,'') || DEFAULT_BASE;
   const key = $('ap-pass').value.trim();
@@ -472,6 +476,8 @@ async function unlockAdmin(){
 async function renderAll(){
   await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadBlPrices(), loadAnns(), loadLogs()]);
   renderWalletHistory();
+  const h = window.location.hash.replace('#','');
+  if(h && $(h) && h.startsWith('v-')) nav(h, true);
 }
 /* ---------- overview + profit ---------- */
 function statCard(ic, n, l, s){
