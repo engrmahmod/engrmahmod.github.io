@@ -52,7 +52,7 @@ nav.side button .ic{font-size:1.15rem; width:28px; text-align:center}
 nav.side button.on{background:#f1eafe; color:var(--acc)}
 nav.side button:hover{color:var(--acc)}
 main{flex:1; padding:22px 20px 80px; min-width:0}
-.view{display:none}
+.view{display:none; scroll-margin-top:80px}
 .view.on{display:block; animation:fade .25s}
 @keyframes fade{from{opacity:0; transform:translateY(8px)} to{opacity:1}}
 h2.vt{margin:4px 0 18px; font-size:1.3rem}
@@ -177,6 +177,16 @@ table.tbl{width:100%; border-collapse:collapse; font-size:.85rem; min-width:560p
 .mpill{font-size:.68rem; padding:4px 11px; border-radius:20px; font-weight:700; white-space:nowrap}
 .mpill.live{background:#dcfce7; color:var(--green); border:1px solid #bbf7d0}
 .mpill.test{background:#fef3c7; color:var(--amber); border:1px solid #fde68a}
+/* ---------- mobile list cards (table on desktop, cards on phones) ---------- */
+#u-cards,#tx-cards{display:none}
+.mcard{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:14px; margin-bottom:10px; box-shadow:0 4px 16px #0f1e3d08; cursor:pointer}
+.mcard .mtop{display:flex; gap:10px; align-items:center; min-width:0}
+.mcard .mtop .mn{flex:1; min-width:0}
+.mcard .mtop .mn b{display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.mcard .mtop .mn span{color:var(--muted); font-size:.78rem}
+.mcard .mmeta{color:var(--muted); font-size:.85rem; line-height:1.6; margin-top:10px; word-break:break-word}
+.mcard .mmeta .mono{color:var(--txt)}
+.mcard .mfoot{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-top:12px; flex-wrap:wrap}
 footer{text-align:center; color:var(--muted); font-size:.8rem; padding:26px 0 40px}
 footer b{color:var(--txt)}
 #lock-screen{position:fixed; inset:0; background:#f8fafc; z-index:200; display:none; align-items:center; justify-content:center; padding:20px}
@@ -199,6 +209,12 @@ footer b{color:var(--txt)}
   .mini b{font-size:.95rem}
   header.top{padding:12px; gap:10px}
   header.top .t{min-width:0}
+  #u-table-wrap,#tx-table-wrap{display:none}
+  #u-cards,#tx-cards{display:block}
+  .filters{flex-direction:column; align-items:stretch}
+  .filters input,.filters select{width:100%}
+  .filters label{display:flex; align-items:center; gap:8px}
+  .filters label input{width:auto; flex:1}
 }
 @media(max-width:480px){
   header.top{padding:10px; gap:8px}
@@ -283,7 +299,8 @@ footer b{color:var(--txt)}
       <input class="grow" id="u-search" placeholder="🔍 Search name, username, phone or email…" oninput="renderUsers()">
       <select id="u-verified" onchange="renderUsers()"><option value="all">All users</option><option value="yes">Verified only</option><option value="no">Unverified only</option></select>
     </div>
-    <div class="card tblwrap" style="padding:8px 16px"><table class="tbl"><thead><tr><th>User</th><th>Phone</th><th>Email</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="u-rows"></tbody></table></div>
+    <div class="card tblwrap" id="u-table-wrap" style="padding:8px 16px"><table class="tbl"><thead><tr><th>User</th><th>Phone</th><th>Email</th><th>Wallet</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead><tbody id="u-rows"></tbody></table></div>
+    <div id="u-cards"></div>
   </section>
   <!-- WALLET -->
   <section class="view" id="v-wallet">
@@ -322,8 +339,9 @@ footer b{color:var(--txt)}
       <label style="font-size:.82rem; color:var(--muted)">To <input type="date" id="tx-to" onchange="renderTxs()"></label>
       <button class="btn sm ghost" onclick="clearTxFilters()">Clear filters</button>
     </div>
-    <div class="card tblwrap" style="padding:8px 16px"><table class="tbl"><thead><tr><th>Date</th><th>User</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody id="tx-rows"></tbody></table></div>
-    <p class="note">Tap any row for full details. Pending rows can be rechecked with the provider or resolved from their record.</p>
+    <div class="card tblwrap" id="tx-table-wrap" style="padding:8px 16px"><table class="tbl"><thead><tr><th>Date</th><th>User</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody id="tx-rows"></tbody></table></div>
+    <div id="tx-cards"></div>
+    <p class="note">Tap any row or card for full details. Pending rows can be rechecked with the provider or resolved from their record.</p>
   </section>
   <!-- API CONNECTIONS -->
   <section class="view" id="v-conn">
@@ -590,7 +608,7 @@ async function loadUsers(){
     const j = await aapi('/api/admin/users');
     USERS = j.ok?j.users:[];
     renderUsers();
-  }catch(e){ $('u-rows').innerHTML = '<tr><td>Could not load users.</td></tr>'; }
+  }catch(e){ $('u-rows').innerHTML = '<tr><td>Could not load users.</td></tr>'; $('u-cards').innerHTML = '<div class="card">Could not load users.</div>'; }
 }
 function renderUsers(){
   const q = ($('u-search') ? $('u-search').value : '').toLowerCase();
@@ -608,6 +626,14 @@ function renderUsers(){
     '<td><span class="vbadge'+(u.email_verified?'':' no')+'">'+(u.email_verified?'✓ verified':'unverified')+'</span></td>'+
     '<td><button class="btn sm ghost" onclick="event.stopPropagation(); openUser('+u.id+')">View</button> <button class="btn sm" onclick="event.stopPropagation(); pickWalletUser('+u.id+', true)">Wallet</button></td></tr>'
   ).join('') : '<tr><td colspan="7">No users found.</td></tr>';
+  $('u-cards').innerHTML = list.length ? list.map(u=>
+    '<div class="mcard" onclick="openUser('+u.id+')">'+
+    '<div class="mtop"><div class="avatar" style="width:42px;height:42px">'+esc((u.name||'?')[0].toUpperCase())+'</div>'+
+    '<div class="mn"><b>'+esc(u.name)+'</b><span>@'+esc(u.username||'—')+'</span></div>'+
+    '<span class="vbadge'+(u.email_verified?'':' no')+'">'+(u.email_verified?'✓ verified':'unverified')+'</span></div>'+
+    '<div class="mmeta"><span class="mono">'+esc(u.phone)+'</span><br>'+esc(u.email||'')+'<br>Joined '+esc((u.created||'').slice(0,10))+'</div>'+
+    '<div class="mfoot"><b>'+naira(u.wallet)+'</b><span><button class="btn sm ghost" onclick="event.stopPropagation(); openUser('+u.id+')">View</button> <button class="btn sm" onclick="event.stopPropagation(); pickWalletUser('+u.id+', true)">Wallet</button></span></div></div>'
+  ).join('') : '<div class="card">No users found.</div>';
 }
 async function openUser(id){
   try{
@@ -726,7 +752,7 @@ async function loadTxs(){
     const j = await aapi('/api/admin/transactions');
     TXS = j.ok?j.transactions:[];
     renderTxs(); renderWalletHistory();
-  }catch(e){ $('tx-rows').innerHTML = '<tr><td>Could not load.</td></tr>'; }
+  }catch(e){ $('tx-rows').innerHTML = '<tr><td>Could not load.</td></tr>'; $('tx-cards').innerHTML = '<div class="card">Could not load.</div>'; }
 }
 function setTxStatus(s){
   TX_STATUS = s;
@@ -768,6 +794,11 @@ function renderTxs(){
     '<td><span class="pill '+(t.direction==='in'?'in':'out')+'">'+(t.direction==='in'?'+':'−')+naira(t.amount)+'</span></td>'+
     '<td>'+statusPill(t.status)+'</td></tr>'
   ).join('') || '<tr><td colspan="5">No transactions match these filters.</td></tr>';
+  $('tx-cards').innerHTML = list.slice(0,200).map(({t,i})=>
+    '<div class="mcard" onclick="openTx('+i+')">'+
+    '<div class="mtop"><div class="mn"><b>'+esc(t.description||t.type||'')+'</b><span>'+esc(umap[t.user_id]||t.phone||'')+' · '+esc((t.created||'').slice(0,16).replace('T',' '))+'</span></div>'+statusPill(t.status)+'</div>'+
+    '<div class="mfoot"><span class="pill '+(t.direction==='in'?'in':'out')+'">'+(t.direction==='in'?'+':'−')+naira(t.amount)+'</span><span class="mono" style="color:var(--muted)">'+esc(t.reference||'')+'</span></div></div>'
+  ).join('') || '<div class="card">No transactions match these filters.</div>';
 }
 function openTx(i){
   const t = TXS[i]; if(!t) return;
