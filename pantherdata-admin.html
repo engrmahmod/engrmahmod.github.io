@@ -304,8 +304,8 @@ footer b{color:var(--txt)}
     <div class="logo">PANTHER<span>DATA</span></div>
     <p class="sub">Admin Control Panel</p>
     <div class="field"><label>Backend URL</label><input id="ap-base" placeholder="https://sweetvtu-backend.onrender.com"></div>
-    <div class="field"><label>Admin Key</label><div class="inwrap"><input id="ap-pass" type="password" placeholder="••••••••"><button class="eye" onclick="var i=$('ap-pass'); i.type=i.type==='password'?'text':'password'">👁️</button></div></div>
-    <label style="display:flex; gap:8px; align-items:center; font-size:.85rem; color:var(--muted); margin:4px 0 12px"><input type="checkbox" id="ap-remember" checked> Keep me signed in on this device</label>
+    <div class="field" id="ap-key-field"><label>Admin Key</label><div class="inwrap"><input id="ap-pass" type="password" placeholder="••••••••"><button class="eye" onclick="var i=$('ap-pass'); i.type=i.type==='password'?'text':'password'">👁️</button></div></div>
+    <label id="ap-remember-row" style="display:flex; gap:8px; align-items:center; font-size:.85rem; color:var(--muted); margin:4px 0 12px"><input type="checkbox" id="ap-remember" checked> Keep me signed in on this device</label>
     <div class="err" id="ap-err"></div>
     <button class="btn" id="ap-btn" onclick="doAdminLogin()">Sign In</button>
     <div id="ap-code-step" style="display:none">
@@ -313,6 +313,17 @@ footer b{color:var(--txt)}
       <button class="btn" id="ap-code-btn" onclick="doAdminVerifyCode()">Verify Code</button>
       <p class="note" style="margin-top:12px"><a onclick="backToAdminKey()" style="cursor:pointer">← Use a different key</a></p>
     </div>
+    <div id="ap-staff-step" style="display:none">
+      <div class="field"><label>Staff email</label><input id="ap-staff-email" type="email" placeholder="pantherdata1@gmail.com"></div>
+      <button class="btn" id="ap-staff-btn" onclick="doStaffRequestCode()">Send Code</button>
+      <p class="note" style="margin-top:12px"><a onclick="showKeyLogin()" style="cursor:pointer">← Back to admin key sign-in</a></p>
+    </div>
+    <div id="ap-staff-code-step" style="display:none">
+      <div class="field"><label>Sign-in code</label><input id="ap-staff-code" inputmode="numeric" maxlength="6" placeholder="6-digit code" style="text-align:center;font-size:1.2rem;letter-spacing:.35em"></div>
+      <button class="btn" id="ap-staff-code-btn" onclick="doStaffVerifyCode()">Verify Code</button>
+      <p class="note" style="margin-top:12px"><a onclick="showStaffLogin()" style="cursor:pointer">← Use a different email</a></p>
+    </div>
+    <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
   </div>
 </div>
@@ -448,7 +459,14 @@ footer b{color:var(--txt)}
       <div class="rowline"><span class="k">Permission level</span><b>Full access — one admin key</b></div>
       <div class="rowline"><span class="k">Where the key lives</span><b>Render settings only — never in this page</b></div>
       <div class="rowline"><span class="k">Screen lock</span><b>After 15 minutes idle</b></div>
-      <p class="note">There is one admin role today: anyone holding the key can do everything here, including wallet adjustments and deleting users. Keep the key private. Separate staff roles would need a backend change — say the word and I will build it.</p>
+      <p class="note">Main admin (you): key + emailed code, full access including settings and backups. Staff: email + code only, full access except settings, connection tests, staff management and backups — and secret API values are never shown to them. Keep the key private.</p>
+    </div>
+    <div class="card" id="staff-card"><h3>👥 Staff access</h3>
+      <p class="note">Staff sign in with email + code only — they never get the admin key. Add an email here and that person can sign in with a code sent to it.</p>
+      <div class="field"><label>Staff email</label><input id="st-email" type="email" placeholder="pantherdata1@gmail.com"></div>
+      <button class="btn sm" onclick="addStaff()">➕ Add staff</button>
+      <div class="tres" id="st-res"></div>
+      <div id="st-list" style="margin-top:10px"><span class="note">Loading…</span></div>
     </div>
     <div class="card"><h3>📋 Activity log</h3><p class="note">Server record of admin actions: wallet adjustments, price saves, settings saves, password and PIN resets, deletions, transaction resolutions and announcements.</p>
       <div class="prow" style="margin-top:0"><button class="btn sm ghost" onclick="loadLogs()">↻ Refresh log</button></div>
@@ -522,7 +540,9 @@ footer b{color:var(--txt)}
   <button class="btn sm ghost" style="margin-top:14px" onclick="closeTx()">Close</button>
 </div></div>
 <script>
-/* Panther Data admin v2 — talks to the backend. Admin key required.
+/* Panther Data admin v2 — talks to the backend. Main admin: key + code.
+   Staff: email + code, full access except settings, tests, staff
+   management and backups; secret values never shown to staff.
    Buying provider: Bilal only. Funding: Monnify. Codes: email. */
 const DEFAULT_BASE = 'https://sweetvtu-backend.onrender.com';
 const $ = id => document.getElementById(id);
@@ -530,6 +550,7 @@ const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtDate = d => { if(!d) return '—'; const x = new Date(d); if(isNaN(x)) return esc(String(d).slice(0,16)); return x.toLocaleString('en-NG',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}); };
 let ABASE = '', AKEY = '', ASESS = '', REMEMBER = true, PEND_BASE = '', PEND_KEY = '';
+let IS_STAFF = false, PEND_STAFF_EMAIL = '';
 let USERS = [], TXS = [], SETCACHE = [], CONNSTAT = {};
 let BLPLANS = [], ANNS = [], LOGS = [];
 let CUR_USER = null, CUR_TX = null, WALLET_USER = null, WALLET_ACTION = 'add';
@@ -538,7 +559,7 @@ try {
   const saved = JSON.parse(localStorage.getItem('sv_admin')||'null');
   const sess = JSON.parse(sessionStorage.getItem('sv_admin')||'null');
   const use = saved || sess;
-  if(use && use.session){ ABASE=(use.base||'').trim(); ASESS=(use.session||'').trim(); REMEMBER = !!saved; }
+  if(use && use.session){ ABASE=(use.base||'').trim(); ASESS=(use.session||'').trim(); REMEMBER = !!saved; IS_STAFF = !!use.staff; }
   else if(use && use.key){
     /* Old format stored the raw key; a key alone no longer signs in,
        so drop it and fall through to the key + code login. */
@@ -562,6 +583,8 @@ function toggleSide(){ $('dtabs').classList.toggle('open'); $('side-backdrop').c
 function closeSide(){ $('dtabs').classList.remove('open'); $('side-backdrop').classList.remove('show'); }
 function nav(id, fromHash){
   if(!$(id)) return;
+  /* Staff never open Connections (provider keys live there) or Backup. */
+  if(IS_STAFF && (id==='v-conn' || id==='v-backup')) id='v-over';
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   $(id).classList.add('on');
   document.querySelectorAll('#dtabs button').forEach(b=>b.classList.remove('on'));
@@ -571,7 +594,7 @@ function nav(id, fromHash){
   /* Each page gets its own link (#v-users, #v-wallet, …) so the phone
      back button moves between pages instead of leaving the admin. */
   if(!fromHash && window.location.hash !== '#'+id) window.location.hash = id;
-  if(id==='v-sec') loadLogs();
+  if(id==='v-sec'){ loadLogs(); loadStaff(); }
   if(id==='v-notif') loadAnns();
   if(id==='v-wallet') renderWalletHistory();
 }
@@ -632,13 +655,87 @@ async function doAdminVerifyCode(){
     btn.disabled = false; btn.textContent='Verify Code'; err.textContent=e.message;
   }
 }
+/* ---------- staff sign-in (email + code, no key) ---------- */
+function showStaffLogin(){
+  $('ap-key-field').style.display='none'; $('ap-remember-row').style.display='none';
+  $('ap-btn').style.display='none'; $('ap-code-step').style.display='none';
+  $('ap-staff-link').style.display='none'; $('ap-err').textContent='';
+  $('ap-staff-code-step').style.display='none';
+  $('ap-staff-step').style.display='block'; $('ap-staff-email').focus();
+}
+function showKeyLogin(){
+  $('ap-staff-step').style.display='none'; $('ap-staff-code-step').style.display='none';
+  $('ap-key-field').style.display='block'; $('ap-remember-row').style.display='flex';
+  $('ap-btn').style.display='block'; $('ap-staff-link').style.display='block'; $('ap-err').textContent='';
+}
+async function doStaffRequestCode(){
+  const base = $('ap-base').value.trim().replace(/\/+$/,'') || DEFAULT_BASE;
+  const email = $('ap-staff-email').value.trim().toLowerCase();
+  const err = $('ap-err'), btn = $('ap-staff-btn');
+  if(!email || !email.includes('@')){ err.textContent='Enter a valid staff email.'; return; }
+  err.textContent=''; btn.disabled = true; btn.innerHTML='<span class="btn-spin"></span>';
+  try{
+    const r = await fetch(base + '/api/staff/request-code', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email})});
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || ('Server error '+r.status));
+    PEND_BASE = base; PEND_STAFF_EMAIL = email;
+    if(!j.email_sent) err.textContent='Code requested, but the email could not be sent. Try again.';
+    btn.disabled = false; btn.textContent='Send Code';
+    $('ap-staff-step').style.display='none'; $('ap-staff-code-step').style.display='block';
+    $('ap-staff-code').value=''; $('ap-staff-code').focus();
+  }catch(e){ btn.disabled = false; btn.textContent='Send Code'; err.textContent=e.message; }
+}
+async function doStaffVerifyCode(){
+  const code = $('ap-staff-code').value.trim();
+  const err = $('ap-err'), btn = $('ap-staff-code-btn');
+  if(!/^\d{6}$/.test(code)){ err.textContent='Enter the 6-digit code from your email.'; return; }
+  err.textContent=''; btn.disabled = true; btn.innerHTML='<span class="btn-spin"></span>';
+  try{
+    const r = await fetch(PEND_BASE + '/api/staff/verify-code', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({email: PEND_STAFF_EMAIL, code})});
+    const j = await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(j.error || ('Server error '+r.status));
+    ABASE=PEND_BASE; ASESS=j.staff_session; IS_STAFF=true; PEND_BASE=''; PEND_STAFF_EMAIL='';
+    $('ap-staff-email').value=''; $('ap-staff-code').value='';
+    /* Staff sessions last 12 hours on the server, so they are kept
+       only until this tab closes. */
+    try{ sessionStorage.setItem('sv_admin', JSON.stringify({base:ABASE, session:ASESS, staff:true})); localStorage.removeItem('sv_admin'); }catch(e){}
+    $('ap-staff-code-step').style.display='none'; showKeyLogin();
+    $('a-login').style.display='none'; $('a-panel').style.display='block';
+    applyStaffNav(); renderAll();
+  }catch(e){ btn.disabled = false; btn.textContent='Verify Code'; err.textContent=e.message; }
+}
+function applyStaffNav(){
+  const hide = IS_STAFF;
+  document.querySelectorAll('[data-t="v-conn"],[data-t="v-backup"]').forEach(b=>b.style.display = hide ? 'none' : '');
+  const card = $('staff-card'); if(card) card.style.display = hide ? 'none' : '';
+}
+async function loadStaff(){
+  if(IS_STAFF) return;
+  try{
+    const j = await aapi('/api/admin/staff');
+    const rows = (j.staff||[]).filter(s=>s.active);
+    $('st-list').innerHTML = rows.length ? rows.map(s=>'<div class="rowline"><span class="k">'+esc(s.email)+'</span><b>Full</b> <button class="btn sm ghost" onclick="removeStaff(&quot;'+esc(s.email)+'&quot;)">Remove</button></div>').join('') : '<span class="note">No staff yet.</span>';
+  }catch(e){ $('st-list').innerHTML='<span class="note">Could not load staff.</span>'; }
+}
+async function addStaff(){
+  const email = $('st-email').value.trim().toLowerCase();
+  const res = $('st-res');
+  if(!email || !email.includes('@')){ res.className='tres bad'; res.textContent='Enter a valid email.'; return; }
+  try{ await aapi('/api/admin/staff','POST',{email}); res.className='tres ok'; res.textContent='✓ Staff added: '+email; $('st-email').value=''; loadStaff(); }
+  catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
+}
+async function removeStaff(email){
+  if(!confirm('Remove staff access for '+email+'?')) return;
+  try{ await aapi('/api/admin/staff/remove','POST',{email}); loadStaff(); }catch(e){ alert(e.message); }
+}
 function doAdminLogout(){
-  const base = ABASE, sess = ASESS;
-  ABASE=''; AKEY=''; ASESS=''; PEND_BASE=''; PEND_KEY='';
+  const base = ABASE, sess = ASESS, wasStaff = IS_STAFF;
+  ABASE=''; AKEY=''; ASESS=''; PEND_BASE=''; PEND_KEY=''; IS_STAFF=false; PEND_STAFF_EMAIL='';
   try{ localStorage.removeItem('sv_admin'); sessionStorage.removeItem('sv_admin'); }catch(e){}
-  if(base && sess){ fetch(base + '/api/admin/logout', {method:'POST', headers:{'X-Admin-Session':sess}}).catch(()=>{}); }
+  if(base && sess){ fetch(base + (wasStaff ? '/api/staff/logout' : '/api/admin/logout'), {method:'POST', headers:{'X-Admin-Session':sess}}).catch(()=>{}); }
   $('a-panel').style.display='none'; $('lock-screen').classList.remove('show'); $('a-login').style.display='flex';
-  $('ap-code-step').style.display='none'; $('ap-btn').style.display='block';
+  $('ap-code-step').style.display='none'; $('ap-staff-step').style.display='none'; $('ap-staff-code-step').style.display='none';
+  applyStaffNav(); showKeyLogin();
 }
 async function unlockAdmin(){
   try{
@@ -1256,7 +1353,9 @@ async function downloadBackup(){
   if(ABASE && ASESS){
     try{
       const r = await fetch(ABASE + '/api/admin/users', {headers:{'X-Admin-Session':ASESS}});
-      if(r.ok){ $('a-login').style.display='none'; $('a-panel').style.display='block'; renderAll(); return; }
+      if(r.ok){
+        try{ const m = await fetch(ABASE + '/api/staff/me', {headers:{'X-Admin-Session':ASESS}}).then(x=>x.json()); IS_STAFF = !!m.is_staff; }catch(e){}
+        $('a-login').style.display='none'; $('a-panel').style.display='block'; applyStaffNav(); renderAll(); return; }
       try{ localStorage.removeItem('sv_admin'); sessionStorage.removeItem('sv_admin'); }catch(e){}
     }catch(e){}
   }
