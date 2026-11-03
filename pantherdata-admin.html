@@ -1116,6 +1116,7 @@ async function resolveTx(outcome){
 const PROV_META = [
   {group:'Bilal', icon:'🟣', desc:'All purchases — data, airtime, cable TV and electricity. Live provider.', test:'bilal', sandboxKey:null},
   {group:'LegitDataWay', icon:'🟢', desc:'Incoming provider — data, airtime, cable TV and electricity. Save the credentials here, then test before the flip.', test:'legitdataway', sandboxKey:null},
+  {group:'Provider', icon:'🔀', desc:'Which provider handles live purchases. Flip to legitdataway only after the test buys pass.', test:null, sandboxKey:null},
   {group:'Monnify', icon:'🏦', desc:'Wallet funding — permanent virtual accounts per customer.', test:'monnify', sandboxKey:'MONNIFY_SANDBOX'},
   {group:'Email', icon:'📧', desc:'Signup codes and password resets.', test:'brevo', sandboxKey:null},
 ];
@@ -1152,8 +1153,9 @@ function renderConns(){
         '</div></div>';
     });
     html += '<div class="prow"><button class="btn sm" onclick="saveCard(\''+p.group+'\')">💾 Save '+p.group+'</button>'+
-      '<button class="btn sm ghost" onclick="testConn(\''+p.test+'\')">🔌 Test connection</button>'+
-      (p.group==='Bilal'?'<button class="btn sm ghost" onclick="loadBilalBalance()">💰 Show balance</button>':'')+'</div>'+
+      (p.test?'<button class="btn sm ghost" onclick="testConn(\''+p.test+'\')">🔌 Test connection</button>':'')+
+      (p.group==='Bilal'?'<button class="btn sm ghost" onclick="loadBilalBalance()">💰 Show balance</button>':'')+
+      (p.group==='LegitDataWay'?'<button class="btn sm ghost" onclick="seedLwPlans()">🌱 Seed plans</button>':'')+'</div>'+
       '<div class="tres" id="tres-'+p.test+'"></div>';
     if(p.group==='Bilal') html += '<div class="tres" id="bl-conn-bal"></div>';
     return html+'</div>';
@@ -1166,6 +1168,15 @@ async function loadBilalBalance(){
     const b = await aapi('/api/admin/bilal-balance');
     el.className = 'tres '+(b.ok?'ok':'bad');
     el.textContent = b.ok ? 'Provider wallet balance: '+naira(b.balance) : '✗ '+(b.error||'unavailable');
+  }catch(e){ el.className='tres bad'; el.textContent='✗ '+e.message; }
+}
+async function seedLwPlans(){
+  const el = $('tres-legitdataway'); if(!el) return;
+  el.className='tres'; el.textContent='Seeding LegitDataWay plans…';
+  try{
+    const j = await aapi('/api/admin/legitdataway-seed-plans','POST',{});
+    el.className = 'tres '+(j.ok?'ok':'bad');
+    el.textContent = j.ok ? '✓ Seeded '+j.plans+' plans, '+j.discos+' discos.' : '✗ '+(j.error||'failed');
   }catch(e){ el.className='tres bad'; el.textContent='✗ '+e.message; }
 }
 async function saveSetting(key, value){
