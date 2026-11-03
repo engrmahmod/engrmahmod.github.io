@@ -1112,9 +1112,10 @@ async function resolveTx(outcome){
     await loadTxs(); await loadOverview(); closeTx();
   }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
 }
-/* ---------- api connections (Bilal + funding + email only) ---------- */
+/* ---------- api connections (Bilal + LegitDataWay + funding + email) ---------- */
 const PROV_META = [
   {group:'Bilal', icon:'🟣', desc:'All purchases — data, airtime, cable TV and electricity. Live provider.', test:'bilal', sandboxKey:null},
+  {group:'LegitDataWay', icon:'🟢', desc:'Incoming provider — data, airtime, cable TV and electricity. Save the credentials here, then test before the flip.', test:'legitdataway', sandboxKey:null},
   {group:'Monnify', icon:'🏦', desc:'Wallet funding — permanent virtual accounts per customer.', test:'monnify', sandboxKey:'MONNIFY_SANDBOX'},
   {group:'Email', icon:'📧', desc:'Signup codes and password resets.', test:'brevo', sandboxKey:null},
 ];
