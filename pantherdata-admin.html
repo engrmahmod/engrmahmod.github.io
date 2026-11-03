@@ -543,7 +543,7 @@ footer b{color:var(--txt)}
 /* Panther Data admin v2 — talks to the backend. Main admin: key + code.
    Staff: email + code, full access except settings, tests, staff
    management and backups; secret values never shown to staff.
-   Buying provider: Bilal only. Funding: Monnify. Codes: email. */
+   Buying provider: whichever provider is active (Bilal or LegitDataWay). Funding: Monnify. Codes: email. */
 const DEFAULT_BASE = 'https://sweetvtu-backend.onrender.com';
 const $ = id => document.getElementById(id);
 const naira = n => '₦'+Number(n||0).toLocaleString('en-NG');
@@ -824,19 +824,24 @@ async function loadOverview(){
       '<div class="bar-row"><span>Unmatched</span><div class="bar"><i class="amber" style="width:'+(100-matchedPct)+'%"></i></div><b>'+(100-matchedPct)+'%</b></div>'+
       '<p class="note" style="margin-top:12px">Exact profit comes from the real provider cost saved on each new data and cable sale. Older sales are estimated by matching the sale name to a current plan price, and airtime is estimated at 2%. Electricity has no cost on file, so it counts as unmatched, not as profit.</p>';
     const mo = SETCACHE.find(x=>x.key==='MONNIFY_SANDBOX');
-    const blUser = SETCACHE.find(x=>x.key==='BILAL_USERNAME');
+    const provKey = (SETCACHE.find(x=>x.key==='PROVIDER')||{}).value || 'bilal';
+    const provName = {legitdataway:'LegitDataWay', bilal:'Bilal', fatizara:'Fatizara', vtpass:'VTpass'}[(provKey||'').toLowerCase()] || provKey;
+    const provUserKey = {legitdataway:'LEGITDATAWAY_USERNAME', bilal:'BILAL_USERNAME', fatizara:'FATIZARA_USERNAME'}[(provKey||'').toLowerCase()];
+    const provUser = provUserKey ? (SETCACHE.find(x=>x.key===provUserKey)||{}).value : '';
     const monLive = mo&&mo.value==='0';
     $('mode-rows').innerHTML =
       '<div class="card-head"><div class="ci">🔌</div><h3>Provider modes</h3></div>'+
-      '<div class="mode-row"><div class="mi">🟣</div><div class="mt"><b>Bilal</b><span>Buying provider · all purchases</span></div><span class="mpill live">● LIVE</span></div>'+
-      '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>Bilal account</b><span>'+(blUser && blUser.value ? esc(blUser.value) : 'Not set')+'</span></div></div>'+
+      '<div class="mode-row"><div class="mi">🟣</div><div class="mt"><b>'+esc(provName)+'</b><span>Buying provider · all purchases</span></div><span class="mpill live">● LIVE</span></div>'+
+      '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>'+esc(provName)+' account</b><span>'+(provUser ? esc(provUser) : 'Not set')+'</span></div></div>'+
       '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>Monnify funding</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
     renderUsers(); renderTxs(); renderWalletHistory();
   }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
-    const b = await aapi('/api/admin/bilal-balance');
+    const b = await aapi('/api/admin/provider-balance');
+    const pv = b.provider || (SETCACHE.find(x=>x.key==='PROVIDER')||{}).value || 'bilal';
+    const pvName = {legitdataway:'LegitDataWay', bilal:'Bilal', fatizara:'Fatizara', vtpass:'VTpass'}[(pv||'').toLowerCase()] || pv;
     $('bl-bal').innerHTML = b.ok
-      ? '<div class="wallet-hero"><div class="wh-top"><div class="wh-ic">💰</div><div><div class="wh-label">Bilal wallet · Available</div><div class="wh-big">'+naira(b.balance)+'</div></div><span class="wh-pill">● LIVE</span></div><div class="wh-note">Balance from your provider account. Fund it from the provider dashboard if it looks low.</div></div>'
+      ? '<div class="wallet-hero"><div class="wh-top"><div class="wh-ic">💰</div><div><div class="wh-label">'+esc(pvName)+' wallet · Available</div><div class="wh-big">'+naira(b.balance)+'</div></div><span class="wh-pill">● LIVE</span></div><div class="wh-note">Balance from your provider account. Fund it from the provider dashboard if it looks low.</div></div>'
       : '<div style="padding:20px"><span class="note">Unavailable: '+esc(b.error||'check your provider credentials in Connections.')+'</span></div>';
   }catch(e){ $('bl-bal').innerHTML = '<div style="padding:20px"><span class="note">Unavailable</span></div>'; }
 }
