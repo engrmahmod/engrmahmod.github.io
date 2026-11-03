@@ -760,15 +760,23 @@ function normName(s){
 function profitAnalytics(){
   const byName = {};
   BLPLANS.forEach(p=>{ byName[normName(p.name)] = p; });
-  let profit = 0, matched = 0, unmatchedAmt = 0, unmatchedN = 0, sales = 0;
+  // Exact profit: sales that carry the real provider cost saved at buy
+  // time (data/cable sales since the cost-tracking deploy). Estimated
+  // profit: older sales (no cost on file) matched to a current plan price
+  // by name, plus airtime at a flat 2% guess. The two are never mixed.
+  let profitExact = 0, profitEst = 0, matchedExact = 0, matchedEst = 0,
+      unmatchedAmt = 0, unmatchedN = 0, sales = 0;
   TXS.forEach(t=>{
     if(t.status!=='successful' || t.direction!=='out' || t.service==='admin') return;
     sales += Number(t.amount||0);
+    if(t.cost_price !== null && t.cost_price !== undefined && t.cost_price !== ''){
+      profitExact += Number(t.amount||0) - Number(t.cost_price||0); matchedExact++; return;
+    }
     const base = String(t.description||'').split(/→|->/)[0].trim();
-    if(t.type==='airtime'){ profit += Number(t.amount||0)*0.02; matched++; return; }
+    if(t.type==='airtime'){ profitEst += Number(t.amount||0)*0.02; matchedEst++; return; }
     if(t.type==='data' || t.type==='cable'){
       const p = byName[normName(base)];
-      if(p){ profit += Number(t.amount||0) - Number(p.cost||0); matched++; return; }
+      if(p){ profitEst += Number(t.amount||0) - Number(p.cost||0); matchedEst++; return; }
     }
     unmatchedAmt += Number(t.amount||0); unmatchedN++;
   });
@@ -776,7 +784,9 @@ function profitAnalytics(){
   BLPLANS.forEach(p=>{ const sell = (p.sell==null?'':p.sell)===''?Number(p.cost||0):Number(p.sell); const cost = Number(p.cost||0); if(cost>0) margins.push((sell-cost)/cost*100); });
   const avgMargin = margins.length ? (margins.reduce((a,b)=>a+b,0)/margins.length) : 0;
   const below = BLPLANS.filter(p=>{ const sell = (p.sell==null?'':p.sell)===''?Number(p.cost||0):Number(p.sell); return sell < Number(p.cost||0); }).length;
-  return {profit, matched, unmatchedAmt, unmatchedN, sales, avgMargin, below};
+  return {profit: profitExact + profitEst, profitExact, profitEst,
+          matched: matchedExact + matchedEst, matchedExact, matchedEst,
+          unmatchedAmt, unmatchedN, sales, avgMargin, below};
 }
 async function loadOverview(){
   try{
@@ -804,15 +814,15 @@ async function loadOverview(){
     const totSales = pr.matched + pr.unmatchedN;
     const matchedPct = totSales ? Math.round(pr.matched/totSales*100) : 0;
     $('profit-rows').innerHTML =
-      '<div class="card-head"><div class="ci">📈</div><h3>Profit analytics</h3><span class="hpill">Estimated</span></div>'+
-      '<div class="profit-hero"><div><div class="ph-label">Estimated profit</div><div class="ph-big">'+naira(Math.round(pr.profit))+'</div><div class="ph-sub">'+pr.matched+' matched sales · '+naira(pr.unmatchedAmt)+' unmatched</div></div><span class="ph-pill">All time</span></div>'+
+      '<div class="card-head"><div class="ci">📈</div><h3>Profit analytics</h3><span class="hpill">Exact + estimated</span></div>'+
+      '<div class="profit-hero"><div><div class="ph-label">Total profit</div><div class="ph-big">'+naira(Math.round(pr.profit))+'</div><div class="ph-sub">'+naira(Math.round(pr.profitExact))+' exact · '+naira(Math.round(pr.profitEst))+' estimated · '+naira(pr.unmatchedAmt)+' unmatched</div></div><span class="ph-pill">All time</span></div>'+
       '<div class="mini-grid">'+
       '<div class="mini"><span>Average margin</span><b>'+pr.avgMargin.toFixed(1)+'%</b></div>'+
       '<div class="mini"><span>Matched sales</span><b>'+pr.matched+'</b></div>'+
       '<div class="mini"><span>Below cost</span><b class="'+(pr.below?'below':'')+'">'+pr.below+'</b></div></div>'+
       '<div class="bar-row"><span>Matched</span><div class="bar"><i style="width:'+matchedPct+'%"></i></div><b>'+matchedPct+'%</b></div>'+
       '<div class="bar-row"><span>Unmatched</span><div class="bar"><i class="amber" style="width:'+(100-matchedPct)+'%"></i></div><b>'+(100-matchedPct)+'%</b></div>'+
-      '<p class="note" style="margin-top:12px">Estimated only: data and cable sales matched to a current plan price, plus airtime at 2% (provider charges ₦98 per ₦100). Electricity has no plan cost on file, so it counts as unmatched, not as profit.</p>';
+      '<p class="note" style="margin-top:12px">Exact profit comes from the real provider cost saved on each new data and cable sale. Older sales are estimated by matching the sale name to a current plan price, and airtime is estimated at 2%. Electricity has no cost on file, so it counts as unmatched, not as profit.</p>';
     const mo = SETCACHE.find(x=>x.key==='MONNIFY_SANDBOX');
     const blUser = SETCACHE.find(x=>x.key==='BILAL_USERNAME');
     const monLive = mo&&mo.value==='0';
