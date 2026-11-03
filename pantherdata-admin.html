@@ -823,7 +823,9 @@ async function loadOverview(){
       '<div class="bar-row"><span>Matched</span><div class="bar"><i style="width:'+matchedPct+'%"></i></div><b>'+matchedPct+'%</b></div>'+
       '<div class="bar-row"><span>Unmatched</span><div class="bar"><i class="amber" style="width:'+(100-matchedPct)+'%"></i></div><b>'+(100-matchedPct)+'%</b></div>'+
       '<p class="note" style="margin-top:12px">Exact profit comes from the real provider cost saved on each new data and cable sale. Older sales are estimated by matching the sale name to a current plan price, and airtime is estimated at 2%. Electricity has no cost on file, so it counts as unmatched, not as profit.</p>';
-    const mo = SETCACHE.find(x=>x.key==='MONNIFY_SANDBOX');
+    const fundProv = (SETCACHE.find(x=>x.key==='FUNDING_PROVIDER')||{}).value || 'monnify';
+    const fundIsXp = fundProv.toLowerCase()==='xpouch';
+    const mo = SETCACHE.find(x=>x.key===(fundIsXp?'XPOUCH_SANDBOX':'MONNIFY_SANDBOX'));
     const provKey = (SETCACHE.find(x=>x.key==='PROVIDER')||{}).value || 'bilal';
     const provName = {legitdataway:'LegitDataWay', bilal:'Bilal', fatizara:'Fatizara', vtpass:'VTpass'}[(provKey||'').toLowerCase()] || provKey;
     const provUserKey = {legitdataway:'LEGITDATAWAY_USERNAME', bilal:'BILAL_USERNAME', fatizara:'FATIZARA_USERNAME'}[(provKey||'').toLowerCase()];
@@ -833,7 +835,7 @@ async function loadOverview(){
       '<div class="card-head"><div class="ci">🔌</div><h3>Provider modes</h3></div>'+
       '<div class="mode-row"><div class="mi">🟣</div><div class="mt"><b>'+esc(provName)+'</b><span>Buying provider · all purchases</span></div><span class="mpill live">● LIVE</span></div>'+
       '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>'+esc(provName)+' account</b><span>'+(provUser ? esc(provUser) : 'Not set')+'</span></div></div>'+
-      '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>Monnify funding</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
+      '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>'+(fundIsXp?'Xpouch funding':'Monnify funding')+'</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
     renderUsers(); renderTxs(); renderWalletHistory();
   }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
@@ -1123,6 +1125,7 @@ const PROV_META = [
   {group:'LegitDataWay', icon:'🟢', desc:'Incoming provider — data, airtime, cable TV and electricity. Save the credentials here, then test before the flip.', test:'legitdataway', sandboxKey:null},
   {group:'Provider', icon:'🔀', desc:'Which provider handles live purchases. Flip to legitdataway only after the test buys pass.', test:null, sandboxKey:null},
   {group:'Monnify', icon:'🏦', desc:'Wallet funding — permanent virtual accounts per customer.', test:'monnify', sandboxKey:'MONNIFY_SANDBOX'},
+  {group:'Xpouch', icon:'💳', desc:'Wallet funding — permanent virtual accounts per customer, no BVN needed.', test:'xpouch', sandboxKey:'XPOUCH_SANDBOX'},
   {group:'Email', icon:'📧', desc:'Signup codes and password resets.', test:'brevo', sandboxKey:null},
 ];
 async function loadConns(){
