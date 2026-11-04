@@ -1162,9 +1162,10 @@ function renderConns(){
     html += '<div class="prow"><button class="btn sm" onclick="saveCard(\''+p.group+'\')">💾 Save '+p.group+'</button>'+
       (p.test?'<button class="btn sm ghost" onclick="testConn(\''+p.test+'\')">🔌 Test connection</button>':'')+
       (p.group==='Bilal'?'<button class="btn sm ghost" onclick="loadBilalBalance()">💰 Show balance</button>':'')+
-      (p.group==='LegitDataWay'?'<button class="btn sm ghost" onclick="seedLwPlans()">🌱 Seed plans</button>':'')+'</div>'+
+      (p.group==='LegitDataWay'?'<button class="btn sm ghost" onclick="seedLwPlans()">🌱 Seed plans</button><button class="btn sm ghost" onclick="toggleLwPlans()">📋 View plans</button>':'')+'</div>'+
       '<div class="tres" id="tres-'+p.test+'"></div>';
     if(p.group==='Bilal') html += '<div class="tres" id="bl-conn-bal"></div>';
+    if(p.group==='LegitDataWay') html += '<div id="lw-plans-wrap" style="display:none;margin-top:12px"><div class="filters"><input class="grow" id="lw-plan-search" placeholder="🔍 Search plans… (e.g. 3.2GB)" oninput="renderLwPlans()"></div><div id="lw-plans-list" style="margin-top:8px"></div></div>';
     return html+'</div>';
   }).join('');
 }
@@ -1185,6 +1186,40 @@ async function seedLwPlans(){
     el.className = 'tres '+(j.ok?'ok':'bad');
     el.textContent = j.ok ? '✓ Seeded '+j.plans+' plans, '+j.discos+' discos.' : '✗ '+(j.error||'failed');
   }catch(e){ el.className='tres bad'; el.textContent='✗ '+e.message; }
+}
+let LWPLANS = [];
+async function toggleLwPlans(){
+  const w = $('lw-plans-wrap'); if(!w) return;
+  if(w.style.display !== 'none'){ w.style.display = 'none'; return; }
+  w.style.display = 'block';
+  const list = $('lw-plans-list'); list.textContent = 'Loading plans…';
+  try{
+    const j = await aapi('/api/admin/legitdataway-plans');
+    if(!j.ok) throw new Error(j.error || 'Failed to load plans.');
+    LWPLANS = j.plans || [];
+    renderLwPlans();
+  }catch(e){ list.textContent = '✗ ' + e.message; }
+}
+function renderLwPlans(){
+  const list = $('lw-plans-list'); if(!list) return;
+  const q = ($('lw-plan-search').value || '').toLowerCase();
+  const rows = LWPLANS.filter(p => (p.service + ' ' + p.network + ' ' + p.name + ' ' + (p.sell ?? '')).toLowerCase().includes(q));
+  if(!rows.length){ list.textContent = 'No plans match.'; return; }
+  list.innerHTML = rows.map(p => {
+    const pid = String(p.plan_id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const nm = String(p.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+    const price = (p.sell == null ? 'no price set' : naira(p.sell));
+    return '<div class="prow" style="justify-content:space-between"><span>' + esc(p.network) + ' · ' + esc(p.name) + ' — ' + price + '</span><button class="btn sm" onclick="delLwPlan(\'' + pid + '\',\'' + nm + '\')">🗑️ Delete</button></div>';
+  }).join('');
+}
+async function delLwPlan(plan_id, name){
+  if(!confirm('Remove this plan from the shop?\n' + name + '\nIt will no longer be sold. (A future Seed plans run would bring it back.)')) return;
+  try{
+    const j = await aapi('/api/admin/legitdataway-plan', 'DELETE', {plan_id});
+    if(!j.ok) throw new Error(j.error || 'Delete failed.');
+    LWPLANS = LWPLANS.filter(p => p.plan_id !== plan_id);
+    renderLwPlans();
+  }catch(e){ alert('✗ ' + e.message); }
 }
 async function saveSetting(key, value){
   const j = await aapi('/api/admin/settings','POST',{key, value});
