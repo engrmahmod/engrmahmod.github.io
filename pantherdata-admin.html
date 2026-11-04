@@ -737,12 +737,32 @@ function doAdminLogout(){
   $('ap-code-step').style.display='none'; $('ap-staff-step').style.display='none'; $('ap-staff-code-step').style.display='none';
   applyStaffNav(); showKeyLogin();
 }
+/* Session check with retries: the free backend sleeps after ~15 min idle
+   and the first request while it wakes fails. A transport failure or a
+   5xx is NOT a dead session — only a 401/403 rejection is. Retrying here
+   is what keeps a refresh on the panel instead of dropping to sign-in.
+   Returns true (session alive), false (definitively rejected), or null
+   (unknown after retries — session may still be alive). */
+async function checkAdminSession(){
+  const delays = [2000, 3000, 5000];
+  for(let attempt = 0; attempt <= delays.length; attempt++){
+    try{
+      const r = await fetch(ABASE + '/api/admin/users', {headers:{'X-Admin-Session':ASESS}});
+      if(r.ok) return true;
+      if(r.status===401 || r.status===403) return false;
+    }catch(e){}
+    if(attempt < delays.length) await new Promise(res=>setTimeout(res, delays[attempt]));
+  }
+  return null;
+}
 async function unlockAdmin(){
-  try{
-    const r = await fetch(ABASE + '/api/admin/users', {headers:{'X-Admin-Session':ASESS}});
-    if(r.ok){ $('lock-screen').classList.remove('show'); touch(); return; }
-  }catch(e){}
-  $('lock-screen').classList.remove('show'); doAdminLogout();
+  const ok = await checkAdminSession();
+  if(ok === true){ $('lock-screen').classList.remove('show'); touch(); return; }
+  if(ok === false){ $('lock-screen').classList.remove('show'); doAdminLogout(); return; }
+  /* Unknown (backend still waking): keep the lock screen up and the
+     session stored, so tapping Unlock again can still restore it. */
+  const sub = $('lock-screen').querySelector('p.sub');
+  if(sub) sub.textContent = 'Server is waking up — tap Unlock again in a moment.';
 }
 async function renderAll(){
   await Promise.allSettled([loadOverview(), loadUsers(), loadTxs(), loadConns(), loadBlPrices(), loadAnns(), loadLogs()]);
@@ -1416,13 +1436,14 @@ async function downloadBackup(){
 /* ---------- boot ---------- */
 (async function(){
   if(ABASE && ASESS){
-    try{
-      const r = await fetch(ABASE + '/api/admin/users', {headers:{'X-Admin-Session':ASESS}});
-      if(r.ok){
-        try{ const m = await fetch(ABASE + '/api/staff/me', {headers:{'X-Admin-Session':ASESS}}).then(x=>x.json()); IS_STAFF = !!m.is_staff; }catch(e){}
-        $('a-login').style.display='none'; $('a-panel').style.display='block'; applyStaffNav(); renderAll(); return; }
-      try{ localStorage.removeItem('sv_admin'); sessionStorage.removeItem('sv_admin'); }catch(e){}
-    }catch(e){}
+    const ok = await checkAdminSession();
+    if(ok === true){
+      try{ const m = await fetch(ABASE + '/api/staff/me', {headers:{'X-Admin-Session':ASESS}}).then(x=>x.json()); IS_STAFF = !!m.is_staff; }catch(e){}
+      $('a-login').style.display='none'; $('a-panel').style.display='block'; applyStaffNav(); renderAll(); return; }
+    /* Only a definitive 401/403 rejection kills the stored session.
+       An unknown result (backend still waking) keeps it stored, so a
+       later refresh can still restore the panel on the same page. */
+    if(ok === false){ try{ localStorage.removeItem('sv_admin'); sessionStorage.removeItem('sv_admin'); }catch(e){} }
   }
   $('a-login').style.display='flex';
 })();
