@@ -1207,17 +1207,18 @@ function renderLwPlans(){
   if(!rows.length){ list.textContent = 'No plans match.'; return; }
   list.innerHTML = rows.map(p => {
     const pid = String(p.plan_id).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    const nm = String(p.name).replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, ' ');
+    const isOff = !!p.hidden;
     const price = (p.sell == null ? 'no price set' : naira(p.sell));
-    return '<div class="prow" style="justify-content:space-between"><span>' + esc(p.network) + ' · ' + esc(p.name) + ' — ' + price + '</span><button class="btn sm" onclick="delLwPlan(\'' + pid + '\',\'' + nm + '\')">🗑️ Delete</button></div>';
+    const dim = isOff ? ' style="opacity:.55"' : '';
+    return '<div class="prow" style="justify-content:space-between"><span' + dim + '>' + esc(p.network) + ' · ' + esc(p.name) + ' — ' + price + (isOff ? ' (Off)' : '') + '</span><button class="btn sm" onclick="toggleLwPlan(\'' + pid + '\',' + (isOff ? 0 : 1) + ')">' + (isOff ? 'Off' : 'On') + '</button></div>';
   }).join('');
 }
-async function delLwPlan(plan_id, name){
-  if(!confirm('Remove this plan from the shop?\n' + name + '\nIt will no longer be sold. (A future Seed plans run would bring it back.)')) return;
+async function toggleLwPlan(plan_id, hidden){
   try{
-    const j = await aapi('/api/admin/legitdataway-plan', 'DELETE', {plan_id});
-    if(!j.ok) throw new Error(j.error || 'Delete failed.');
-    LWPLANS = LWPLANS.filter(p => p.plan_id !== plan_id);
+    const j = await aapi('/api/admin/legitdataway-plan-visibility', 'POST', {plan_id, hidden});
+    if(!j.ok) throw new Error(j.error || 'Switch failed.');
+    const p = LWPLANS.find(x => x.plan_id === plan_id);
+    if(p) p.hidden = hidden;
     renderLwPlans();
   }catch(e){ alert('✗ ' + e.message); }
 }
