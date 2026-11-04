@@ -1160,6 +1160,7 @@ const PROV_META = [
   {group:'LegitDataWay', icon:'🟢', desc:'Incoming provider — data, airtime, cable TV and electricity. Save the credentials here, then test before the flip.', test:'legitdataway', sandboxKey:null},
   {group:'Provider', icon:'🔀', desc:'Which provider handles live purchases. Flip to legitdataway only after the test buys pass.', test:null, sandboxKey:null},
   {group:'Xpouch', icon:'💳', desc:'Wallet funding — permanent virtual accounts per customer, no BVN needed.', test:'xpouch', sandboxKey:'XPOUCH_SANDBOX'},
+  {group:'Manual funding', icon:'🏦', desc:'Manual funding account shown on Fund Wallet. Customers transfer here and you credit their wallet by hand.', test:null, sandboxKey:null},
   {group:'Email', icon:'📧', desc:'Signup codes and password resets.', test:'brevo', sandboxKey:null},
 ];
 async function loadConns(){
