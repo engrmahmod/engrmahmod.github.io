@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09i</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09j</p>
   </div>
 </div>
 
@@ -416,6 +416,7 @@ footer b{color:var(--txt)}
       </div>
       <div class="field"><label>Amount (₦)</label><input id="w-amount" type="number" min="1" step="any" placeholder="1000"></div>
       <div class="field"><label>Note (optional, shows in their history)</label><input id="w-note" placeholder="e.g. Refund for failed purchase"></div>
+      <div class="field" id="w-pin-field" style="display:none"><label>Wallet PIN (4 digits)</label><input id="w-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"></div>
       <div id="w-preview" class="note" style="margin-bottom:12px"></div>
       <button class="btn" onclick="submitWallet()">Confirm adjustment</button>
       <div class="tres" id="w-res"></div>
@@ -487,6 +488,14 @@ footer b{color:var(--txt)}
       <div class="rowline"><span class="k">Where the key lives</span><b>Render settings only — never in this page</b></div>
       <div class="rowline"><span class="k">Screen lock</span><b>After 15 minutes idle</b></div>
       <p class="note">Main admin (you): key + emailed code, full access including settings and backups. Staff: email + code only, full access except settings, connection tests, staff management and backups — and secret API values are never shown to them. Keep the key private.</p>
+    </div>
+    <div class="card" id="wp-card"><h3>🔐 Wallet PIN</h3>
+      <p class="note">Every wallet adjustment (credit, debit or bonus) asks for this 4-digit PIN. Only the main admin can set or change it. Until a PIN is set, adjustments work without one.</p>
+      <div class="rowline"><span class="k">Status</span><b id="wp-status">Loading…</b></div>
+      <div class="field"><label>New wallet PIN (4 digits)</label><input id="wp-pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"></div>
+      <button class="btn sm" onclick="saveWalletPin()">Set wallet PIN</button>
+      <button class="btn sm ghost" onclick="clearWalletPin()">Remove PIN</button>
+      <div class="tres" id="wp-res"></div>
     </div>
     <div class="card" id="staff-card"><h3>👥 Staff access</h3>
       <p class="note">Staff sign in with email + code only — they never get the admin key. Add an email here and that person can sign in with a code sent to it.</p>
@@ -621,7 +630,7 @@ function nav(id, fromHash){
   /* Each page gets its own link (#v-users, #v-wallet, …) so the phone
      back button moves between pages instead of leaving the admin. */
   if(!fromHash && window.location.hash !== '#'+id) window.location.hash = id;
-  if(id==='v-sec'){ loadLogs(); loadStaff(); }
+  if(id==='v-sec'){ loadLogs(); loadStaff(); refreshWalletPinStatus(); }
   if(id==='v-notif') loadAnns();
   if(id==='v-wallet') renderWalletHistory();
   if(id==='v-ref') renderReferrals();
@@ -737,6 +746,7 @@ function applyStaffNav(){
   const hide = IS_STAFF;
   document.querySelectorAll('[data-t="v-conn"],[data-t="v-backup"],[data-t="v-prov"]').forEach(b=>b.style.display = hide ? 'none' : '');
   const card = $('staff-card'); if(card) card.style.display = hide ? 'none' : '';
+  const wpc = $('wp-card'); if(wpc) wpc.style.display = hide ? 'none' : '';
 }
 async function loadStaff(){
   if(IS_STAFF) return;
@@ -867,7 +877,7 @@ function renderMonthlyAnalysis(){
     if(t.status!=='successful') return;
     const d = new Date(t.created||'');
     if(isNaN(d) || maKey(d) !== MA_MONTH) return;
-    if(t.type==='fund' && t.direction==='in'){
+    if(t.type==='fund' && t.direction==='in' && !/\(remove\)/.test(t.description||'')){
       const f = fund[t.user_id] || (fund[t.user_id] = {total:0, n:0});
       f.total += Number(t.amount||0); f.n += 1;
     }
@@ -973,6 +983,7 @@ async function loadOverview(){
       '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>'+esc(provName)+' account</b><span>'+(provUser ? esc(provUser) : 'Not set')+'</span></div></div>'+
       '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>'+(fundIsXp?'Xpouch funding':'Bank funding')+'</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
     renderUsers(); renderTxs(); renderWalletHistory(); renderMonthlyAnalysis(); renderReferrals();
+    updateWalletPinField();
   }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
     const b = await aapi('/api/admin/provider-balance');
@@ -1141,19 +1152,50 @@ function updateWalletPreview(){
   const nb = Number(WALLET_USER.wallet||0) + (WALLET_ACTION==='remove'?-v:v);
   $('w-preview').textContent = v>0 ? (WALLET_ACTION==='bonus'?'Bonus ':(WALLET_ACTION==='add'?'Credit ':'Debit '))+naira(v)+' — new balance '+naira(nb) : '';
 }
+/* Wallet PIN: set by the main admin in Security. While no PIN is set,
+   adjustments work as before; once set, every adjustment needs it. */
+function walletPinSet(){ const s = SETCACHE.find(x=>x.key==='WALLET_PIN_HASH'); return !!(s && (s.pin_set || s.value)); }
+function updateWalletPinField(){ const f = $('w-pin-field'); if(f) f.style.display = walletPinSet() ? '' : 'none'; }
+function refreshWalletPinStatus(){ const el = $('wp-status'); if(el) el.textContent = walletPinSet() ? 'Set — every wallet adjustment asks for it' : 'Not set — adjustments work without a PIN'; }
+async function saveWalletPin(){
+  const pin = ($('wp-pin').value||'').trim();
+  const res = $('wp-res');
+  if(!/^\d{4}$/.test(pin)){ res.className='tres bad'; res.textContent='✗ Enter exactly 4 digits.'; return; }
+  res.className='tres'; res.textContent='Saving…';
+  try{
+    const j = await aapi('/api/admin/wallet-pin','POST',{pin});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    res.className='tres ok'; res.textContent='✓ Wallet PIN set.';
+    $('wp-pin').value='';
+    await loadConns(); refreshWalletPinStatus(); updateWalletPinField();
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
+}
+async function clearWalletPin(){
+  if(!confirm('Remove the wallet PIN? Wallet adjustments will no longer ask for one.')) return;
+  const res = $('wp-res');
+  res.className='tres'; res.textContent='Saving…';
+  try{
+    const j = await aapi('/api/admin/wallet-pin','POST',{pin:''});
+    if(!j.ok) throw new Error(j.error||'Failed.');
+    res.className='tres ok'; res.textContent='✓ Wallet PIN removed.';
+    await loadConns(); refreshWalletPinStatus(); updateWalletPinField();
+  }catch(e){ res.className='tres bad'; res.textContent='✗ '+e.message; }
+}
 async function submitWallet(){
   if(!WALLET_USER) return alert('Choose a customer first.');
   const v = parseFloat($('w-amount').value||'0');
   if(!(v>0)) return alert('Enter a valid amount.');
+  if(WALLET_ACTION==='remove' && v > Number(WALLET_USER.wallet||0)) return alert('Amount is more than the customer\'s balance.');
+  if(walletPinSet() && !($('w-pin').value||'').trim()) return alert('Enter the wallet PIN.');
   const note = $('w-note').value.trim();
   const isBonus = WALLET_ACTION==='bonus';
   if(!confirm((isBonus?'BONUS ':(WALLET_ACTION==='add'?'CREDIT ':'DEBIT '))+naira(v)+' '+(WALLET_ACTION==='add'||isBonus?'to ':'from ')+WALLET_USER.name+'?')) return;
   const res = $('w-res'); res.className='tres'; res.textContent='Saving…';
   try{
-    const j = await aapi('/api/admin/wallet','POST',{phone: WALLET_USER.phone, amount: v, action: isBonus?'add':WALLET_ACTION, note: isBonus?('Bonus'+(note?': '+note:'')):note});
+    const j = await aapi('/api/admin/wallet','POST',{phone: WALLET_USER.phone, amount: v, action: isBonus?'add':WALLET_ACTION, note: isBonus?('Bonus'+(note?': '+note:'')):note, pin: ($('w-pin')||{}).value || ''});
     if(!j.ok) throw new Error(j.error||'Failed.');
     res.className='tres ok'; res.textContent='✓ Wallet updated.';
-    $('w-amount').value=''; $('w-note').value='';
+    $('w-amount').value=''; $('w-note').value=''; if($('w-pin')) $('w-pin').value='';
     await loadUsers(); await loadTxs(); await loadOverview();
     const fresh = USERS.find(x=>x.id===WALLET_USER.id); if(fresh) pickWalletUser(fresh.id, false);
     renderWalletHistory();
@@ -1180,6 +1222,8 @@ function renderFundedWallets(){
   const byUser = {};
   TXS.forEach(t=>{
     if(t.type!=='fund' || t.status!=='successful') return;
+    if(t.direction==='out') return;
+    if(/\(remove\)/.test(t.description||'')) return; /* pre-fix admin debits recorded as money in */
     const u = byUser[t.user_id] || (byUser[t.user_id] = {total:0, n:0, last:'', lastTs:0});
     u.total += Number(t.amount||0); u.n += 1;
     const ts = Date.parse(t.created||'');
