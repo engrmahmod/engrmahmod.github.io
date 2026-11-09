@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09g</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09h</p>
   </div>
 </div>
 
@@ -411,6 +411,7 @@ footer b{color:var(--txt)}
       <div class="seg" style="margin-bottom:14px">
         <button id="w-seg-add" class="on" onclick="setWalletAction('add')">＋ Credit</button>
         <button id="w-seg-remove" onclick="setWalletAction('remove')">− Debit</button>
+        <button id="w-seg-bonus" onclick="setWalletAction('bonus')">🎁 Bonus</button>
       </div>
       <div class="field"><label>Amount (₦)</label><input id="w-amount" type="number" min="1" step="any" placeholder="1000"></div>
       <div class="field"><label>Note (optional, shows in their history)</label><input id="w-note" placeholder="e.g. Refund for failed purchase"></div>
@@ -1086,23 +1087,25 @@ function setWalletAction(a){
   WALLET_ACTION = a;
   $('w-seg-add').classList.toggle('on', a==='add');
   $('w-seg-remove').classList.toggle('on', a==='remove');
+  $('w-seg-bonus').classList.toggle('on', a==='bonus');
   updateWalletPreview();
 }
 function updateWalletPreview(){
   if(!WALLET_USER) return;
   const v = parseFloat($('w-amount').value||'0')||0;
-  const nb = Number(WALLET_USER.wallet||0) + (WALLET_ACTION==='add'?v:-v);
-  $('w-preview').textContent = v>0 ? (WALLET_ACTION==='add'?'Credit ':'Debit ')+naira(v)+' — new balance '+naira(nb) : '';
+  const nb = Number(WALLET_USER.wallet||0) + (WALLET_ACTION==='remove'?-v:v);
+  $('w-preview').textContent = v>0 ? (WALLET_ACTION==='bonus'?'Bonus ':(WALLET_ACTION==='add'?'Credit ':'Debit '))+naira(v)+' — new balance '+naira(nb) : '';
 }
 async function submitWallet(){
   if(!WALLET_USER) return alert('Choose a customer first.');
   const v = parseFloat($('w-amount').value||'0');
   if(!(v>0)) return alert('Enter a valid amount.');
   const note = $('w-note').value.trim();
-  if(!confirm((WALLET_ACTION==='add'?'CREDIT ':'DEBIT ')+naira(v)+' '+(WALLET_ACTION==='add'?'to ':'from ')+WALLET_USER.name+'?')) return;
+  const isBonus = WALLET_ACTION==='bonus';
+  if(!confirm((isBonus?'BONUS ':(WALLET_ACTION==='add'?'CREDIT ':'DEBIT '))+naira(v)+' '+(WALLET_ACTION==='add'||isBonus?'to ':'from ')+WALLET_USER.name+'?')) return;
   const res = $('w-res'); res.className='tres'; res.textContent='Saving…';
   try{
-    const j = await aapi('/api/admin/wallet','POST',{phone: WALLET_USER.phone, amount: v, action: WALLET_ACTION, note});
+    const j = await aapi('/api/admin/wallet','POST',{phone: WALLET_USER.phone, amount: v, action: isBonus?'add':WALLET_ACTION, note: isBonus?('Bonus'+(note?': '+note:'')):note});
     if(!j.ok) throw new Error(j.error||'Failed.');
     res.className='tres ok'; res.textContent='✓ Wallet updated.';
     $('w-amount').value=''; $('w-note').value='';
@@ -1116,8 +1119,9 @@ function renderWalletHistory(){
   const umap = {}; USERS.forEach(u=>umap[u.id]=u.name);
   $('w-history').innerHTML = adj.length ? adj.map(t=>{
     const m = String(t.description||'').match(/\((add|remove)\)/);
-    const act = m ? (m[1]==='add'?'Credit':'Debit') : 'Adjustment';
-    return '<div class="rowline"><span class="k">'+fmtDate(t.created)+'</span><span>'+esc(umap[t.user_id]||'')+' · '+act+'</span><b style="color:'+(act==='Credit'?'var(--green)':'var(--red)')+'">'+naira(t.amount)+'</b></div>';
+    const isBonus = /bonus/i.test(t.description||'');
+    const act = isBonus ? 'Bonus' : (m ? (m[1]==='add'?'Credit':'Debit') : 'Adjustment');
+    return '<div class="rowline"><span class="k">'+fmtDate(t.created)+'</span><span>'+esc(umap[t.user_id]||'')+' · '+act+'</span><b style="color:'+((act==='Credit'||act==='Bonus')?'var(--green)':'var(--red)')+'">'+naira(t.amount)+'</b></div>';
   }).join('') : '<span class="note">No wallet adjustments yet.</span>';
   renderFundedWallets();
 }
