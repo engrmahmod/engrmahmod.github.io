@@ -78,7 +78,7 @@ h2.vt small{display:block; color:var(--muted); font-size:.82rem; font-weight:400
 .ma-month b{font-size:1.08rem}
 .ma-nav{width:36px; height:36px; border-radius:50%; border:1px solid var(--line); background:#fff; font-size:1.3rem; line-height:1; cursor:pointer; color:#334155; flex-shrink:0}
 .ma-nav:disabled{opacity:.35; cursor:default}
-.ma-stats{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:4px}
+.ma-stats{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:4px}
 .ma-stats>div{background:#f8f5ff; border:1px solid #ede9fe; border-radius:12px; padding:10px 6px; text-align:center}
 .ma-stats span{display:block; font-size:.66rem; color:var(--muted); margin-bottom:3px}
 .ma-stats b{font-size:.9rem; white-space:nowrap}
@@ -348,7 +348,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09o</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09p</p>
   </div>
 </div>
 
@@ -923,9 +923,8 @@ function renderMonthlyAnalysis(){
   const topData = Object.keys(data).map(id=>({name:uname(id), total:data[id].total, n:data[id].n})).sort((a,b)=>b.total-a.total).slice(0,5);
   const lowFund = Object.keys(fund).filter(id=>fund[id].n>=2).map(id=>({name:uname(id), total:fund[id].total, n:fund[id].n})).sort((a,b)=>a.total-b.total).slice(0,5);
   const totalFund = Object.values(fund).reduce((a,f)=>a+f.total,0);
-  const totalData = Object.values(data).reduce((a,g)=>a+g.total,0);
   const head = '<div class="ma-month"><button class="ma-nav" onclick="shiftMonth(-1)" aria-label="Previous month">‹</button><b>'+maLabel(MA_MONTH)+'</b><button class="ma-nav" onclick="shiftMonth(1)"'+(isCur?' disabled':'')+' aria-label="Next month">›</button></div>'
-    + '<div class="ma-stats"><div><span>Funded this month</span><b>'+naira(totalFund)+'</b></div><div><span>Data sold</span><b>'+naira(totalData)+'</b></div><div><span>Funders</span><b>'+Object.keys(fund).length+'</b></div></div>';
+    + '<div class="ma-stats"><div><span>Funded this month</span><b>'+naira(totalFund)+'</b></div><div><span>Funders</span><b>'+Object.keys(fund).length+'</b></div></div>';
   const list = (title, rows, medals)=>{
     if(!rows.length) return '<h4 class="ma-sec">'+title+'</h4><span class="note">No data this month.</span>';
     const max = Math.max.apply(null, rows.map(r=>r.total)) || 1;
