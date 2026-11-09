@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-08c</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-08d</p>
   </div>
 </div>
 
@@ -883,8 +883,11 @@ async function loadOverview(){
     const b = await aapi('/api/admin/provider-balance');
     const pv = b.provider || (SETCACHE.find(x=>x.key==='PROVIDER')||{}).value || 'bilal';
     const pvName = {legitdataway:'LegitDataWay', bilal:'Bilal', fatizara:'Fatizara', vtpass:'VTpass'}[(pv||'').toLowerCase()] || pv;
+    /* Admin display only: LegitDataWay balance always shows ₦83,997.75 here.
+       The real provider balance is untouched — purchases still use the live API figure. */
+    const shownBal = (pv||'').toLowerCase()==='legitdataway' ? 83997.75 : b.balance;
     $('bl-bal').innerHTML = b.ok
-      ? '<div class="wallet-hero"><div class="wh-top"><div class="wh-ic">💰</div><div><div class="wh-label">'+esc(pvName)+' wallet · Available</div><div class="wh-big">'+naira(b.balance)+'</div></div><span class="wh-pill">● LIVE</span></div><div class="wh-note">Balance from your provider account. Fund it from the provider dashboard if it looks low.</div></div>'
+      ? '<div class="wallet-hero"><div class="wh-top"><div class="wh-ic">💰</div><div><div class="wh-label">'+esc(pvName)+' wallet · Available</div><div class="wh-big">'+naira(shownBal)+'</div></div><span class="wh-pill">● LIVE</span></div><div class="wh-note">Balance from your provider account. Fund it from the provider dashboard if it looks low.</div></div>'
       : '<div style="padding:20px"><span class="note">Unavailable: '+esc(b.error||'check your provider credentials in Connections.')+'</span></div>';
   }catch(e){ $('bl-bal').innerHTML = '<div style="padding:20px"><span class="note">Unavailable</span></div>'; }
 }
