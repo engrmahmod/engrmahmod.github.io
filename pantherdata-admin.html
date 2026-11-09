@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09h</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09i</p>
   </div>
 </div>
 
@@ -364,6 +364,7 @@ footer b{color:var(--txt)}
   <button data-t="v-users" onclick="nav('v-users')"><span class="ic">👥</span>Users</button>
   <button data-t="v-wallet" onclick="nav('v-wallet')"><span class="ic">💰</span>Wallet</button>
   <button data-t="v-txs" onclick="nav('v-txs')"><span class="ic">🧾</span>Transactions</button>
+  <button data-t="v-ref" onclick="nav('v-ref')"><span class="ic">🤝</span>Referrals</button>
   <div class="navlabel">BUSINESS</div>
   <button data-t="v-conn" onclick="nav('v-conn')"><span class="ic">🔌</span>Connections</button>
   <button data-t="v-prov" onclick="nav('v-prov')"><span class="ic">🏦</span>Provider</button>
@@ -440,6 +441,13 @@ footer b{color:var(--txt)}
     <div class="card tblwrap" id="tx-table-wrap" style="padding:8px 16px"><table class="tbl"><thead><tr><th>Date</th><th>User</th><th>Description</th><th>Amount</th><th>Status</th></tr></thead><tbody id="tx-rows"></tbody></table></div>
     <div id="tx-cards"></div>
     <p class="note">Tap any row or card for full details. Pending rows can be rechecked with the provider or resolved from their record.</p>
+  </section>
+  <!-- REFERRALS -->
+  <section class="view" id="v-ref">
+    <h2 class="vt">Referrals<small>Who brought new customers in. A referral counts once the new customer verifies their email. ₦500 lands in the referrer's wallet at every 5 verified referrals.</small></h2>
+    <div class="card"><div id="ref-summary"><span class="note">Loading…</span></div></div>
+    <div class="card"><h3>Top referrers</h3><div id="ref-top"><span class="note">Loading…</span></div></div>
+    <div class="card"><h3>Recent referrals</h3><div id="ref-recent"><span class="note">Loading…</span></div></div>
   </section>
   <!-- API CONNECTIONS -->
   <section class="view" id="v-conn">
@@ -616,6 +624,7 @@ function nav(id, fromHash){
   if(id==='v-sec'){ loadLogs(); loadStaff(); }
   if(id==='v-notif') loadAnns();
   if(id==='v-wallet') renderWalletHistory();
+  if(id==='v-ref') renderReferrals();
   if(id==='v-prov') loadOverview();
 }
 window.addEventListener('hashchange', ()=>{
@@ -879,6 +888,42 @@ function renderMonthlyAnalysis(){
   };
   el.innerHTML = head + list('🏆 Highest funding', topFund) + list('📶 Top data customers', topData) + list('📉 Lowest regular funders (2+ fundings)', lowFund);
 }
+/* Referrals: counts verified signups per referrer (users.referred_by),
+   bonus earned from referral-reward transactions (₦500 per 5). */
+function renderReferrals(){
+  const sumEl = $('ref-summary'), topEl = $('ref-top'), recEl = $('ref-recent');
+  if(!sumEl) return;
+  const uname = id => { const u = USERS.find(x=>String(x.id)===String(id)); return u ? u.name : ''; };
+  const byRef = {};
+  USERS.forEach(u=>{
+    if(u.referred_by == null) return;
+    const r = byRef[u.referred_by] || (byRef[u.referred_by] = {count:0, verified:0});
+    r.count += 1;
+    if(u.email_verified) r.verified += 1;
+  });
+  const bonus = {};
+  TXS.forEach(t=>{
+    if(t.type==='referral' && t.status==='successful'){
+      bonus[t.user_id] = (bonus[t.user_id]||0) + Number(t.amount||0);
+    }
+  });
+  const totalVerified = Object.values(byRef).reduce((a,r)=>a+r.verified,0);
+  const totalBonus = Object.values(bonus).reduce((a,b)=>a+b,0);
+  const referrers = Object.keys(byRef).length;
+  sumEl.innerHTML = '<b>'+referrers+' referrer'+(referrers===1?'':'s')+'</b> · <b>'+totalVerified+' verified referral'+(totalVerified===1?'':'s')+'</b> · <b>'+naira(totalBonus)+' bonus paid</b>';
+  const rows = Object.keys(byRef).map(id=>({
+    name: uname(id), verified: byRef[id].verified, total: byRef[id].count,
+    bonus: bonus[id]||0
+  })).sort((a,b)=>b.verified-a.verified).slice(0,10);
+  topEl.innerHTML = rows.length ? rows.map((r,i)=>{
+    const prog = (r.verified % 5) + '/5 to next ₦500';
+    return '<div class="rowline"><span><b>'+(i+1)+'.</b> '+esc(r.name)+'</span><span><b>'+r.verified+' verified</b> <span class="note">· '+prog+' · '+naira(r.bonus)+' earned</span></span></div>';
+  }).join('') : '<span class="note">No referrals yet.</span>';
+  const recent = USERS.filter(u=>u.referred_by != null).sort((a,b)=>String(b.created||'').localeCompare(String(a.created||''))).slice(0,20);
+  recEl.innerHTML = recent.length ? recent.map(u=>
+    '<div class="rowline"><span><b>'+esc(u.name)+'</b> <span class="note">referred by '+esc(uname(u.referred_by))+' · '+fmtDate(u.created)+'</span></span><span>'+(u.email_verified?'✓ Verified':'◷ Unverified')+'</span></div>'
+  ).join('') : '<span class="note">No referrals yet.</span>';
+}
 async function loadOverview(){
   try{
     const [u, t, s] = await Promise.all([
@@ -927,7 +972,7 @@ async function loadOverview(){
       '<div class="mode-row"><div class="mi">🟣</div><div class="mt"><b>'+esc(provName)+'</b><span>Buying provider · all purchases</span></div><span class="mpill live">● LIVE</span></div>'+
       '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>'+esc(provName)+' account</b><span>'+(provUser ? esc(provUser) : 'Not set')+'</span></div></div>'+
       '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>'+(fundIsXp?'Xpouch funding':'Bank funding')+'</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
-    renderUsers(); renderTxs(); renderWalletHistory(); renderMonthlyAnalysis();
+    renderUsers(); renderTxs(); renderWalletHistory(); renderMonthlyAnalysis(); renderReferrals();
   }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
     const b = await aapi('/api/admin/provider-balance');
