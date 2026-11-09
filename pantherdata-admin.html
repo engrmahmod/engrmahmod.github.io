@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09l</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09m</p>
   </div>
 </div>
 
@@ -1226,10 +1226,12 @@ function renderFundedWallets(){
   const sumEl = $('funded-summary');
   if(!TXS.length && !USERS.length){ el.innerHTML = '<span class="note">Loading…</span>'; if(sumEl) sumEl.textContent = 'Loading…'; return; }
   const byUser = {};
+  let autoTotal = 0, manualTotal = 0;
   TXS.forEach(t=>{
     if(t.type!=='fund' || t.status!=='successful') return;
     if(t.direction==='out') return;
     if(/\(remove\)/.test(t.description||'')) return; /* pre-fix admin debits recorded as money in */
+    if(t.service==='admin') manualTotal += Number(t.amount||0); else autoTotal += Number(t.amount||0);
     const u = byUser[t.user_id] || (byUser[t.user_id] = {total:0, n:0, last:'', lastTs:0});
     u.total += Number(t.amount||0); u.n += 1;
     const ts = Date.parse(t.created||'');
@@ -1241,7 +1243,7 @@ function renderFundedWallets(){
     return {id: u?u.id:k, name: u?u.name:'', phone: u?u.phone:'', wallet: u?Number(u.wallet||0):0, total: b.total, n: b.n, last: b.last};
   }).sort((a,b)=>b.total-a.total);
   const grand = rows.reduce((a,r)=>a+r.total,0);
-  if(sumEl) sumEl.textContent = rows.length ? rows.length+' funded wallet'+(rows.length>1?'s':'')+' · '+naira(grand)+' total funded' : 'No funded wallets yet.';
+  if(sumEl) sumEl.innerHTML = rows.length ? '<b>'+rows.length+' funded wallet'+(rows.length>1?'s':'')+' · '+naira(grand)+' total funded</b><br><span>Automated '+naira(autoTotal)+' · Manual '+naira(manualTotal)+'</span>' : 'No funded wallets yet.';
   el.innerHTML = rows.length ? rows.map(r=>{
     const click = (typeof r.id === 'number') ? ' style="cursor:pointer" onclick="pickWalletUser('+r.id+', true)"' : '';
     return '<div class="rowline"'+click+'><span><b>'+esc(r.name)+'</b> · '+esc(r.phone)+'<br><span class="note">'+r.n+' funding'+(r.n>1?'s':'')+' · last '+(r.last?fmtDate(r.last):'—')+'</span></span><span style="text-align:right"><b>'+naira(r.total)+'</b><br><span class="note">Balance '+naira(r.wallet)+'</span></span></div>';
