@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09d</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09e</p>
   </div>
 </div>
 
@@ -885,11 +885,12 @@ async function loadOverview(){
     const pv = b.provider || (SETCACHE.find(x=>x.key==='PROVIDER')||{}).value || 'bilal';
     const pvName = {legitdataway:'LegitDataWay', bilal:'Bilal', fatizara:'Fatizara', vtpass:'VTpass'}[(pv||'').toLowerCase()] || pv;
     /* TEMPORARY (2026-11-09, his instruction): LegitDataWay balance only goes DOWN.
-       It reads from ₦83,997.75 and deducts as the real balance deducts — funding
-       never pushes it up. Anchor 54,003.75 = real balance just before his ₦200
-       airtime buy, so it shows ₦83,797.75 now. LATER: revert to the true balance. */
+       It reads from ₦203,947.75 (83,997.75 + the 119,950 top-up, already in the
+       real account) and deducts as the real balance deducts — funding never
+       pushes it above 203,947.75. Anchor 173,753.75 = real balance after the
+       top-up. LATER: revert to the true balance. */
     const shownBal = (pv||'').toLowerCase()==='legitdataway'
-      ? (83997.75 - Math.max(0, 54003.75 - Number(b.balance||0)))
+      ? (203947.75 - Math.max(0, 173753.75 - Number(b.balance||0)))
       : b.balance;
     /* Same balance on Overview as on Provider, so staff/boss can see it too
        (they cannot open the Provider page). */
