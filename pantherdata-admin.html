@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09e</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09f</p>
   </div>
 </div>
 
@@ -400,6 +400,7 @@ footer b{color:var(--txt)}
   <!-- WALLET -->
   <section class="view" id="v-wallet">
     <h2 class="vt">Wallet Management<small>Credit, debit and adjust a customer's wallet. Every adjustment is recorded in their transaction history.</small></h2>
+    <div class="card"><h3>Funded wallets</h3><div id="funded-summary" class="note" style="margin-bottom:8px">Loading…</div><div id="funded-rows"><span class="note">Loading…</span></div></div>
     <div class="card"><h3>Choose a customer</h3>
       <input class="search" id="w-search" placeholder="🔍 Search name, username or phone…" oninput="renderWalletPick()" style="margin-bottom:10px">
       <div id="w-pick"></div>
@@ -1071,6 +1072,34 @@ function renderWalletHistory(){
     const act = m ? (m[1]==='add'?'Credit':'Debit') : 'Adjustment';
     return '<div class="rowline"><span class="k">'+fmtDate(t.created)+'</span><span>'+esc(umap[t.user_id]||'')+' · '+act+'</span><b style="color:'+(act==='Credit'?'var(--green)':'var(--red)')+'">'+naira(t.amount)+'</b></div>';
   }).join('') : '<span class="note">No wallet adjustments yet.</span>';
+  renderFundedWallets();
+}
+/* Funded wallets: customers who put money in (type 'fund', successful —
+   automated funding and manual funding alike). Tap a row to pick that
+   customer for a wallet adjustment. */
+function renderFundedWallets(){
+  const el = $('funded-rows'); if(!el) return;
+  const sumEl = $('funded-summary');
+  if(!TXS.length && !USERS.length){ el.innerHTML = '<span class="note">Loading…</span>'; if(sumEl) sumEl.textContent = 'Loading…'; return; }
+  const byUser = {};
+  TXS.forEach(t=>{
+    if(t.type!=='fund' || t.status!=='successful') return;
+    const u = byUser[t.user_id] || (byUser[t.user_id] = {total:0, n:0, last:'', lastTs:0});
+    u.total += Number(t.amount||0); u.n += 1;
+    const ts = Date.parse(t.created||'');
+    if(ts && ts > u.lastTs){ u.lastTs = ts; u.last = t.created; }
+  });
+  const rows = Object.keys(byUser).map(k=>{
+    const u = USERS.find(x=>String(x.id)===String(k));
+    const b = byUser[k];
+    return {id: u?u.id:k, name: u?u.name:'', phone: u?u.phone:'', wallet: u?Number(u.wallet||0):0, total: b.total, n: b.n, last: b.last};
+  }).sort((a,b)=>b.total-a.total);
+  const grand = rows.reduce((a,r)=>a+r.total,0);
+  if(sumEl) sumEl.textContent = rows.length ? rows.length+' funded wallet'+(rows.length>1?'s':'')+' · '+naira(grand)+' total funded' : 'No funded wallets yet.';
+  el.innerHTML = rows.length ? rows.map(r=>{
+    const click = (typeof r.id === 'number') ? ' style="cursor:pointer" onclick="pickWalletUser('+r.id+', true)"' : '';
+    return '<div class="rowline"'+click+'><span><b>'+esc(r.name)+'</b> · '+esc(r.phone)+'<br><span class="note">'+r.n+' funding'+(r.n>1?'s':'')+' · last '+(r.last?fmtDate(r.last):'—')+'</span></span><span style="text-align:right"><b>'+naira(r.total)+'</b><br><span class="note">Balance '+naira(r.wallet)+'</span></span></div>';
+  }).join('') : '<span class="note">No funded wallets yet.</span>';
 }
 document.addEventListener('input', e=>{ if(e.target && e.target.id==='w-amount') updateWalletPreview(); });
 /* ---------- transactions ---------- */
