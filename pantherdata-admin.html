@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09j</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09k</p>
   </div>
 </div>
 
@@ -1237,7 +1237,7 @@ function renderFundedWallets(){
   const grand = rows.reduce((a,r)=>a+r.total,0);
   if(sumEl) sumEl.textContent = rows.length ? rows.length+' funded wallet'+(rows.length>1?'s':'')+' · '+naira(grand)+' total funded' : 'No funded wallets yet.';
   el.innerHTML = rows.length ? rows.map(r=>{
-    const click = (typeof r.id === 'number') ? ' style="cursor:pointer" onclick="pickWalletUser('+r.id+', true)"' : '';
+    const click = (typeof r.id === 'number') ? ' style="cursor:pointer" onclick="openUser('+r.id+')"' : '';
     return '<div class="rowline"'+click+'><span><b>'+esc(r.name)+'</b> · '+esc(r.phone)+'<br><span class="note">'+r.n+' funding'+(r.n>1?'s':'')+' · last '+(r.last?fmtDate(r.last):'—')+'</span></span><span style="text-align:right"><b>'+naira(r.total)+'</b><br><span class="note">Balance '+naira(r.wallet)+'</span></span></div>';
   }).join('') : '<span class="note">No funded wallets yet.</span>';
 }
