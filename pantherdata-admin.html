@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09f</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09g</p>
   </div>
 </div>
 
@@ -379,6 +379,7 @@ footer b{color:var(--txt)}
     <h2 class="vt">Overview<small>Your business at a glance. Revenue counts successful purchases only — admin wallet adjustments are excluded.</small></h2>
     <div class="stats" id="stat-grid"></div>
     <div class="card"><div id="profit-rows"><span class="note">Loading…</span></div></div>
+    <div class="card"><div id="monthly-analysis"><span class="note">Loading…</span></div></div>
     <div class="card" style="padding:0; overflow:hidden"><div id="ov-bal"><span class="note" style="display:block; padding:20px">Loading…</span></div></div>
   </section>
   <!-- PROVIDER -->
@@ -831,6 +832,52 @@ function profitAnalytics(){
           matched: matchedExact + matchedEst, matchedExact, matchedEst,
           unmatchedAmt, unmatchedN, sales, avgMargin, below};
 }
+/* Monthly analysis: top customers by funding and by data buys, plus the
+   lowest funders among people who funded at least twice in the month. */
+let MA_MONTH = '';
+function maKey(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function maLabel(key){ const p = key.split('-'); return new Date(+p[0], +p[1]-1, 1).toLocaleString('en',{month:'long', year:'numeric'}); }
+function shiftMonth(delta){
+  if(!MA_MONTH) MA_MONTH = maKey(new Date());
+  const cur = maKey(new Date());
+  let p = MA_MONTH.split('-').map(Number), y = p[0], m = p[1] + delta;
+  if(m < 1){ m = 12; y -= 1; } if(m > 12){ m = 1; y += 1; }
+  let nk = y+'-'+String(m).padStart(2,'0');
+  if(nk > cur) nk = cur;
+  MA_MONTH = nk;
+  renderMonthlyAnalysis();
+}
+function renderMonthlyAnalysis(){
+  const el = $('monthly-analysis'); if(!el) return;
+  if(!MA_MONTH) MA_MONTH = maKey(new Date());
+  const isCur = MA_MONTH === maKey(new Date());
+  const head = '<div class="card-head"><div class="ci">📅</div><h3>Monthly analysis</h3><span style="margin-left:auto; display:flex; gap:6px; align-items:center"><button class="btn sm ghost" onclick="shiftMonth(-1)">‹ Prev</button><b>'+maLabel(MA_MONTH)+'</b><button class="btn sm ghost" onclick="shiftMonth(1)"'+(isCur?' disabled':'')+'>Next ›</button></span></div>';
+  const fund = {}, data = {};
+  TXS.forEach(t=>{
+    if(t.status!=='successful') return;
+    const d = new Date(t.created||'');
+    if(isNaN(d) || maKey(d) !== MA_MONTH) return;
+    if(t.type==='fund' && t.direction==='in'){
+      const f = fund[t.user_id] || (fund[t.user_id] = {total:0, n:0});
+      f.total += Number(t.amount||0); f.n += 1;
+    }
+    if(t.type==='data' && t.direction==='out'){
+      const g = data[t.user_id] || (data[t.user_id] = {total:0, n:0});
+      g.total += Number(t.amount||0); g.n += 1;
+    }
+  });
+  const uname = id => { const u = USERS.find(x=>String(x.id)===String(id)); return u ? u.name : ''; };
+  const topFund = Object.keys(fund).map(id=>({name:uname(id), total:fund[id].total, n:fund[id].n})).sort((a,b)=>b.total-a.total).slice(0,5);
+  const topData = Object.keys(data).map(id=>({name:uname(id), total:data[id].total, n:data[id].n})).sort((a,b)=>b.total-a.total).slice(0,5);
+  const lowFund = Object.keys(fund).filter(id=>fund[id].n>=2).map(id=>({name:uname(id), total:fund[id].total, n:fund[id].n})).sort((a,b)=>a.total-b.total).slice(0,5);
+  const list = (title, rows)=>{
+    if(!rows.length) return '<h4 style="margin:12px 0 6px">'+title+'</h4><span class="note">No data this month.</span>';
+    return '<h4 style="margin:12px 0 6px">'+title+'</h4>' + rows.map((r,i)=>
+      '<div class="rowline"><span><b>'+(i+1)+'.</b> '+esc(r.name)+'</span><span><b>'+naira(r.total)+'</b> <span class="note">· '+r.n+'×</span></span></div>'
+    ).join('');
+  };
+  el.innerHTML = head + list('🏆 Highest funding', topFund) + list('📶 Top data customers', topData) + list('📉 Lowest regular funders (2+ fundings)', lowFund);
+}
 async function loadOverview(){
   try{
     const [u, t, s] = await Promise.all([
@@ -879,7 +926,7 @@ async function loadOverview(){
       '<div class="mode-row"><div class="mi">🟣</div><div class="mt"><b>'+esc(provName)+'</b><span>Buying provider · all purchases</span></div><span class="mpill live">● LIVE</span></div>'+
       '<div class="mode-row"><div class="mi">👤</div><div class="mt"><b>'+esc(provName)+' account</b><span>'+(provUser ? esc(provUser) : 'Not set')+'</span></div></div>'+
       '<div class="mode-row"><div class="mi">🏦</div><div class="mt"><b>'+(fundIsXp?'Xpouch funding':'Bank funding')+'</b><span>Wallet funding accounts</span></div><span class="mpill '+(monLive?'live':'test')+'">'+(monLive?'● LIVE':'● SANDBOX')+'</span></div>';
-    renderUsers(); renderTxs(); renderWalletHistory();
+    renderUsers(); renderTxs(); renderWalletHistory(); renderMonthlyAnalysis();
   }catch(e){ $('stat-grid').innerHTML = '<div class="card">Could not load.</div>'; }
   try{
     const b = await aapi('/api/admin/provider-balance');
