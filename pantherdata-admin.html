@@ -327,7 +327,7 @@ footer b{color:var(--txt)}
     </div>
     <p class="note" id="ap-staff-link" style="margin-top:14px"><a onclick="showStaffLogin()" style="cursor:pointer">Sign in with email instead →</a></p>
     <p class="note" style="margin-top:14px">Admin sign-in needs your key plus a code emailed to the admin inbox. One key alone opens nothing. If this box is unticked, your session is kept only until you close this tab.</p>
-    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09k</p>
+    <p class="note" style="margin-top:14px; font-size:.72rem">Admin v2026-11-09l</p>
   </div>
 </div>
 
@@ -363,6 +363,7 @@ footer b{color:var(--txt)}
   <button data-t="v-over" class="on" onclick="nav('v-over')"><span class="ic">📊</span>Overview</button>
   <button data-t="v-users" onclick="nav('v-users')"><span class="ic">👥</span>Users</button>
   <button data-t="v-wallet" onclick="nav('v-wallet')"><span class="ic">💰</span>Wallet</button>
+  <button data-t="v-funded" onclick="nav('v-funded')"><span class="ic">💵</span>Funded wallets</button>
   <button data-t="v-txs" onclick="nav('v-txs')"><span class="ic">🧾</span>Transactions</button>
   <button data-t="v-ref" onclick="nav('v-ref')"><span class="ic">🤝</span>Referrals</button>
   <div class="navlabel">BUSINESS</div>
@@ -402,7 +403,6 @@ footer b{color:var(--txt)}
   <!-- WALLET -->
   <section class="view" id="v-wallet">
     <h2 class="vt">Wallet Management<small>Credit, debit and adjust a customer's wallet. Every adjustment is recorded in their transaction history.</small></h2>
-    <div class="card"><h3>Funded wallets</h3><div id="funded-summary" class="note" style="margin-bottom:8px">Loading…</div><div id="funded-rows"><span class="note">Loading…</span></div></div>
     <div class="card"><h3>Choose a customer</h3>
       <input class="search" id="w-search" placeholder="🔍 Search name, username or phone…" oninput="renderWalletPick()" style="margin-bottom:10px">
       <div id="w-pick"></div>
@@ -422,6 +422,11 @@ footer b{color:var(--txt)}
       <div class="tres" id="w-res"></div>
     </div>
     <div class="card"><h3>Recent wallet adjustments</h3><div id="w-history"><span class="note">Loading…</span></div></div>
+  </section>
+  <!-- FUNDED WALLETS -->
+  <section class="view" id="v-funded">
+    <h2 class="vt">Funded wallets<small>Customers who put money in. Tap a row to pick that customer for adjustment.</small></h2>
+    <div class="card"><div id="funded-summary" class="note" style="margin-bottom:8px">Loading…</div><div id="funded-rows"><span class="note">Loading…</span></div></div>
   </section>
   <!-- TRANSACTIONS -->
   <section class="view" id="v-txs">
@@ -633,6 +638,7 @@ function nav(id, fromHash){
   if(id==='v-sec'){ loadLogs(); loadStaff(); refreshWalletPinStatus(); }
   if(id==='v-notif') loadAnns();
   if(id==='v-wallet') renderWalletHistory();
+  if(id==='v-funded') renderFundedWallets();
   if(id==='v-ref') renderReferrals();
   if(id==='v-prov') loadOverview();
 }
@@ -1237,7 +1243,7 @@ function renderFundedWallets(){
   const grand = rows.reduce((a,r)=>a+r.total,0);
   if(sumEl) sumEl.textContent = rows.length ? rows.length+' funded wallet'+(rows.length>1?'s':'')+' · '+naira(grand)+' total funded' : 'No funded wallets yet.';
   el.innerHTML = rows.length ? rows.map(r=>{
-    const click = (typeof r.id === 'number') ? ' style="cursor:pointer" onclick="openUser('+r.id+')"' : '';
+    const click = (typeof r.id === 'number') ? ' style="cursor:pointer" onclick="pickWalletUser('+r.id+', true)"' : '';
     return '<div class="rowline"'+click+'><span><b>'+esc(r.name)+'</b> · '+esc(r.phone)+'<br><span class="note">'+r.n+' funding'+(r.n>1?'s':'')+' · last '+(r.last?fmtDate(r.last):'—')+'</span></span><span style="text-align:right"><b>'+naira(r.total)+'</b><br><span class="note">Balance '+naira(r.wallet)+'</span></span></div>';
   }).join('') : '<span class="note">No funded wallets yet.</span>';
 }
